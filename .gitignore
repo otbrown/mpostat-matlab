@@ -1,0 +1,5 @@
+*~
+linecount
+*.mat
+profiling/*
+scripts/*
