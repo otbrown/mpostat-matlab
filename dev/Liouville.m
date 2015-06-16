@@ -27,11 +27,6 @@ function [liouvillian] = Liouville(hamiltonian, dissipators, HILBY, NUM_SITES)
     densityMatrix = sym('rho', [dimension, dimension]);
     rhoVec = reshape(densityMatrix, [1, dimension^2]);
     lindDiss = zeros(dimension);
-    basis = cell(1, dimension^2);
-    baseIdent = eye(dimension^2);
-    for basedex = 1 : 1 : dimension^2
-        basis{basedex} = baseIdent(basedex, :);
-    end
     
     % commutator
     lindComm = -1i * (hamiltonian * densityMatrix - densityMatrix * hamiltonian);
@@ -45,7 +40,6 @@ function [liouvillian] = Liouville(hamiltonian, dissipators, HILBY, NUM_SITES)
             ( 2 * dissOp * densityMatrix * conjDissOp ...
             - conjDissOp * dissOp * densityMatrix ...
             - densityMatrix * conjDissOp * dissOp ) / 2;
-
     end
     
     % form drho/dt and reshape
