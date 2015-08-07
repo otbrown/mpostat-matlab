@@ -42,7 +42,6 @@ function [densityMPS] = SuperDMPS(HILBY, LENGTH, COMPRESS)
         rLen = LENGTH - site - 1;
         len = min(lLen, rLen);
 
-        %densityMPS{site} = ones(rowSize, colSize, HILBY^2);
         densityMPS{site} = zeros(rowSize, colSize, HILBY^2);
         densityMPS{site}(:, :, 1 : (HILBY + 1) : end) = ...
              reshape(kron(ones(1, HILBY), eye(rowSize, colSize)), [rowSize, colSize, HILBY]);
