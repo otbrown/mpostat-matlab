@@ -32,7 +32,7 @@ function [densityMPS] = SuperDMPS(HILBY, LENGTH, COMPRESS)
     densityMPS = cell(LENGTH, 1);
 
     % first and last site
-    norm = 1 / sqrt(HILBY);
+    norm = 1 / sqrt(HILBY^LENGTH);
     
     densityMPS{1} = zeros(1, HILBY^2, HILBY, HILBY);
     densityMPS{LENGTH} = zeros(HILBY^2, 1, HILBY, HILBY);
