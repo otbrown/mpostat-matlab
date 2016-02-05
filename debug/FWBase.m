@@ -6,7 +6,7 @@
 
 function [bits] = FWBase(n, BASE, WIDTH)
     % check that WIDTH is high enough
-    minWidth = ceil(log(n) / log(BASE));
+    minWidth = floor(log(n) / log(BASE)) + 1;
     if WIDTH < minWidth
         msgID = 'FWBase:BadWidth'
         msg = sprintf('%d needs at least %d bits in base %d. WIDTH: %d.', n, minWidth, BASE, WIDTH);
@@ -16,7 +16,7 @@ function [bits] = FWBase(n, BASE, WIDTH)
     end
 
     bits = zeros(WIDTH,1);
-    for i = minWidth : -1 : 1
+    for i = WIDTH : -1 : (WIDTH - minWidth + 1)
         bits(i) = mod(n, BASE);
         n = fix(n / BASE);
     end
