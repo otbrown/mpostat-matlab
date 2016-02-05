@@ -4,30 +4,30 @@
 % 2015-08-07
 %
 % Valid calls:
-% densityMatrix = DMRebuild(dmps)
-% densityMatrix = DMRebuild(dmps, matrixFlag)
-% [densityMatrix, epsilon] = DMRebuild(dmps, matrixFlag, actual) 
+% densityMatrix = DMRebuild(dmpo)
+% densityMatrix = DMRebuild(dmpo, matrixFlag)
+% [densityMatrix, epsilon] = DMRebuild(dmpo, matrixFlag, actual) 
 %
 % Returns:
 % !REQUIRED
-% densityMatrix : dim(H)^2N vector, or dim(H)^N square array, complex double -- contains the density matrix recreated from the MPS
+% densityMatrix : dim(H)^2N vector, or dim(H)^N square array, complex double -- contains the density matrix recreated from the MPO
 % !OPTIONAL
-% epsilon       : dim(H)^2N vector, or dim(H)^N square array, complex double -- contains the absolute difference between the density matrix recreated from the MPS and another supplied
+% epsilon       : dim(H)^2N vector, or dim(H)^N square array, complex double -- contains the absolute difference between the density matrix recreated from the MPO and another supplied
 %
 % Inputs:
 % !REQUIRED
-% dmps          : cell array, N by 1, where N is the length of the system, contains the density matrix mps matrices
+% dmpo          : cell array, N by 1, where N is the length of the system, contains the density matrix mpo matrices
 % !OPTIONAL
 % matrixFlag    : bool, jk double bc MATLAB. if ~= 0 then densityMatrix is returned as a square matrix, rather than a column vector
 % actual        : dim(H)^2N vector, or dim(H)^N square array, complex double -- the density matrix against which the rebuilt one should be compared
 
-function [densityMatrix, varargout] = DMRebuild(dmps, varargin)
+function [densityMatrix, varargout] = DMRebuild(dmpo, varargin)
     % INPUT AND RETURN CHECKS AND LABELLING
     nargoutchk(0,2);
     narginchk(1,3);
 
-    LENGTH = size(dmps,1);
-    HILBY = size(dmps{1}, 3);
+    LENGTH = size(dmpo,1);
+    HILBY = size(dmpo{1}, 3);
     SPACE = HILBY^LENGTH;
 
     matrixFlag = 0;
@@ -46,7 +46,7 @@ function [densityMatrix, varargout] = DMRebuild(dmps, varargin)
         diffFlag = 1;
     else
         if nargin > 2
-            fprintf('You must provide a return variable for the difference array: [densityMatrix, epsilon] = DMRebuild(dmps, matrixFlag, actual)\n');
+            fprintf('You must provide a return variable for the difference array: [densityMatrix, epsilon] = DMRebuild(dmpo, matrixFlag, actual)\n');
             return;
         elseif nargin == 2
             matrixFlag = varargin{1};
@@ -61,7 +61,7 @@ function [densityMatrix, varargout] = DMRebuild(dmps, varargin)
     % REBUILD VECTORISED DENSITY MATRIX
     for ketState = 0 : 1 : (SPACE - 1)
         for braState = 0 : 1 : (SPACE - 1)
-            stateDex = braState * SPACE + ketState + 1;
+            stateDex = ketState * SPACE + braState + 1;
             braBits = FWBase(braState, HILBY, LENGTH);
             ketBits = FWBase(ketState, HILBY, LENGTH);
 
@@ -69,7 +69,7 @@ function [densityMatrix, varargout] = DMRebuild(dmps, varargin)
             for site = 1 : 1 : LENGTH
                 bra = braBits(site) + 1;
                 ket = ketBits(site) + 1;
-                coefft = coefft * dmps{site}(:, :, bra, ket);
+                coefft = coefft * dmpo{site}(:, :, bra, ket);
             end
 
             densityMatrix(stateDex) = coefft;
