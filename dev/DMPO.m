@@ -14,8 +14,8 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 	dmpo = cell(LENGTH, 1);
 
 	% first and last site
-	dmpo{1} = rand(1, HILBY^2, HILBY, HILBY);
-	dmpo{LENGTH} = rand(HILBY^2, 1, HILBY, HILBY);
+	dmpo{1} = rand(1, HILBY^2, HILBY, HILBY) + 1i*rand(1, HILBY^2, HILBY, HILBY);
+	dmpo{LENGTH} = rand(HILBY^2, 1, HILBY, HILBY) + 1i*rand(HILBY^2, 1, HILBY, HILBY);
 
 	% and the rest
 	colSz = HILBY^2;
@@ -29,7 +29,7 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 		rowSz = colSz;
 		colSz = min(HILBY^(2*len), COMPRESS);
 
-		dmpo{site} = rand(rowSz, colSz, HILBY, HILBY);
+		dmpo{site} = rand(rowSz, colSz, HILBY, HILBY) + 1i*rand(rowSz, colSz, HILBY, HILBY);
 	end
 
 	% make Hermitian
