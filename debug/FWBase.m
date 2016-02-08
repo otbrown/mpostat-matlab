@@ -8,7 +8,7 @@ function [bits] = FWBase(n, BASE, WIDTH)
     % check that WIDTH is high enough
     minWidth = floor(log(n) / log(BASE)) + 1;
     if WIDTH < minWidth
-        msgID = 'FWBase:BadWidth'
+        msgID = 'FWBase::BadWidth'
         msg = sprintf('%d needs at least %d bits in base %d. WIDTH: %d.', n, minWidth, BASE, WIDTH);
         widthException = MException(msgID, msg);
 
