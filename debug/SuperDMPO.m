@@ -1,8 +1,8 @@
-% SuperDMPS.m
+% SuperDMPO.m
 % function which returns a DMPS which represents
 % an even superposition of states -- not practically
 % useful, but helpful for checking chosen structure
-% of the DMPS is sound, and that in principle one can
+% of the DMPO is sound, and that in principle one can
 % recover the original density matrix
 % Oliver Thomson Brown
 % 2016-02-01
