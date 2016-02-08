@@ -21,9 +21,9 @@ function [sumDMPO] = DMPOSum(rhoA, rhoB)
 
 	% check that rhoA and rhoB describe similar systems
 	if lengthA ~= lengthB || hilbyA ~= hilbyB
-		msgID = 'DMPOSum::BadArgs'
+		msgID = 'DMPOSum:BadArgs';
 		msg = sprintf('Arguments must describe systems with the same local state dimensions, and the same number of sites. lengthA = %d, lengthB = %d, hilbyA = %d, hilbyB = %d', lengthA, lengthB, hilbyA, hilbyB);
-		unmatchedDMPOSumArgs = MException(msgId, msg);		
+		unmatchedDMPOSumArgs = MException(msgID, msg);		
 		throw(unmatchedDMPOSumArgs);
 	end
 
