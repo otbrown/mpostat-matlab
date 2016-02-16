@@ -8,7 +8,7 @@
 %
 % RETURN
 % compDMPO:		cell array, compressed dmpo representation
-% 
+%
 % INPUTS
 % dmpo:			cell array, uncompressed dmpo representation
 % COMPRESS:		integer, the maximum matrix dimension to be allowed in the
@@ -28,24 +28,33 @@ function [compDMPO] = DMPOCompress(dmpo, COMPRESS)
 
 	% allocate return
 	compDMPO = dmpo;
-	
-	for site = 1 : 1 : LENGTH
+
+	% COMPRESS COLUMN DIMENSIONS
+	for site = 1 : 1 : LENGTH - 1
 		[rowSz, colSz, ~, ~] = size(dmpo{site});
-		if rowSz > COMPRESS || colSz > COMPRESS
+		if colSz > COMPRESS || rowSz > COMPRESS
+			% there is probably a better way than this naieve approach
+			% LIKE FOR EXAMPLE SOMETHING THAT'S NOT WRONG
+			M = reshape(compDMPO{site}, [rowSz, colSz, HILBY^2]);
+			M = permute(M, [1, 3, 2]);
+			M = reshape(M, [rowSz*HILBY^2, colSz]);
+			[U, S, V] = svd(M);
+			M = U * S;
+			M = reshape(M, [rowSz, colSz, HILBY^2]);
+			M = permute(M, [1, 3, 2]);
+			M = reshape(M, [rowSz, colSz, HILBY, HILBY]);
+
 			rowSz = min(rowSz, COMPRESS);
 			colSz = min(colSz, COMPRESS);
-			compDMPO{site} = zeros(rowSz, colSz, HILBY, HILBY);
-			% there is probably a better way than this naieve approach
-			for ket = 1 : 1 : HILBY
-				for bra = 1 : 1 : HILBY
-					[U, S, V] = svd(dmpo{site}(:, :, bra, ket));
-					U = U(1 : rowSz, 1 : rowSz);
-					S = S(1 : rowSz, 1 : colSz);
-					V = ctranspose(V);
-					V = V(1 : colSz, 1 : colSz);
-					compDMPO{site}(:, :, bra, ket) = U * S * V; 
+			compDMPO{site} = M(1 : rowSz, 1 : colSz, :, :);
+
+			V = ctranspose(V);
+			for bra = 1 : 1 : HILBY
+				for ket = 1 : 1 : HILBY
+					compDMPO{site + 1}(:, :, bra, ket) = V * compDMPO{site + 1}(:, :, bra, ket);
 				end
 			end
 		end
 	end
+
 end
