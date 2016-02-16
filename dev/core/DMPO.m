@@ -32,6 +32,9 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 		dmpo{site} = rand(rowSz, colSz, HILBY, HILBY) + 1i*rand(rowSz, colSz, HILBY, HILBY);
 	end
 
+	% SVD normalise -- This normalises the tensors NOT THE STATE
+	dmpo = SVDNorm(dmpo);
+
 	% make Hermitian
 	% *** BUILD THIS ***
 	% rho = (rho + rho^H)/2
@@ -39,5 +42,5 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 
 	% trace norm
 	% *** BUILD THIS ***
-	% dmpo = TrNorm(dmpo);	
+	% dmpo = TrNorm(dmpo);
 end
