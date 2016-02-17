@@ -52,6 +52,5 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 	dmpo = DMPOCompress(dmpo, COMPRESS);
 
 	% trace norm
-	% *** BUILD THIS ***
-	% dmpo = TrNorm(dmpo);
+	dmpo = TrNorm(dmpo);
 end
