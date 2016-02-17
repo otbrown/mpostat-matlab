@@ -29,32 +29,37 @@ function [compDMPO] = DMPOCompress(dmpo, COMPRESS)
 	% allocate return
 	compDMPO = dmpo;
 
-	% COMPRESS COLUMN DIMENSIONS
+	% THIS GIVES CORRECT SHAPE BUT DRASTICALLY ALTERS TRACE
 	for site = 1 : 1 : LENGTH - 1
-		[rowSz, colSz, ~, ~] = size(dmpo{site});
-		if colSz > COMPRESS || rowSz > COMPRESS
-			% there is probably a better way than this naieve approach
-			% LIKE FOR EXAMPLE SOMETHING THAT'S NOT WRONG
-			M = reshape(compDMPO{site}, [rowSz, colSz, HILBY^2]);
-			M = permute(M, [1, 3, 2]);
-			M = reshape(M, [rowSz*HILBY^2, colSz]);
-			[U, S, V] = svd(M);
-			M = U * S;
-			M = reshape(M, [rowSz, colSz, HILBY^2]);
-			M = permute(M, [1, 3, 2]);
-			M = reshape(M, [rowSz, colSz, HILBY, HILBY]);
+		[rowSz, colSz, ~, ~] = size(compDMPO{site});
 
-			rowSz = min(rowSz, COMPRESS);
-			colSz = min(colSz, COMPRESS);
-			compDMPO{site} = M(1 : rowSz, 1 : colSz, :, :);
+		
 
-			V = ctranspose(V);
-			for bra = 1 : 1 : HILBY
-				for ket = 1 : 1 : HILBY
-					compDMPO{site + 1}(:, :, bra, ket) = V * compDMPO{site + 1}(:, :, bra, ket);
-				end
+		M = reshape(compDMPO{site}, [rowSz, colSz, HILBY^2]);
+		M = permute(M, [1, 3, 2]);
+		M = reshape(M, [rowSz * HILBY^2, colSz]);
+
+		[Q, R] = qr(M, 0);
+
+		colSz = size(Q,2);
+
+		Q = reshape(Q, [rowSz, HILBY^2, colSz]);
+		Q = permute(Q, [1, 3, 2]);
+		Q = reshape(Q, [rowSz, colSz, HILBY, HILBY]);
+
+		% actual compression kicks in here
+		rowSz = min(rowSz, COMPRESS);
+		colSz = min(colSz, COMPRESS);
+		compDMPO{site} = Q(1 : rowSz, 1 : colSz, :, :);
+
+		rowSz = size(R, 1);
+		colSz = size(compDMPO{site + 1}, 2);
+		N = zeros(rowSz, colSz, HILBY, HILBY);
+		for bra = 1 : 1 : HILBY
+			for ket = 1 : 1 : HILBY
+				N(:, :, bra, ket) = R * compDMPO{site + 1}(:, :, bra, ket);
 			end
 		end
+		compDMPO{site + 1} = N;
 	end
-
 end
