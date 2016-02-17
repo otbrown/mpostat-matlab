@@ -22,15 +22,21 @@ function [normDMPO] = SVDNorm(dmpo)
 
         [Q, R] = qr(M, 0);
 
+        colSz = size(Q, 2);
+
         Q = reshape(Q, [rowSz, HILBY^2, colSz]);
         Q = permute(Q, [1, 3, 2]);
         normDMPO{site} = reshape(Q, [rowSz, colSz, HILBY, HILBY]);
 
+        rowSz = size(R, 1);
+        colSz = size(normDMPO{site+1}, 2);
+        N = zeros(rowSz, colSz, HILBY, HILBY);
         for bra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
-                normDMPO{site + 1}(:, :, bra, ket) = R * normDMPO{site + 1}(:, :, bra, ket);
+                N(:, :, bra, ket) = R * normDMPO{site + 1}(:, :, bra, ket);
             end
         end
+        normDMPO{site + 1} = N;
     end
 
     [rowSz, colSz, ~, ~] = size(normDMPO{LENGTH});
@@ -43,5 +49,4 @@ function [normDMPO] = SVDNorm(dmpo)
     Q = reshape(Q, [rowSz, HILBY^2, colSz]);
     Q = permute(Q, [1, 3, 2]);
     normDMPO{LENGTH} = reshape(Q, [rowSz, colSz, HILBY, HILBY]);
-
 end
