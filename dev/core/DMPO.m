@@ -2,6 +2,16 @@
 % function which generates an arbitrary density matrix product operator
 % Oliver Thomson Brown
 % 2016-02-05
+%
+% dmpo = DMPO(HILBY, LENGTH, COMPRESS)
+%
+% RETURN
+% dmpo		: cell array, an arbitrary density matrix product operator
+%
+% INPUTS
+% HILBY		: integer, size of the local state space
+% LENGTH	: integer, the number of sites in the system
+% COMPRESS	: integer, the maximum virtual dimension of any given tensor
 
 function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 
@@ -36,9 +46,10 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 	dmpo = SVDNorm(dmpo);
 
 	% make Hermitian
-	% *** BUILD THIS ***
-	% rho = (rho + rho^H)/2
-	% dmpo = Herm(dmpo);
+	dmpo = DMPOHerm(dmpo);
+
+	% recompress, since DMPOHerm doubles virtual dimensions
+	dmpo = DMPOCompress(dmpo, COMPRESS);
 
 	% trace norm
 	% *** BUILD THIS ***
