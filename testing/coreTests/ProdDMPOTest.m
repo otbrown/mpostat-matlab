@@ -14,8 +14,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
     end
 
     properties (MethodSetupParameter)
-        testHILBY = {2, 3, 4};
-        testLENGTH = {7, 5, 4};
+        testHILBY = {2, 3, 4, 5};
+        testLENGTH = {7, 5, 4, 5};
     end
 
     methods (TestMethodSetup, ParameterCombination='sequential')
