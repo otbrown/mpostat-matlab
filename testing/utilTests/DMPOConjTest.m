@@ -5,7 +5,7 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) DMPOConjTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-15;
+        absTol = 1E-14;
         sample = 0.1;
         SAMPLE_MAX = 100;
         dmpo;
@@ -15,8 +15,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
     end
 
     properties (MethodSetupParameter)
-        testHILBY = {2, 2, 2, 3, 4, 5};
-        testSystemSz = {5, 6, 7, 5, 5, 5};
+        testHILBY = {2, 3, 4, 5};
+        testSystemSz = {7, 5, 4, 4};
     end
 
     methods (TestMethodSetup, ParameterCombination='sequential')
