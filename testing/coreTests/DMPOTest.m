@@ -5,7 +5,7 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) DMPOTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-15;
+        absTol = 1E-14;
         COMPRESS = 100;
         HILBY;
         LENGTH;
