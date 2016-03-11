@@ -12,24 +12,22 @@
 % dmpo      : cell array, an arbitrary density matrix product operator
 
 function trace = DMPOTrace(dmpo)
-    % we just want the coefficients that correspond to both input and output
-    % states of the density matrix being the same (the diagonal elements)
-
-    % gather data
+    % pull constants
     LENGTH = size(dmpo, 1);
     HILBY = size(dmpo{1}, 3);
-    SPACE = HILBY^LENGTH - 1;
 
-    % initialise return
-    trace = 0;
+    % array allocate
+    physCon = cell(LENGTH, 1);
 
-    % loop through states in the system, find their coefft and add it in
-    for state = 0 : 1 : SPACE
-        bits = FWBase(state, HILBY, LENGTH) + 1;
-        coefft = 1;
-        for site = 1 : 1 : LENGTH
-            coefft = coefft * dmpo{site}(:, :, bits(site), bits(site));
+    for site = 1 : 1 : LENGTH
+        physCon{site} = zeros(size(dmpo{site}(:, :, 1, 1)));
+        for state = 1 : 1 : HILBY
+            physCon{site} = physCon{site} + dmpo{site}(:, :, state, state);
         end
-        trace = trace + coefft;
+    end
+
+    trace = physCon{1};
+    for site = 2 : 1 : LENGTH
+        trace = trace * physCon{site};
     end
 end
