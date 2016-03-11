@@ -1,6 +1,17 @@
 % DMPOExp.m
+% function which calculates an expectation value from an operator and
+% a density matrix product operator <O> = Tr{O*rho}
 % Oliver Thomson Brown
 % 2016-03-11
+%
+% expect = DMPOExp(dmpo, op)
+%
+% RETURN
+% expect    : double, the expectation value Tr{O*rho}
+%
+% INPUTS
+% dmpo      : cell array, dmpo{site}(row, col, braState, ketState)
+% op        : double array, op(braState, ketState, site);
 
 function [expect] = DMPOExp(dmpo, op)
     % pull constants
