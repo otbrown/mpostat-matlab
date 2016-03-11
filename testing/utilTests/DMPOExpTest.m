@@ -5,7 +5,7 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) DMPOExpTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-15;
+        absTol = 1E-14;
         COMPRESS = 100;
         HILBY;
         LENGTH;
@@ -13,12 +13,11 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         dmpo;
         prodDMPO;
         idOp;
-        nOp;
     end
 
     properties (MethodSetupParameter)
-        testHILBY = {2, 3};
-        testLENGTH = {7, 5};
+        testHILBY = {2, 3, 4, 5};
+        testLENGTH = {7, 6, 5, 4};
     end
 
     methods (TestMethodSetup, ParameterCombination='sequential')
@@ -29,9 +28,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
             tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             tc.prodDMPO = ProdDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS, tc.STATE);
             tc.idOp = repmat(eye(tc.HILBY), [1, 1, tc.LENGTH]);
-            n = zeros(tc.HILBY);
-            n(tc.HILBY^2) = 1;
-            tc.nOp = repmat(n, [1, 1, tc.LENGTH]);
         end
     end
 
@@ -56,9 +52,19 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         end
 
         function testNExpectation(tc)
-            nExp = DMPOExp(tc.prodDMPO, tc.nOp);
+            nSiteOp = cell(tc.LENGTH, 1);
+            n = diag([0 : 1 : tc.HILBY - 1]);
+            for site = 1 : 1 : tc.LENGTH
+                nSiteOp{site} = repmat(eye(tc.HILBY), [1, 1, tc.LENGTH]);
+                nSiteOp{site}(:, :, site) = n;
+            end
+
+            nExp = 0;
+            for site = 1 : 1 : tc.LENGTH
+                 nExp = nExp + DMPOExp(tc.prodDMPO, nSiteOp{site});
+            end
             epsilon = abs(abs(nExp) - tc.LENGTH * (tc.HILBY - 1));
             tc.assertLessThan(epsilon, tc.absTol);
         end
     end
-end    
+end
