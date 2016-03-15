@@ -21,9 +21,10 @@ function [prodDMPO] = ProdDMPO(HILBY, LENGTH, COMPRESS, STATE)
     if COMPRESS == 0
         COMPRESS = Inf;
     elseif COMPRESS < HILBY^2
-        fprintf(1, 'Maximum matrix size cannot be less than the size of the 2-site density matrix. Please set COMPRESS >= %d.\n', HILBY^2);
-        prodDMPO = 0;
-        return;
+		msgID = 'ProdDMPO:BadCOMPRESS';
+		msg = sprintf('Minimum matrix dimension is %d. Supplied COMPRESS value was %d.', HILBY^2, COMPRESS);
+		badCOMPRESSException = MException(msgID, msg);
+		throw(badCOMPRESSException);
     end
 
     % generate indices for state
