@@ -18,6 +18,11 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 	% COMPRESS == 0 means no compression
 	if COMPRESS == 0
 		COMPRESS = Inf;
+	elseif COMPRESS < HILBY^2
+		msgID = 'DMPO:BadCOMPRESS';
+		msg = sprintf('Minimum matrix dimension is %d. Supplied COMPRESS value was %d.', HILBY^2, COMPRESS);
+		badCOMPRESSException = MException(msgID, msg);
+		throw(badCOMPRESSException);
 	end
 
 	% allocate return
