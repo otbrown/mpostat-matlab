@@ -10,42 +10,42 @@
 %
 % Inputs
 % hamiltonian   : hamiltonian for the system
-% dissipators   : cell array, 1 x numDiss x 2, dissipators{1, dissdex, 1}
-%                   contains a dissipative constant, and dissipators{1,
-%                   dissdex, 2} contains the operator O, where the first 
-%                   term in the dissipative part of the equation is 
-%                   2*O*rho*O^{\dagger} 
+% dissipators   : cell array, numDiss x 2, dissipators{dissdex, 1}
+%                   contains a dissipative constant, and dissipators{dissdex, 2}
+%                   contains the operator O, where the first
+%                   term in the dissipative part of the equation is
+%                   2*O*rho*O^{\dagger}
 % HILBY         : size of the local Hilbert space
 % NUM_SITES     : number of sites in the system
 
 function [liouvillian] = Liouville(hamiltonian, dissipators, HILBY, NUM_SITES)
     % constants
     dimension = HILBY^NUM_SITES;
-    dissNum = size(dissipators, 2);
-    
+    dissNum = size(dissipators, 1);
+
     % pralloc
     densityMatrix = sym('rho', [dimension, dimension]);
     rhoVec = reshape(densityMatrix, [1, dimension^2]);
     lindDiss = zeros(dimension);
-    
+
     % commutator
     lindComm = -1i * (hamiltonian * densityMatrix - densityMatrix * hamiltonian);
-    
+
     % dissipative terms
     for dissdex = 1 : 1 : dissNum
-        dissConstant = dissipators{1, dissdex, 1};
-        dissOp = dissipators{1, dissdex, 2};
+        dissConstant = dissipators{dissdex, 1};
+        dissOp = dissipators{dissdex, 2};
         conjDissOp = ctranspose(dissOp);
         lindDiss = lindDiss + dissConstant * ...
             ( 2 * dissOp * densityMatrix * conjDissOp ...
             - conjDissOp * dissOp * densityMatrix ...
             - densityMatrix * conjDissOp * dissOp ) / 2;
     end
-    
+
     % form drho/dt and reshape
     lindblad = lindComm + lindDiss;
     dRhoVec = reshape(lindblad, [dimension^2, 1]);
-    
+
     % generate liouvillian
     liouvillian = equationsToMatrix(dRhoVec, rhoVec);
 end
