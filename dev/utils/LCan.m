@@ -19,12 +19,19 @@
 %             into canonical form, but the next site along is still affected
 
 function [ldmpo] = LCan(dmpo, route)
+    % gather constants
+    LENGTH = size(dmpo, 1);
+    HILBY = size(dmpo{1}, 3);
+
+    if route(end) >= LENGTH
+		msgID = 'LCan:BadRoute';
+		msg = sprintf('Route cannnot extend to (or exceed) the last site in the system. System has %d sites, your route ended at %d.', LENGTH, route(end));
+		badRouteException = MException(msgID, msg);
+		throw(badRouteException);
+    end
+
     % allocate return
     ldmpo = dmpo;
-
-    % gather constants
-    LENGTH = size(ldmpo, 1);
-    HILBY = size(ldmpo{1}, 3);
 
     for site = route
         % manipulate site tensor into a matrix
