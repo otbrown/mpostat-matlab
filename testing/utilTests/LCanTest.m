@@ -37,6 +37,11 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
             tc.fatalAssertSize(tc.canDMPO, size(tc.dmpo));
         end
 
+        function testThrowBadRoute(tc)
+            badRoute = [1 : 1 : tc.LENGTH];
+            tc.fatalAssertError(@()LCan(tc.dmpo, badRoute), 'LCan:BadRoute');
+        end
+
         function testTensorShape(tc)
             % LCan may reduce virtual dimensions, but should still be consistent
             rowSz = 1;
