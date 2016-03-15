@@ -14,8 +14,15 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         canDMPO;
     end
 
-    methods (TestMethodSetup)
-        function MethodSetup(tc)
+    properties (MethodSetupParameter)
+        testHILBY = {2, 3, 4, 5};
+        testLENGTH = {7, 5, 4, 5};
+    end
+
+    methods (TestMethodSetup, ParameterCombination='sequential')
+        function MethodSetup(tc, testHILBY, testLENGTH)
+            tc.HILBY = testHILBY;
+            tc.LENGTH = testLENGTH;
             tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             tc.canDMPO = LCan(tc.dmpo, [1 : 1 : tc.LENGTH - 1]);
         end
@@ -31,9 +38,12 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         end
 
         function testTensorShape(tc)
-            % LCan should not alter dimensions, including virtual
-            for site = 1 : 1 : tc.LENGTH
-                tc.assertSize(tc.canDMPO{site}, size(tc.dmpo{site}));
+            % LCan may reduce virtual dimensions, but should still be consistent
+            rowSz = 1;
+            for site = 1 : 1 : (tc.LENGTH - 1)
+                colSz = size(tc.canDMPO{site + 1}, 1);
+                tc.fatalAssertSize(tc.canDMPO{site}, [rowSz, colSz, tc.HILBY, tc.HILBY]);
+                rowSz = colSz;
             end
         end
 
