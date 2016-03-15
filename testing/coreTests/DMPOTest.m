@@ -47,7 +47,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
             % be multiplied into the next
             rowSz = 1;
             for site = 1 : 1 : (tc.LENGTH - 1)
-                colSz = size(tc.dmpo{site}, 2);
+                colSz = size(tc.dmpo{site + 1}, 1);
                 tc.fatalAssertSize(tc.dmpo{site}, [rowSz, colSz, tc.HILBY, tc.HILBY]);
                 % update rowSz for next site
                 rowSz = colSz;
