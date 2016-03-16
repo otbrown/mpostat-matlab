@@ -36,6 +36,7 @@ function [rdmpo] = RCan(dmpo, route)
         M = reshape(rdmpo{site}, [rowSz, colSz * HILBY^2]);
 
         % SVD decomposition
+        % ISSUE! This uses a lot of mem compared to the LCan QR
         [U, S, V] = svd(M, 0);
         V = ctranspose(V);
 
