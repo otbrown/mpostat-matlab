@@ -8,15 +8,15 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         absTol = 1E-14;
         HILBY = 2;
         LENGTH = 7;
-        COMPRESS = 100;
+        COMPRESS = 50;
         SAMPLE_MAX = 100;
         dmpo;
         canDMPO;
     end
 
     properties (MethodSetupParameter)
-        testHILBY = {2, 3, 4, 5};
-        testLENGTH = {7, 5, 4, 5};
+        testHILBY = {2, 2, 3, 4};
+        testLENGTH = {7, 6, 5, 4};
     end
 
     methods (TestMethodSetup, ParameterCombination='sequential')
@@ -29,7 +29,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
     end
 
     methods (Test)
-        % you might be thinking, "this looks a LOT like LCanTest". Yup.
+        % you might be thinking, "this looks a LOT like LCanTest", but you're
+        % wrong, because this comment is here
         function testClass(tc)
             tc.fatalAssertClass(tc.canDMPO, 'cell');
         end
@@ -63,19 +64,14 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         end
 
         function testCan(tc)
-            % FIX ME
-            %{
-            for site = 1 : 1 : tc.LENGTH - 1
+            for site = 2 : 1 : tc.LENGTH
                 [rowSz, colSz, ~, ~] = size(tc.canDMPO{site});
-                M = reshape(tc.canDMPO{site}, [rowSz, colSz, tc.HILBY^2]);
-                M = permute(M, [1, 3, 2]);
-                M = reshape(M, [rowSz * tc.HILBY^2, colSz]);
+                V = reshape(tc.canDMPO{site}, [rowSz, colSz * tc.HILBY^2]);
 
-                I = eye(colSz, colSz);
-                epsilon = (ctranspose(M) * M) - I;
+                I = eye(rowSz, rowSz);
+                epsilon = (V * ctranspose(V)) - I;
                 tc.assertLessThan(epsilon, tc.absTol);
             end
-            %}
         end
 
         function testElements(tc)
