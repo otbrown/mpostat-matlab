@@ -8,7 +8,7 @@ updateBlock = zeros(COL_SIZE, OP_COL, COL_SIZE);
 conjTensor = zeros(COL_SIZE, ROW_SIZE, HILBY, HILBY);
 for bra = 1 : 1 : HILBY
     for ket = 1 : 1 : HILBY
-        conjTensor(:, :, ket, bra) = ctranspose(siteTensor(:, :, bra, ket));
+        conjTensor(:, :, bra, ket) = ctranspose(siteTensor(:, :, bra, ket));
     end
 end
 
