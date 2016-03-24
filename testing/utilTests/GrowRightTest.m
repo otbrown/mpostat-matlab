@@ -2,7 +2,7 @@
 % Oliver Thomson Brown
 % 2016-03-22
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) GrowLeftTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) GrowRightTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-15;
@@ -37,12 +37,13 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
                 tc.rightBlock{site} = GrowRight(tc.dmpo{site + 1}, tc.impo, tc.rightBlock{site + 1}, rowSz, colSz, tc.HILBY, tc.OP_ROW, tc.OP_COL);
             end
         end
+    end
 
-        methods (Test)
+    methods (Test)
         function vecNormTest(tc)
             % calculate vector norm by using LeftGrow past the end of the system
             [rowSz, colSz, ~, ~] = size(tc.dmpo{1});
-            testVecNorm = GrowRight(tc.dmpo{1}, tc.impo, tc.leftBlock{1}, rowSz, colSz, tc.HILBY, tc.OP_ROW, tc.OP_COL);
+            testVecNorm = GrowRight(tc.dmpo{1}, tc.impo, tc.rightBlock{1}, rowSz, colSz, tc.HILBY, tc.OP_ROW, tc.OP_COL);
 
             % calculate the vector norm the old fashioned way...
             % RETURN ALLOCATION
@@ -71,4 +72,5 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
             epsilon = abs(testVecNorm - vecNorm);
             tc.assertLessThan(epsilon, tc.absTol);
         end
+    end
 end
