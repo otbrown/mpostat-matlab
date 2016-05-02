@@ -1,8 +1,8 @@
-% MDMPOTest.m
+% SuperDMPOTest.m
 % Oliver Thomson Brown
 % 2016-03-14
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) MDMPOTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) SuperDMPOTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-15;
@@ -22,7 +22,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         function MethodSetup(tc, testHILBY, testLENGTH)
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
-            tc.dmpo = MDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = SuperDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
         end
     end
 
