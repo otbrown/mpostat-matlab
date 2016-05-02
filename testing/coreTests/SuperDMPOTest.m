@@ -35,7 +35,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
             % have to anonymise function to ensure that error is caught
             % by fatal assert
             BAD_COMPRESS = tc.HILBY^2 - 1;
-            tc.fatalAssertError(@()MDMPO(tc.HILBY, tc.LENGTH, BAD_COMPRESS), 'MDMPO:BadCOMPRESS');
+            tc.fatalAssertError(@()SuperDMPO(tc.HILBY, tc.LENGTH, BAD_COMPRESS), 'SuperDMPO:BadCOMPRESS');
         end
 
         function testSystemSize(tc)
