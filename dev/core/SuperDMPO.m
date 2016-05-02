@@ -21,7 +21,7 @@ function [dmpo] = SuperDMPO(HILBY, LENGTH, COMPRESS)
     if COMPRESS == 0
         COMPRESS = Inf;
     elseif COMPRESS < HILBY^2
-		msgID = 'MDMPO:BadCOMPRESS';
+		msgID = 'SuperDMPO:BadCOMPRESS';
 		msg = sprintf('Minimum matrix dimension is %d. Supplied COMPRESS value was %d.', HILBY^2, COMPRESS);
 		badCOMPRESSException = MException(msgID, msg);
 		throw(badCOMPRESSException);
