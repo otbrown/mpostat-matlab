@@ -12,7 +12,23 @@
 %                   operator for some site. Indices are effOpTensor(row, col,
 %                   conjRow, conjCol, bra, ket, conjBra, conjKet)
 % INPUTS
-%
+% lBlock          : 3-dimensional complex double array, rank-3 left block tensor
+%                   which contains the contraction through the system from the
+%                   first site up to the target site
+% mpo             : 6-dimensional complex double array, rank-6 matrix product
+%                   operator tensor for the target site
+% rBlock          : 3-dimensional complex double array, rank-3 right block
+%                   right block tensor which contains the contraction through
+%                   the sytem from the target site to the last
+% ROW_SIZE        : double, the size of the first virtual dimension of the
+%                   density matrix product operator for the target site
+% COL_SIZE        : double, the size of the second virtual dimension of the
+%                   density matrix product operator for the target site
+% HILBY           : double, the size of the local state space
+% OP_ROW          : double, the size of the first virtual dimension of the
+%                   matrix product operator for the target site
+% OP_COL          : double, the size of the second virtual dimension of the
+%                   matrix product operator for the target site
 
 function [effOpTensor] = EffOpTensor(lBlock, mpo, rBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
     effOpTensor = zeros(ROW_SIZE, COL_SIZE, COL_SIZE, ROW_SIZE, ...
