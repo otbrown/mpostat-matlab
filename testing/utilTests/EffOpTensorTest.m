@@ -5,7 +5,6 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) EffOpTensorTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-15;
         HILBY;
         LENGTH;
         COMPRESS = 0;
