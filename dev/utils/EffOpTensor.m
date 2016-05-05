@@ -15,7 +15,7 @@
 % lBlock          : 3-dimensional complex double array, rank-3 left block tensor
 %                   which contains the contraction through the system from the
 %                   first site up to the target site
-% mpo             : 6-dimensional complex double array, rank-6 matrix product
+% siteMPO         : 6-dimensional complex double array, rank-6 matrix product
 %                   operator tensor for the target site
 % rBlock          : 3-dimensional complex double array, rank-3 right block
 %                   right block tensor which contains the contraction through
@@ -30,7 +30,7 @@
 % OP_COL          : double, the size of the second virtual dimension of the
 %                   matrix product operator for the target site
 
-function [effOpTensor] = EffOpTensor(lBlock, mpo, rBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
+function [effOpTensor] = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
     effOpTensor = zeros(ROW_SIZE, COL_SIZE, COL_SIZE, ROW_SIZE, ...
                         HILBY, HILBY, HILBY, HILBY);
 
@@ -48,7 +48,7 @@ function [effOpTensor] = EffOpTensor(lBlock, mpo, rBlock, ROW_SIZE, COL_SIZE, HI
                                         for opCol = 1 : 1 : OP_COL
                                             LOR = LOR ...
                                             + lBlock(row, opRow, conjCol) ...
-                                            * mpo(conjBra, conjKet, ...
+                                            * siteMPO(conjBra, conjKet, ...
                                             bra, ket, opRow, opCol) ...
                                             * rBlock(col, opCol, conjRow);
                                         end
