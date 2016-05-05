@@ -6,8 +6,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
 
     properties
         absTol = 1E-15;
-        HILBY = 3;
-        LENGTH = 3;
+        HILBY;
+        LENGTH;
         COMPRESS = 0;
         dmpo;
         left;
@@ -17,8 +17,15 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         effTen;
     end
 
+    properties (MethodSetupParameter)
+        testHILBY = {2, 3}
+        testLENGTH = {3, 4}
+    end
+
     methods (TestMethodSetup)
-        function MethodSetup(tc)
+        function MethodSetup(tc, testHILBY, testLENGTH)
+            tc.HILBY = testHILBY;
+            tc.LENGTH = testLENGTH;
             tc.TEST_SITE = ceil(tc.LENGTH / 2);
             tc.dmpo = ProdDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS, 0);
             tc.impo = reshape(eye(tc.HILBY^2), [tc.HILBY, tc.HILBY, ...
