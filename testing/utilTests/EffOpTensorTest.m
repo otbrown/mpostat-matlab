@@ -1,7 +1,6 @@
 % EffOpTensorTest.m
 % Oliver Thomson Brown
 % 2016-05-04
-% TRICKY TO TEST....
 
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) EffOpTensorTest < matlab.unittest.TestCase
 
@@ -48,6 +47,25 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
     methods (Test)
         function testClass(tc)
             tc.fatalAssertClass(tc.effTen, 'double');
+        end
+
+        function testTensorShape(tc)
+            [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{tc.TEST_SITE});
+            tc.fatalAssertSize(tc.effTen, [ROW_SIZE, COL_SIZE, COL_SIZE, ...
+            ROW_SIZE, tc.HILBY, tc.HILBY, tc.HILBY, tc.HILBY]);
+        end
+
+        function testNumNonZeroes(tc)
+            numNonZeroes = nnz(tc.effTen);
+            tc.assertEqual(numNonZeroes, tc.HILBY^2);
+        end
+
+        function testOnes(tc)
+            for bra = 1 : 1 : tc.HILBY
+                for ket = 1 : 1 : tc.HILBY
+                    tc.assertEqual(tc.effTen(1,1,1,1,bra,ket,bra,ket), 1);
+                end
+            end
         end
     end
 end
