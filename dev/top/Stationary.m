@@ -27,7 +27,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     % allocate return variables
     % CLEAN UP INITIAL STATE
     dmpoStat = dmpoInit;
-    eigTrack = NaN(RUNMAX, 1);
+    eigTrack = NaN(RUNMAX - 1, 1);
 
     % build left and right blocks
     % MAKE AN INTERFACE FUNCTION LIKE GROWBLOCK
@@ -56,39 +56,49 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     updCount = 1;
     route = 1 : 1 : LENGTH;
 
-    while ~convFlag && ount < RUNMAX
+    while ~convFlag && updCount < RUNMAX
         for site = route
-
-            [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoState{site});
+            [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
+            [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
             effectiveLiouv = EffL(site, dmpoStat, mpo, left, right);
-            [update , eigTrack(updCount)] = eigs(effectiveLiouv, 1, 'lr');
+            effectiveLiouv = effectiveLiouv + ...
+                             eps*eye(HILBY*HILBY*ROW_SIZE*COL_SIZE);
+            opts.tol = eps;
+            [update , eigTrack(updCount)] = eigs(effectiveLiouv, 1, 'sm', opts);
 
             dmpoStat{site} = reshape(update,[ROW_SIZE, COL_SIZE, HILBY, HILBY]);
 
             updCount = updCount + 1;
 
-            % canonicalise
-            if mod(sweepCount, 2)
+            % canonicalise & include new site in block tensor
+            if mod(sweepCount, 2) && site ~= 1;
                 % RCAN
-            else
+                dmpoStat = RCan(dmpoStat, site);
+                [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
+                right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, ...
+                                            right{site}, ROW_SIZE, COL_SIZE, ...
+                                            HILBY, OP_ROW, OP_COL);
+            elseif site ~= LENGTH
                 % LCAN
+                dmpoStat = LCan(dmpoStat, site);
+                [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
+                left{site + 1} = GrowLeft(dmpoStat{site}, mpo{site}, ...
+                                          left{site}, ROW_SIZE, COL_SIZE, ...
+                                          HILBY, OP_ROW, OP_COL);
             end
+
+            % ADD CONVERGENCE TEST!
 
             % stop following route if RUNMAX is reached
             if updCount == RUNMAX
+                dmpoStat = TrNorm(dmpoStat);
                 break;
             end
         end
 
-        % ADD CONVERGENCE TEST!
-
+        dmpoStat = TrNorm(dmpoStat);
+        sweepCount = sweepCount + 1;
         % flip it and reverse it
-        if mod(sweepCount, 2)
-            route = 1 : 1 : LENGTH;
-        else
-            route = LENGTH : -1 : 1;
-        end
+        route = flip(route);
     end
-
-
 end
