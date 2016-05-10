@@ -7,6 +7,8 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) StationaryTest < matlab.unittest.TestCase
 
     properties
+        absTol = 1E-15;
+        sampleSz = 200;
         dmpoStat;
         eigTrack;
         HILBY = 3;
@@ -15,7 +17,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         dmpoInit;
         mpo;
         THRESHOLD = 1E-7;
-        RUNMAX = 100;
+        RUNMAX = 50;
     end
 
     methods (TestMethodSetup)
@@ -66,6 +68,41 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         function testShape(tc)
             tc.fatalAssertSize(tc.dmpoStat, [tc.LENGTH, 1]);
             tc.fatalAssertSize(tc.eigTrack, [tc.RUNMAX-1, 1]);
+        end
+
+        function testTrace(tc)
+            tr = DMPOTrace(tc.dmpoStat);
+            tc.assertLessThan((tr-1), tc.absTol);
+        end
+
+        function testZZZ(tc)
+            % since we are using a purely dissipative Liouvillian, we expect
+            % the final state to be |000><000|, so we check that element is 1
+            zzz = tc.dmpoStat{1}(:, :, 1, 1) * tc.dmpoStat{2}(:, :, 1, 1) ...
+                  * tc.dmpoStat{3}(:, :, 1, 1);
+            tc.assertLessThan((zzz - 1), tc.absTol);
+        end
+
+        function testZeroes(tc)
+            % since the density matrix should be zero everywhere but the first
+            % element, we test a sample of them
+            SPACE = tc.HILBY^tc.LENGTH;
+            for testNum = 1 : 1 : tc.sampleSz
+                % select random number starting at 1 for braState to avoid
+                % getting the all zeroes state
+                braState = randi([1, SPACE - 1]);
+                ketState = randi([0, SPACE - 1]);
+                braBits = FWBase(braState, tc.HILBY, tc.LENGTH);
+                ketBits = FWBase(ketState, tc.HILBY, tc.LENGTH);
+
+                coefft = 1;
+                for site = 1 : 1 : tc.LENGTH
+                    bra = braBits(site) + 1;
+                    ket = braBits(site) + 1;
+                    coefft = coefft * tc.dmpoStat{site}(:, :, bra, ket);
+                end
+                tc.assertLessThan(coefft, tc.absTol);
+            end
         end
     end
 end
