@@ -63,8 +63,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
             effectiveLiouv = EffL(site, dmpoStat, mpo, left, right);
             effectiveLiouv = effectiveLiouv + ...
                              eps*eye(HILBY*HILBY*ROW_SIZE*COL_SIZE);
-            opts.tol = eps;
-            [update , eigTrack(updCount)] = eigs(effectiveLiouv, 1, 'sm', opts);
+            [update , eigTrack(updCount)] = eigs(effectiveLiouv, 1, 'sm');
 
             dmpoStat{site} = reshape(update,[ROW_SIZE, COL_SIZE, HILBY, HILBY]);
 
