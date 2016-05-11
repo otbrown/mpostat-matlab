@@ -26,8 +26,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
             tc.HILBY = testHILBY;
             tc.systemSz = testSystemSz;
             tc.prodState = randi([0, testHILBY^testSystemSz - 1]);
-            tc.dmpo= ProdDMPO(testHILBY, testSystemSz, 0, tc.prodState);
-            tc.COMPRESS = testHILBY^(testSystemSz - 2);
+            tc.dmpo= SuperDMPO(testHILBY, testSystemSz, 0);
+            tc.COMPRESS = testHILBY^(testSystemSz) - tc.HILBY^3;
             tc.cdmpo = DMPOCompress(tc.dmpo, tc.COMPRESS);
             tc.cTr = DMPOTrace(tc.cdmpo);
         end
@@ -70,6 +70,29 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
             drift = abs(abs(tr) - abs(tc.cTr));
 
             tc.assertLessThan(drift, tc.absTol);
+        end
+
+        function testElementDrift(tc)
+            SPACE = tc.HILBY^tc.systemSz;
+            sampleSz = min(floor(0.1 * SPACE^2), 100);
+            for test = 1 : 1 : sampleSz
+                braState = randi([0, SPACE - 1]);
+                ketState = randi([0, SPACE - 1]);
+                braBits = FWBase(braState, tc.HILBY, tc.systemSz) + 1;
+                ketBits = FWBase(ketState, tc.HILBY, tc.systemSz) + 1;
+
+                coefft = 1;
+                compCoefft = 1;
+                for site = 1 : 1 : tc.systemSz
+                    bra = braBits(site);
+                    ket = ketBits(site);
+                    coefft = coefft * tc.dmpo{site}(:, :, bra, ket);
+                    compCoefft = compCoefft * tc.cdmpo{site}(:, :, bra, ket);
+                end
+
+                epsilon = abs(coefft - compCoefft);
+                tc.assertLessThan(epsilon, tc.absTol);
+            end
         end
     end
 end
