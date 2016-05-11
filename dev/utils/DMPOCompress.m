@@ -29,55 +29,46 @@ function [compDMPO] = DMPOCompress(dmpo, COMPRESS)
 	% allocate return
 	compDMPO = dmpo;
 
+	% bring to right-canonical
+	compDMPO = RCan(compDMPO, LENGTH : -1 : 2);
+
 	for site = 1 : 1 : LENGTH - 1
+		compDMPO = LCan(compDMPO, site);
 		[rowSz, colSz, ~, ~] = size(compDMPO{site});
 		% only need to modify tensors that are too large
 		if colSz > COMPRESS || rowSz > COMPRESS
 			M = reshape(compDMPO{site}, [rowSz, colSz, HILBY^2]);
+	        M = permute(M, [1, 3, 2]);
+	        M = reshape(M, [rowSz * HILBY^2, colSz]);
+
+			% SVD decomposition
+			[U, S, V] = svd(M, 0);
+
+			uCol = min(size(U,2), COMPRESS);
+			sDim = min(size(S,1), COMPRESS);
+
+			M = U(:, 1 : uCol) * S(1 : sDim, 1 : sDim);
+
+			rowSz = min(size(compDMPO{site}, 1), COMPRESS);
+			colSz = min(size(compDMPO{site}, 2), COMPRESS);
+
+			% reshape back to site tensor format
+			M = reshape(M, [rowSz, HILBY^2, colSz]);
 			M = permute(M, [1, 3, 2]);
-			M = reshape(M, [rowSz * HILBY^2, colSz]);
+			compDMPO{site} = reshape(M, [rowSz, colSz, HILBY, HILBY]);
 
-			[Q, R] = qr(M, 0);
-
-			colSz = size(Q, 2);
-
-			Q = reshape(Q, [rowSz, HILBY^2, colSz]);
-			Q = permute(Q, [1, 3, 2]);
-			Q = reshape(Q, [rowSz, colSz, HILBY, HILBY]);
-
-			% actual compression kicks in here
-			rowSz = min(rowSz, COMPRESS);
-			colSz = min(colSz, COMPRESS);
-			compDMPO{site} = Q(1 : rowSz, 1 : colSz, :, :);
-
-			% move R into the next site
-			rowSz = size(R, 1);
-			colSz = size(compDMPO{site + 1}, 2);
-			N = zeros(rowSz, colSz, HILBY, HILBY);
+			% next site along
+			V = ctranspose(V);
+			vRow = min(size(V,1), COMPRESS);
+			nCol = size(compDMPO{site + 1}, 2);
+			V = V(1 : vRow, :);
+			N = zeros(vRow, nCol, HILBY, HILBY);
 			for bra = 1 : 1 : HILBY
 				for ket = 1 : 1 : HILBY
-					N(:, :, bra, ket) = R * compDMPO{site + 1}(:, :, bra, ket);
+					N(:, :, bra, ket) = V * compDMPO{site + 1}(:, :, bra, ket);
 				end
 			end
 			compDMPO{site + 1} = N;
 		end
-	end
-
-	% last site requires special handling,
-	% since we can't multiply R into the next site
-	if size(compDMPO{LENGTH}, 1) > COMPRESS
-		rowSz = size(compDMPO{LENGTH}, 1);
-		M = reshape(compDMPO{LENGTH}, [rowSz, 1, HILBY^2]);
-		M = permute(M, [1, 3, 2]);
-		M = reshape(M, [rowSz * HILBY^2, 1]);
-
-		[Q, R] = qr(M, 0);
-
-		Q = reshape(Q, [rowSz, HILBY^2, 1]);
-		Q = permute(Q, [1, 3, 2]);
-		Q = reshape(Q, [rowSz, 1, HILBY, HILBY]);
-
-		% compression occurs here
-		compDMPO{LENGTH} = Q(1 : COMPRESS, 1, :, :) * R;
 	end
 end
