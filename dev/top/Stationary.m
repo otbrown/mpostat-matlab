@@ -19,7 +19,7 @@
 % THRESHOLD     : double, the convergence threshold
 % RUNMAX        : integer, the maximum number of updates before the code fails
 
-function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
+function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, MAX_DIM, THRESHOLD, RUNMAX)
     % gather up system parameters
     LENGTH = length(dmpoInit);
     HILBY = size(dmpoInit{1}, 3);
@@ -90,14 +90,23 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
 
             % stop following route if RUNMAX is reached
             if updCount == RUNMAX
-                dmpoStat = TrNorm(dmpoStat);
+                % take the Hermitian part of the current state, then break out
+                % of the sweep
+                dmpoStat = DMPOHerm(dmpoStat);
+                dmpoStat = DMPOCompress(dmpoStat, MAX_DIM);
                 break;
             end
         end
 
-        dmpoStat = TrNorm(dmpoStat);
+        % take the Hermitian part of the current state and enforce MAX_DIM
+        dmpoStat = DMPOHerm(dmpoStat);
+        dmpoStat = DMPOCompress(dmpoStat, MAX_DIM);
+
         sweepCount = sweepCount + 1;
+
         % flip it and reverse it
         route = flip(route);
     end
+    % trace normalise the state
+    dmpoStat = TrNorm(dmpoStat);
 end
