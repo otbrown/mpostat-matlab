@@ -16,6 +16,8 @@
 %                 initial state
 % mpo           : cell array, Liouvillian for the system in matrix product
 %                 operator form
+% MAX_DIM       : double, the maximum size of virtual dimension for the sie
+%                 tensors
 % THRESHOLD     : double, the convergence threshold
 % RUNMAX        : integer, the maximum number of updates before the code fails
 
