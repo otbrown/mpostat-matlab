@@ -77,6 +77,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
             tc.assertLessThan((tr-1), tc.absTol);
         end
 
+        function testEigZero(tc)
+            tc.assertLessThan(tc.eigTrack(end), tc.THRESHOLD);
+        end
+
         function testZZZ(tc)
             % since we are using a purely dissipative Liouvillian, we expect
             % the final state to be |000><000|, so we check that element is 1
