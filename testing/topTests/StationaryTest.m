@@ -18,6 +18,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
         mpo;
         THRESHOLD = 1E-7;
         RUNMAX = 50;
+        MAX_DIM = 100;
     end
 
     methods (TestMethodSetup)
@@ -55,6 +56,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
 
             % solve using Stationary
             [tc.dmpoStat, tc.eigTrack] = Stationary(tc.dmpoInit, tc.mpo, ...
+                                                    tc.MAX_DIM, ...
                                                     tc.THRESHOLD, tc.RUNMAX);
         end
     end
