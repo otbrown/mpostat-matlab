@@ -52,7 +52,8 @@ for conjRow = 1 : 1 : COL_SIZE
                                     for row = 1 : 1 : ROW_SIZE
                                         FA = FA + leftBlock(conjCol, opRow, row) * siteTensor(row, col, bra, ket);
                                     end
-                                    WFA = WFA + mpo(bra, ket, conjBra, conjKet, opRow, opCol) * FA;
+                                    %WFA = WFA + mpo(bra, ket, conjBra, conjKet, opRow, opCol) * FA;
+                                    WFA = WFA + mpo(conjBra, conjKet, bra, ket, opRow, opCol) * FA;
                                 end
                             end
                         end
