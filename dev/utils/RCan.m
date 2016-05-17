@@ -40,7 +40,7 @@ function [rdmpo] = RCan(dmpo, route)
         % ISSUE! This uses a lot of mem compared to the LCan QR
         [U, S, V] = svd(M, 'econ');
         V = ctranspose(V);
-        [vr, ~] = size(V);
+        vr = size(V, 1);
         V2 = zeros(rowSz, colSz * HILBY^2);
         V2(1 : vr, :) = V;
 
