@@ -30,30 +30,36 @@ function [rdmpo] = RCan(dmpo, route)
     % allocate return
     rdmpo = dmpo;
 
+    [rowSz, colSz, ~, ~] = size(rdmpo{route(1)});
+
     for site = route
         % manipulate site tensor into matrix
-        [rowSz, colSz, ~, ~] = size(rdmpo{site});
         M = reshape(rdmpo{site}, [rowSz, colSz * HILBY^2]);
 
         % SVD decomposition
         % ISSUE! This uses a lot of mem compared to the LCan QR
-        [U, S, V] = svd(M, 0);
+        [U, S, V] = svd(M, 'econ');
         V = ctranspose(V);
-
-        rowSz = size(V, 1);
+        [vr, ~] = size(V);
+        V2 = zeros(rowSz, colSz * HILBY^2);
+        V2(1 : vr, :) = V;
 
         % manipulate V back into a rank-4 tensor and embed
-        rdmpo{site} = reshape(V, [rowSz, colSz, HILBY, HILBY]);
+        rdmpo{site} = reshape(V2, [rowSz, colSz, HILBY, HILBY]);
 
         % multiply U * S into the next site along
+        colSz = rowSz;
         rowSz = size(rdmpo{site - 1}, 1);
-        colSz = size(S, 2);
-        N = zeros(rowSz, colSz, HILBY, HILBY);
+
+        [sr, sc] = size(S);
+        S2 = zeros(sr, colSz);
+        S2(:, 1 : sc) = S;
+
         for bra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
-                N(:, :, bra, ket) = rdmpo{site - 1}(:, :, bra, ket) * U * S;
+                rdmpo{site - 1}(:, :, bra, ket) = ...
+                rdmpo{site - 1}(:, :, bra, ket) * U * S2;
             end
         end
-        rdmpo{site - 1} = N;
     end
 end
