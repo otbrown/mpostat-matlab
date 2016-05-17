@@ -24,7 +24,7 @@
 % COL_SIZE          : integer, the size of the second virtual dimension of
 %                     siteTensor
 % OP_ROW            : integer, the size of the first virtual dimension of mpo
-% OP_COL            : integer, the size of the second virtual dimension of mpo 
+% OP_COL            : integer, the size of the second virtual dimension of mpo
 
 function [updateBlock] = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
     updateBlock = zeros(ROW_SIZE, OP_ROW, ROW_SIZE);
@@ -51,7 +51,8 @@ function [updateBlock] = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SI
                                         for col = 1 : 1 : COL_SIZE
                                             FB = FB + rightBlock(conjRow, opCol, col) * siteTensor(row, col, bra, ket);
                                         end
-                                        WFB = WFB + mpo(bra, ket, conjBra, conjKet, opRow, opCol) * FB;
+                                        %WFB = WFB + mpo(bra, ket, conjBra, conjKet, opRow, opCol) * FB;
+                                        WFB = WFB + mpo(conjBra, conjKet, bra, ket, opRow, opCol) * FB;
                                     end
                                 end
                             end
