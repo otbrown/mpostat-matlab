@@ -41,24 +41,48 @@ function [ldmpo] = LCan(dmpo, route)
         M = reshape(M, [rowSz * HILBY^2, colSz]);
 
         % QR decomposition
-        [Q, R] = qr(M,0);
+        %[Q, R] = qr(M,0);
+        % SVD Decomposition
+        [U, S, V] = svd(M, 'econ');
+        V = ctranspose(V);
+        dim = size(U, 2);
 
-        colSz = size(Q, 2);
+        %colSz = size(Q, 2);
+        %colSz = size(US, 2);
 
         % manipulate Q into rank-4 tensor and embed in site
-        Q = reshape(Q, [rowSz, HILBY^2, colSz]);
-        Q = permute(Q, [1, 3, 2]);
-        ldmpo{site} = reshape(Q, [rowSz, colSz, HILBY, HILBY]);
+        %Q = reshape(Q, [rowSz, HILBY^2, colSz]);
+        %Q = permute(Q, [1, 3, 2]);
+        %ldmpo{site} = reshape(Q, [rowSz, colSz, HILBY, HILBY]);
+        % reshape M to be the new site tensor
+        %M = reshape(US, [rowSz, HILBY^2, colSz]);
+        %M = permute(US, [1, 3, 2]);
+        %ldmpo{site} = reshape(US, [rowSz, colSz, HILBY, HILBY]);
+        U2 = zeros(rowSz * HILBY^2, colSz);
+        U2(:, 1 : dim) = U;
+        U2 = reshape(U2, [rowSz, HILBY^2, colSz]);
+        U2 = permute(U2, [1, 3, 2]);
+        ldmpo{site} = reshape(U2, [rowSz, colSz, HILBY, HILBY]);
 
         % multiply R into the next site along
-        rowSz = size(R, 1);
-        colSz = size(ldmpo{site+1}, 2);
-        N = zeros(rowSz, colSz, HILBY, HILBY);
+        %rowSz = size(R, 1);
+        %rowSz = size(V, 1);
+        %colSz = size(ldmpo{site+1}, 2);
+        %N = zeros(rowSz, colSz, HILBY, HILBY);
+        rowSz = colSz;
+        colSz = size(ldmpo{site + 1}, 2);
+
+        S2 = zeros(rowSz, dim);
+        S2(1 : dim, :) = S;
+
         for bra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
-                N(:, :, bra, ket) = R * ldmpo{site + 1}(:, :, bra, ket);
+                %N(:, :, bra, ket) = R * ldmpo{site + 1}(:, :, bra, ket);
+                %N(:, :, bra, ket) = V * ldmpo{site + 1}(:, :, bra, ket);
+                ldmpo{site + 1}(:, :, bra, ket) = ...
+                S2 * V * ldmpo{site + 1}(:, :, bra, ket);
             end
         end
-        ldmpo{site + 1} = N;
+        %ldmpo{site + 1} = N;
     end
 end
