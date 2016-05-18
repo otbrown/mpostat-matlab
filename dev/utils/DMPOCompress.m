@@ -36,36 +36,32 @@ function [compDMPO] = DMPOCompress(dmpo, COMPRESS)
 		compDMPO = LCan(compDMPO, site);
 		[rowSz, colSz, ~, ~] = size(compDMPO{site});
 		% only need to modify tensors that are too large
-		if colSz > COMPRESS || rowSz > COMPRESS
+		if colSz > COMPRESS
 			M = reshape(compDMPO{site}, [rowSz, colSz, HILBY^2]);
 	        M = permute(M, [1, 3, 2]);
 	        M = reshape(M, [rowSz * HILBY^2, colSz]);
 
 			% SVD decomposition
-			[U, S, V] = svd(M, 0);
+			[U, S, V] = svd(M, 'econ');
+			V = ctranspose(V);
+			uc = size(U, 2);
 
-			uCol = min(size(U,2), COMPRESS);
-			sDim = min(size(S,1), COMPRESS);
+			dim = min(uc, COMPRESS);
 
-			M = U(:, 1 : uCol) * S(1 : sDim, 1 : sDim);
-
-			rowSz = min(size(compDMPO{site}, 1), COMPRESS);
-			colSz = min(size(compDMPO{site}, 2), COMPRESS);
+			U = U(:, 1 : dim);
+			S = S(1 : dim, :);
 
 			% reshape back to site tensor format
-			M = reshape(M, [rowSz, HILBY^2, colSz]);
+			M = reshape(U, [rowSz, HILBY^2, dim]);
 			M = permute(M, [1, 3, 2]);
-			compDMPO{site} = reshape(M, [rowSz, colSz, HILBY, HILBY]);
+			compDMPO{site} = reshape(M, [rowSz, dim, HILBY, HILBY]);
 
 			% next site along
-			V = ctranspose(V);
-			vRow = min(size(V,1), COMPRESS);
-			nCol = size(compDMPO{site + 1}, 2);
-			V = V(1 : vRow, :);
-			N = zeros(vRow, nCol, HILBY, HILBY);
+			colSz = size(compDMPO{site + 1}, 2);
+			N = zeros(dim, colSz, HILBY, HILBY);
 			for bra = 1 : 1 : HILBY
 				for ket = 1 : 1 : HILBY
-					N(:, :, bra, ket) = V * compDMPO{site + 1}(:, :, bra, ket);
+					N(:, :, bra, ket) = S * V * compDMPO{site + 1}(:, :, bra, ket);
 				end
 			end
 			compDMPO{site + 1} = N;
