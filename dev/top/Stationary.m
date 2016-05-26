@@ -38,16 +38,10 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     left{1} = 1;
     right{LENGTH} = 1;
 
-    for site = 1 : 1 : (LENGTH - 1)
-        [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-        [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
-        left{site + 1} = GrowLeft(dmpoStat{site}, mpo{site}, left{site}, ...
-                                  ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
-    end
-
     for site = LENGTH : -1 : 2
         [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
         [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
+        dmpoStat = RCan(dmpoStat, site);
         right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, right{site}, ...
                                     ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
     end
@@ -62,7 +56,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
         for site = route
             effL = EffL(site, dmpoStat, mpo, left, right);
             effL(abs(effL) < eps) = 0;
-            [update, eigTrack(end + 1)] = eigs(effL, 1, 'lr');
+            [update, eigTrack(updCount)] = eigs(effL, 1, 'lr');
 
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
@@ -80,20 +74,24 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
             updCount = updCount + 1;
 
             % canonicalise & include new site in block tensor
-            if mod(sweepCount, 2) && site ~= 1
-                % RCAN
-                dmpoStat = RCan(dmpoStat, site);
-                [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-                [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
-                right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, right{site}, ...
+            if mod(sweepCount, 2)
+                if site ~= 1
+                    % RCAN
+                    dmpoStat = RCan(dmpoStat, site);
+                    [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
+                    [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
+                    right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, right{site}, ...
                                          ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
-            elseif site ~= LENGTH
+                end
+            else
+                if site ~= LENGTH
                 % LCAN
                 dmpoStat = LCan(dmpoStat, site);
                 [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
                 [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
                 left{site + 1} = GrowLeft(dmpoStat{site}, mpo{site}, left{site}, ...
                                          ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
+                end
             end
 
             % ADD CONVERGENCE TEST!
