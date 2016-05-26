@@ -20,23 +20,28 @@ function [normDMPO] = SVDNorm(dmpo)
         M = permute(M, [1, 3, 2]);
         M = reshape(M, [rowSz * HILBY^2, colSz]);
 
-        [Q, R] = qr(M, 0);
+        [U, S, V] = svd(M, 'econ');
+        V = ctranspose(V);
+        dim = size(U, 2);
 
-        colSz = size(Q, 2);
+        U2 = zeros(rowSz * HILBY^2, colSz);
+        U2(:, 1 : dim) = U;
+        U2 = reshape(U2, [rowSz, HILBY^2, colSz]);
+        U2 = permute(U2, [1, 3, 2]);
+        normDMPO{site} = reshape(U2, [rowSz, colSz, HILBY, HILBY]);
 
-        Q = reshape(Q, [rowSz, HILBY^2, colSz]);
-        Q = permute(Q, [1, 3, 2]);
-        normDMPO{site} = reshape(Q, [rowSz, colSz, HILBY, HILBY]);
+        rowSz = colSz;
+        colSz = size(normDMPO{site + 1}, 2);
 
-        rowSz = size(R, 1);
-        colSz = size(normDMPO{site+1}, 2);
-        N = zeros(rowSz, colSz, HILBY, HILBY);
+        S2 = zeros(rowSz, dim);
+        S2(1 : dim, :) = S;
+
         for bra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
-                N(:, :, bra, ket) = R * normDMPO{site + 1}(:, :, bra, ket);
+                normDMPO{site + 1}(:, :, bra, ket) = ...
+                S2 * V * normDMPO{site + 1}(:, :, bra, ket);
             end
         end
-        normDMPO{site + 1} = N;
     end
 
     [rowSz, colSz, ~, ~] = size(normDMPO{LENGTH});
@@ -44,9 +49,10 @@ function [normDMPO] = SVDNorm(dmpo)
     M = permute(M, [1, 3, 2]);
     M = reshape(M, [rowSz * HILBY^2, colSz]);
 
-    [Q, ~] = qr(M, 0);
-
-    Q = reshape(Q, [rowSz, HILBY^2, colSz]);
-    Q = permute(Q, [1, 3, 2]);
-    normDMPO{LENGTH} = reshape(Q, [rowSz, colSz, HILBY, HILBY]);
+    [U, S, V] = svd(M, 'econ');
+    U2 = zeros(rowSz * HILBY^2, 1);
+    U2(:, 1) = U;
+    U2 = reshape(U2, [rowSz, HILBY^2, 1]);
+    U2 = permute(U2, [1, 3, 2]);
+    normDMPO{LENGTH} = reshape(U2, [rowSz, 1, HILBY, HILBY]);
 end
