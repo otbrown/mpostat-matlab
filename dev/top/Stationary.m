@@ -21,7 +21,7 @@
 % THRESHOLD     : double, the convergence threshold
 % RUNMAX        : integer, the maximum number of updates before the code fails
 
-function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, MAX_DIM, THRESHOLD, RUNMAX)
+function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     % gather up system parameters
     LENGTH = length(dmpoInit);
     HILBY = size(dmpoInit{1}, 3);
@@ -60,49 +60,49 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, MAX_DIM, THRESHOLD, RU
 
     while ~convFlag && updCount < RUNMAX
         for site = route
-            [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-            [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
-            effectiveLiouv = EffL(site, dmpoStat, mpo, left, right);
-            effectiveLiouv = effectiveLiouv + ...
-                             eps*eye(HILBY*HILBY*ROW_SIZE*COL_SIZE);
-            [update , eigTrack(updCount)] = eigs(effectiveLiouv, 1, 'sm');
+            effL = EffL(site, dmpoStat, mpo, left, right);
+            effL(abs(effL) < eps) = 0;
+            [update, eigTrack(end + 1)] = eigs(effL, 1, 'lr');
 
-            dmpoStat{site} = reshape(update,[ROW_SIZE, COL_SIZE, HILBY, HILBY]);
+
+            [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
+
+            for bra = 0 : 1 : (HILBY - 1)
+                for ket = 0 : 1 : (HILBY - 1)
+                    for row = 0 : 1 : (ROW_SIZE - 1)
+                        for col = 1 : 1 : COL_SIZE
+                            dmpoStat{site}(row+1, col, bra+1, ket+1) = update(ket*HILBY*ROW_SIZE*COL_SIZE + bra*ROW_SIZE*COL_SIZE + row*COL_SIZE + col);
+                        end
+                    end
+                end
+            end
 
             updCount = updCount + 1;
 
             % canonicalise & include new site in block tensor
-            if mod(sweepCount, 2) && site ~= 1;
+            if mod(sweepCount, 2) && site ~= 1
                 % RCAN
                 dmpoStat = RCan(dmpoStat, site);
                 [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-                right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, ...
-                                            right{site}, ROW_SIZE, COL_SIZE, ...
-                                            HILBY, OP_ROW, OP_COL);
+                [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
+                right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, right{site}, ...
+                                         ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
             elseif site ~= LENGTH
                 % LCAN
                 dmpoStat = LCan(dmpoStat, site);
                 [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-                left{site + 1} = GrowLeft(dmpoStat{site}, mpo{site}, ...
-                                          left{site}, ROW_SIZE, COL_SIZE, ...
-                                          HILBY, OP_ROW, OP_COL);
+                [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
+                left{site + 1} = GrowLeft(dmpoStat{site}, mpo{site}, left{site}, ...
+                                         ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
             end
 
             % ADD CONVERGENCE TEST!
 
             % stop following route if RUNMAX is reached
             if updCount == RUNMAX
-                % take the Hermitian part of the current state, then break out
-                % of the sweep
-                dmpoStat = DMPOHerm(dmpoStat);
-                dmpoStat = DMPOCompress(dmpoStat, MAX_DIM);
                 break;
             end
         end
-
-        % take the Hermitian part of the current state and enforce MAX_DIM
-        dmpoStat = DMPOHerm(dmpoStat);
-        dmpoStat = DMPOCompress(dmpoStat, MAX_DIM);
 
         sweepCount = sweepCount + 1;
 
