@@ -94,10 +94,12 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
                 end
             end
 
-            % ADD CONVERGENCE TEST!
+            % evaluate convergence
+            convFlag = ConvTest(eigTrack, updCount, 2 * LENGTH, THRESHOLD);
 
-            % stop following route if RUNMAX is reached
-            if updCount == RUNMAX
+            % stop following route if RUNMAX is reached or if the calculation
+            % has converged to desired threshold
+            if convFlag || updCount == RUNMAX 
                 break;
             end
         end
