@@ -8,7 +8,7 @@
 % set up result area
 resultDir = 'testing/results';
 mkdir(resultDir);
-dateStamp = datestr(datetime('today'), 30);
+dateStamp = datestr(datetime('now'), 30);
 savePath = sprintf('%s/%s_TEST.mat', resultDir, dateStamp);
 
 %result = runtests('testing', 'IncludeSubFolders', true);
