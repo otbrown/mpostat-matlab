@@ -11,7 +11,6 @@ mkdir(resultDir);
 dateStamp = datestr(datetime('now'), 30);
 savePath = sprintf('%s/%s_TEST.mat', resultDir, dateStamp);
 
-%result = runtests('testing', 'IncludeSubFolders', true);
-result = runtests('testing/utilTests');
+result = runtests('testing', 'IncludeSubFolders', true);
 
 save(savePath);
