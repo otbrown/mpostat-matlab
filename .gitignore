@@ -3,3 +3,5 @@ linecount
 *.mat
 profiling/*
 scripts/*
+*.tar*
+*.zip
