@@ -5,3 +5,4 @@ profiling/*
 scripts/*
 *.tar*
 *.zip
+*.o*
