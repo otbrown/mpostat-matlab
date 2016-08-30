@@ -5,7 +5,7 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) DMPOSumTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-15;
+        absTol = 1E-14;
         sampleSz = 100;
         HILBY = 3;
         LENGTH = 8;
