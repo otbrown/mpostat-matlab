@@ -56,7 +56,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, tc.COMPRESS, ...
+            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
                                               tc.THRESHOLD, tc.RUNMAX);
 
             % calculate some values to assert against
@@ -163,7 +163,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, tc.COMPRESS, ...
+            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
                                               tc.THRESHOLD, tc.RUNMAX);
 
             % calculate some values to assert against
@@ -273,7 +273,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, tc.COMPRESS, ...
+            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
                                               tc.THRESHOLD, tc.RUNMAX);
 
             % calculate some values to assert against

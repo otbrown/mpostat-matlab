@@ -56,7 +56,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % solve using Stationary
             [tc.dmpoStat, tc.eigTrack] = Stationary(tc.dmpoInit, tc.mpo, ...
-                                                    tc.MAX_DIM, ...
                                                     tc.THRESHOLD, tc.RUNMAX);
         end
     end
