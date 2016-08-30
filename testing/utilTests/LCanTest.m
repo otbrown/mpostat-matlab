@@ -2,7 +2,7 @@
 % Oliver Thomson Brown
 % 2016-03-15
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) LCanTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) LCanTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-14;

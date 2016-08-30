@@ -2,7 +2,7 @@
 % Oliver Thomson Brown
 % 2016-03-10
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) ProdDMPOTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) ProdDMPOTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-15;

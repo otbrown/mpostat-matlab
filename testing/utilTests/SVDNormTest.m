@@ -2,7 +2,7 @@
 % Oliver Thomson Brown
 % 2016-03-08
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) SVDNormTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) SVDNormTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-14;

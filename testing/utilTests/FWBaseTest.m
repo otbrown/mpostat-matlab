@@ -2,7 +2,7 @@
 % Oliver Thomson Brown
 % 2016-03-03
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) FWBaseTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) FWBaseTest < matlab.unittest.TestCase
 
     properties (TestParameter)
         n = {0, 1, 8, 17, 42, 100};

@@ -2,7 +2,7 @@
 % Oliver Thomson Brown
 % 2016-05-04
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) EffOpTensorTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) EffOpTensorTest < matlab.unittest.TestCase
 
     properties
         HILBY;

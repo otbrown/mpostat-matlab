@@ -2,7 +2,7 @@
 % Oliver Thomson Brown
 % 2016-03-22
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) GrowRightTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) GrowRightTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-15;

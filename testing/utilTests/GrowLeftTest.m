@@ -2,7 +2,7 @@
 % Oliver Thomson Brown
 % 2016-03-22
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}) GrowLeftTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) GrowLeftTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-15;
@@ -161,7 +161,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev')}
 
             % calculate the Liouvillian expectation the old-fashioned way
             lExp = ctranspose(tc.rhoVec) * tc.L * tc.rhoVec;
-            fprintf(1, 'lExp: %g\n', lExp);
 
             epsilon = abs(testLExp - lExp);
             tc.assertLessThan(epsilon, tc.absTol);
