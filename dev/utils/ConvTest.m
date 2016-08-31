@@ -19,7 +19,7 @@
 function [ convFlag ] = ConvTest(eigTracker, updCount, sampleSize, threshold)
 	convFlag = 0;
 
-	if sampleSize >= updCount
+	if updCount <= sampleSize
         % total number of updates is still less than sampleSize
         % do nothing
 	else
