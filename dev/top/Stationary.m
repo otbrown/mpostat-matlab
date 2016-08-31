@@ -29,7 +29,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     % allocate return variables
     % CLEAN UP INITIAL STATE
     dmpoStat = dmpoInit;
-    eigTrack = NaN(RUNMAX - 1, 1);
+    eigTrack = NaN(RUNMAX, 1);
 
     % build left and right blocks
     % MAKE AN INTERFACE FUNCTION LIKE GROWBLOCK
