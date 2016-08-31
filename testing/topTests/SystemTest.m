@@ -59,6 +59,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
                                               tc.THRESHOLD, tc.RUNMAX);
 
+			eigTrack = eigTrack(~isnan(eigTrack));
+
             % calculate some values to assert against
             SPACE = tc.HILBY ^ tc.LENGTH;
             sampleSize = min(floor(0.25 * SPACE^2), 100);
@@ -165,6 +167,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             % solve using Stationary
             [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
                                               tc.THRESHOLD, tc.RUNMAX);
+			eigTrack = eigTrack(~isnan(eigTrack));
 
             % calculate some values to assert against
             SPACE = tc.HILBY ^ tc.LENGTH;
@@ -275,6 +278,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             % solve using Stationary
             [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
                                               tc.THRESHOLD, tc.RUNMAX);
+			eigTrack = eigTrack(~isnan(eigTrack));
 
             % calculate some values to assert against
             tr = DMPOTrace(dmpoStat);
