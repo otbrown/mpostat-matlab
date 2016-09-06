@@ -207,8 +207,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
         function drivenDiss3Site(tc)
             % the Hamiltonian from the commensurate density investigation
-            % minus the crucial driving term -- still has a trivial stationary
-            % state
             % build Liouvillian mpo
             % parameters
             detuning01 = 0;
