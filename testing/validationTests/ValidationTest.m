@@ -13,7 +13,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
     properties
         THRESHOLD = 1E-7;
-        RUNMAX = 100;
+        RUNMAX = 500;
+        COMPRESS = 100;
     end
 
     methods (Test)
@@ -27,11 +28,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             detuning02 = 0;
             diss21 = 1;
             diss10 = 0.1;
-            COMPRESS = 100;
             fname = 'data/FourSiteExact.mat';
 
             % inputs
-            dmpoInit = SuperDMPO(HILBY, LENGTH, COMPRESS);
+            dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
 
             % local operators
             I = eye(HILBY);
@@ -156,11 +156,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             detuning02 = 0;
             diss21 = 1;
             diss10 = 0.1;
-            COMPRESS = 100;
             fname = 'data/ElevenSiteTEBD.mat';
 
             % inputs
-            dmpoInit = SuperDMPO(HILBY, LENGTH, COMPRESS);
+            dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
 
             % local operators
             I = eye(HILBY);
@@ -276,5 +275,81 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         end
 
         function MFS15(tc)
+            % system parameters
+            HILBY = 2;
+            LENGTH = 15;
+            J = 1;
+            h = J;
+            V = 0.5 * J;
+            diss = 0.1 * J;
+            fname = 'data/MFS15.mat';
+
+            % inputs
+            dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
+
+            % local operators
+            I = eye(HILBY);
+            X = [0, 1; 1, 0];
+            Y = [0, -1i; 1i, 0];
+            Z = [1, 0; 0, -1];
+
+            % mpo building blocks
+            ident = kron(I, I);
+            Hloc = h * Z;
+            dissipator = kron(2*conj(K), K) ...
+             - kron(I, ctranspose(K)*K) - kron(transpose(K)*conj(K), I);
+
+            % put liouvillian mpo together
+            mpoLoc = kron(I, -1i*Hloc) + kron(1i*Hloc, I) + dissipator;
+
+            lmpo(:, :, :, :, 1, 1) = reshape(ident, ...
+                                            [HILBY, HILBY,HILBY, HILBY]);
+            lmpo(:, :, :, :, 2, 1) = reshape(kron(I, X), ...
+                                            [HILBY, HILBY, HILBY, HILBY]);
+            lmpo(:, :, :, :, 3, 1) = reshape(kron(X, I), ...
+                                            [HILBY, HILBY, HILBY, HILBY]);
+            lmpo(:, :, :, :, 4, 1) = reshape(mpoLoc,
+                                            [HILBY, HILBY, HILBY, HILBY]);
+            lmpo(:, :, :, :, 4, 2) = reshape(kron(I, -1i*J*X), ...
+                                            [HILBY, HILBY, HILBY, HILBY]);
+            lmpo(:, :, :, :, 4, 3) = reshape(kron(1i*J*X, I), ...
+                                            [HILBY, HILBY, HILBY, HILBY]);
+            lmpo(:, :, :, :, 4, 4) = reshape(ident, ...
+                                            [HILBY, HILBY, HILBY, HILBY]);
+            lmpo(:, :, :, :, 2, 2) = reshape(V * ident / J, ...
+                                            [HILBY, HILBY, HILBY, HILBY]);
+            lmpo(:, :, :, :, 3, 3) = reshape(V * ident / J, ...
+                                            [HILBY, HILBY, HILBY, HILBY]);
+
+            % build mpo cell
+            mpo = cell(LENGTH, 1);
+            mpo{1} = lmpo(:, :, :, :, 4, :);
+            mpo{LENGTH} = lmpo(:, :, :, :, :, 1);
+            for site = 2 : 1 : (LENGTH - 1)
+                mpo{site} = lmpo;
+            end
+
+            % solve using Stationary
+            [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, tc.THRESHOLD, tc.RUNMAX);
+            eigTrack = eigTrack(~isnan(eigTrack));
+
+            % calculate observables
+            testSite = 8;
+            testCorXX = zeros(4, 1);
+            XOp = zeros(HILBY, HILBY, LENGTH);
+            for site = 1 : 1 : LENGTH
+                XOp(:, :, site) = I;
+            end
+            XOp(:, :, testSite) = X;
+            op = XOp;
+
+            for l = 1 : 1 : 4;
+                op(:, :, testSite + l) = X;
+                testCorXX(l) = DMPOExp(dmpoStat, op);
+                op = XOp;
+            end
+
+            % be assertive!
+            load(fname);
         end
 end
