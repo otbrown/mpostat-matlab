@@ -224,8 +224,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % calculate observables
             % allocate
-            testN = zeros(LENGTH,1);
-            testAdAdAA = zeros(LENGTH,1);
+            testSite = 5;
             testG1 = zeros(LENGTH);
             testG2 = zeros(LENGTH);
 
@@ -235,14 +234,13 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
             op = idOp;
 
-            for site = 1 : 1 : LENGTH
-                op(:, :, site) = ctranspose(a) * a;
-                testN(site) = DMPOExp(dmpoStat, op);
-                op = idOp;
-                op(:, :, site) = ctranspose(a)*ctranspose(a)*a*a;
-                testAdAdAA(site) = DMPOExp(dmpoStat, op);
-                op = idOp;
-            end
+            op(:, :, testSite) = ctranspose(a)*a;
+            testN = DMPOExp(dmpoStat, op);
+            op = idOp;
+
+            op(:, :, testSite) = ctranspose(a)*ctranspose(a)*a*a;
+            testAdAdAA = DMPOExp(dmpoStat, op);
+            op = idOp;
 
             for j = 1 : 1 : LENGTH
                 for l = 1 : 1 : LENGTH
