@@ -1,4 +1,3 @@
-
 % ConvTest.m
 % function which checks if the last sampleSize eigenvalues have been below
 % threshold
