@@ -351,5 +351,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % be assertive!
             load(fname);
+            for l = 1 : 1 : 4
+                tc.assertLessThan(abs(CorXX(l) - testCorXX(l)), tc.THRESHOLD);
+            end
         end
 end
