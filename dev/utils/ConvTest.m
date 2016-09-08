@@ -15,8 +15,9 @@
 % sampleSize	: double, the number of results to check for convergence
 % threshold	    : double, convergence threshold
 
-function [ convFlag ] = ConvTest(eigTracker, updCount, sampleSize, threshold)
+function [ convFlag, worstCase ] = ConvTest(eigTracker, updCount, sampleSize, threshold)
 	convFlag = 0;
+	worstCase = NaN;
 
 	if updCount <= sampleSize
         % total number of updates is still less than sampleSize
