@@ -47,6 +47,9 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     end
 
     % Run the search
+    opts.p = 50;
+    opts.maxit = 1000;
+    opts.tol = 10*eps;
     convFlag = 0;
     sweepCount = 0;
     updCount = 1;
@@ -56,8 +59,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
         for site = route
             effL = EffL(site, dmpoStat, mpo, left, right);
             effL(abs(effL) < eps) = 0;
-            [update, eigTrack(updCount)] = eigs(effL, 1, 'lr');
-
+            [update, eigTrack(updCount)] = eigs(effL, 1, 'lr', opts);
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
 
@@ -70,8 +72,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
                     end
                 end
             end
-
-            updCount = updCount + 1;
 
             % canonicalise & include new site in block tensor
             if mod(sweepCount, 2)
@@ -95,11 +95,13 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
             end
 
             % evaluate convergence
-            convFlag = ConvTest(eigTrack, updCount, 2 * LENGTH, THRESHOLD);
+            [convFlag, ~] = ConvTest(eigTrack, updCount, 2 * LENGTH, THRESHOLD);
+
+            updCount = updCount + 1;
 
             % stop following route if RUNMAX is reached or if the calculation
             % has converged to desired threshold
-            if convFlag || updCount == RUNMAX 
+            if convFlag || updCount == RUNMAX
                 break;
             end
         end
