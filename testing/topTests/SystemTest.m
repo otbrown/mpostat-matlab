@@ -7,7 +7,7 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) SystemTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-15;
+        absTol = 1E-14;
         dispTol = 1E-4;
         HILBY = 3;
         LENGTH = 3;
@@ -292,9 +292,9 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             % make some assertions
             tc.assertLessThan(abs(tr - 1), tc.absTol);
             tc.assertLessThan(abs(eigTrack(end)), tc.THRESHOLD);
-            tc.assertLessThan(abs(rho000 - 0.0007), tc.dispTol);
-            tc.assertLessThan(abs(rho111 - 0.7316), tc.dispTol);
-            tc.assertLessThan(abs(rho222 - 0.0002), tc.dispTol);
+            tc.assertLessThan(abs(rho000 - 5.665E-4), tc.dispTol);
+            tc.assertLessThan(abs(rho111 - 0.7377), tc.dispTol);
+            tc.assertLessThan(abs(rho222 - 1.3439E-4), tc.dispTol);
         end
     end
 
