@@ -77,6 +77,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             for sample = 1 : 1 : sampleSize
                 braState = randi([0, SPACE - 1]);
                 ketState = randi([0, SPACE - 1]);
+                if braState == 0 && ketState == 0
+                    braState = 1;
+                    ketState = 1;
+                end
                 braBits = FWBase(braState, tc.HILBY, tc.LENGTH);
                 ketBits = FWBase(ketState, tc.HILBY, tc.LENGTH);
 
@@ -185,6 +189,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             for sample = 1 : 1 : sampleSize
                 braState = randi([0, SPACE - 1]);
                 ketState = randi([0, SPACE - 1]);
+                if braState == 0 && ketState == 0
+                    braState = 1;
+                    ketState = 1;
+                end
                 braBits = FWBase(braState, tc.HILBY, tc.LENGTH);
                 ketBits = FWBase(ketState, tc.HILBY, tc.LENGTH);
 
