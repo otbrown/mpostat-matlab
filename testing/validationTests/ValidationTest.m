@@ -353,4 +353,5 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 tc.assertLessThan(abs(CorXX(l) - testCorXX(l)), tc.THRESHOLD);
             end
         end
+    end
 end
