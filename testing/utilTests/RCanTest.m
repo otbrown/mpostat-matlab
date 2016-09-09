@@ -5,10 +5,10 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) RCanTest < matlab.unittest.TestCase
 
     properties
-        absTol = 2E-14;
+        absTol = 1E-14;
         HILBY = 2;
         LENGTH = 7;
-        COMPRESS = 50;
+        COMPRESS = 100;
         SAMPLE_MAX = 100;
         dmpo;
         canDMPO;
