@@ -12,8 +12,8 @@ if ~exist(resultDir, 'dir')
 end
 
 utilResult = runtests('testing/utilTests');
-utilResult = runtests('testing/utilTests');
-utilResult = runtests('testing/utilTests');
+coreResult = runtests('testing/coreTests');
+topResult = runtests('testing/topTests');
 
 failCount = sum([utilResult.Failed]) + sum([coreResult.Failed]) ...
             + sum([topResult.Failed]);
