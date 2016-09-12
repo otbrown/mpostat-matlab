@@ -31,6 +31,7 @@
 %                   matrix product operator for the target site
 
 function [effOpTensor] = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
+    % effOpTensor(row, col, conjRow, conjCol, conjBra, conjKet, bra, ket)
     effOpTensor = zeros(ROW_SIZE, COL_SIZE, COL_SIZE, ROW_SIZE, ...
                         HILBY, HILBY, HILBY, HILBY);
 
@@ -39,26 +40,21 @@ function [effOpTensor] = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE
     %   lBlock(conjCol, opRow, row)
     %   siteMPO(conjBra, conjKet, bra, ket, opRow, opCol)
     %   rBlock(conjRow, opCol, col)
+    lBlock = permute(lBlock, [3, 2, 1]);
     siteMPO = permute(siteMPO, [5, 6, 1, 2, 3, 4]);
-    rBlock = permute(rBlock, [2, 1, 3]);
+    rBlock = permute(rBlock, [2, 3, 1]);
 
-    % naieve for looping
     for conjKet = 1 : 1 : HILBY
         for conjBra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
                 for bra = 1 : 1 : HILBY
-                    for conjCol = 1 : 1 : ROW_SIZE
-                        for conjRow = 1 : 1 : COL_SIZE
-                            for col = 1 : 1 : COL_SIZE
-                                for row = 1 : 1 : ROW_SIZE
-                                    effOpTensor(row, col, conjRow, conjCol, ...
-                                    bra, ket, conjBra, conjKet) = ...
-                                    lBlock(conjCol, :, row) ...
-                                    * siteMPO(:, :, conjBra, conjKet, ...
-                                              bra, ket) ...
-                                    * rBlock(:, conjRow, col);
-                                end
-                            end
+                    for conjRow = 1 : 1 : COL_SIZE
+                        for conjCol = 1 : 1 : ROW_SIZE
+                            effOpTensor(:, :, conjRow, conjCol, bra, ket, ...
+                                        conjBra, conjKet) = ...
+                            lBlock(:, :, conjCol) ...
+                            * siteMPO(:, :, conjBra, conjKet, bra, ket) ...
+                            * rBlock(:, :, conjRow);
                         end
                     end
                 end
