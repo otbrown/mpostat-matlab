@@ -28,7 +28,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             detuning02 = 0;
             diss21 = 1;
             diss10 = 0.1;
-            fname = 'data/FourSiteExact.mat';
+            fname = 'testing/validationTests/data/FourSiteExact.mat';
 
             % inputs
             dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
@@ -156,7 +156,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             detuning02 = 0;
             diss21 = 1;
             diss10 = 0.1;
-            fname = 'data/ElevenSiteTEBD.mat';
+            fname = 'testing/validationTests/data/ElevenSiteTEBD.mat';
 
             % inputs
             dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
@@ -280,7 +280,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             h = J;
             V = 0.5 * J;
             diss = 0.1 * J;
-            fname = 'data/MFS15.mat';
+            fname = 'testing/validationTests/data/MFS15.mat';
 
             % inputs
             dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
