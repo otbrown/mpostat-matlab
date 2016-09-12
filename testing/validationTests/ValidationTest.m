@@ -128,13 +128,13 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                         expAdAdAA = DMPOExp(dmpoStat, op);
                         op = idOp;
                     else
-                        expAdA = Nmpo(j);
+                        expAdA = N(j);
                         op(:, :, j) = ctranspose(a)*ctranspose(a)*a*a;
                         expAdAdAA = DMPOExp(dmpoStat, op);
                         op = idOp;
                     end
-                    testG1(j,l) = expAdA / sqrt(Nmpo(j)*Nmpo(l));
-                    testG2(j,l) = expAdAdAA / (Nmpo(j)*Nmpo(l));
+                    testG1(j,l) = expAdA / sqrt(N(j)*N(l));
+                    testG2(j,l) = expAdAdAA / (N(j)*N(l));
                 end
             end
 
@@ -254,13 +254,13 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                         expAdAdAA = DMPOExp(dmpoStat, op);
                         op = idOp;
                     else
-                        expAdA = Nmpo(j);
+                        expAdA = N(j);
                         op(:, :, j) = ctranspose(a)*ctranspose(a)*a*a;
                         expAdAdAA = DMPOExp(dmpoStat, op);
                         op = idOp;
                     end
-                    testG1(j,l) = expAdA / sqrt(Nmpo(j)*Nmpo(l));
-                    testG2(j,l) = expAdAdAA / (Nmpo(j)*Nmpo(l));
+                    testG1(j,l) = expAdA / sqrt(N(j)*N(l));
+                    testG2(j,l) = expAdAdAA / (N(j)*N(l));
                 end
             end
 
