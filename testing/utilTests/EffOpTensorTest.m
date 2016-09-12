@@ -41,7 +41,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             for site = tc.LENGTH : -1 : 2
                 [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{site});
                 tc.right{site - 1} = GrowRight(tc.dmpo{site}, tc.impo, ...
-                tc.right{site}, ROW_SIZE, COL_SIZE, tc.HILBY, 1, 1);
+                tc.right{site}, ROW_SIZE, COL_SIZE, tc.HILBY, 1);
             end
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{tc.TEST_SITE});

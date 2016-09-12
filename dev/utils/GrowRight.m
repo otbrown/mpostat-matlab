@@ -5,7 +5,7 @@
 % Oliver Thomson Brown
 % 2016-03-22
 %
-% updateBlock = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
+% updateBlock = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW)
 %
 % RETURN
 % updateBlock       : rank-3 complex double array, contains the contraction from
@@ -24,9 +24,8 @@
 % COL_SIZE          : integer, the size of the second virtual dimension of
 %                     siteTensor
 % OP_ROW            : integer, the size of the first virtual dimension of mpo
-% OP_COL            : integer, the size of the second virtual dimension of mpo
 
-function [updateBlock] = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
+function [updateBlock] = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW)
     updateBlock = zeros(ROW_SIZE, ROW_SIZE, OP_ROW);
 
     conjTensor = zeros(ROW_SIZE, COL_SIZE, HILBY, HILBY);

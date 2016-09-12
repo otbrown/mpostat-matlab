@@ -93,8 +93,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             for site = tc.LENGTH : -1 : 2
                 [rowSz, colSz, ~, ~] = size(tc.dmpo{site});
                 [~, ~, ~, ~, OP_ROW, OP_COL] = size(tc.lmpo{site});
-                tc.iRight{site - 1} = GrowRight(tc.dmpo{site}, tc.impo, tc.iRight{site}, rowSz, colSz, tc.HILBY, 1, 1);
-                tc.lRight{site - 1} = GrowRight(tc.dmpo{site}, tc.lmpo{site}, tc.lRight{site}, rowSz, colSz, tc.HILBY, OP_ROW, OP_COL);
+                tc.iRight{site - 1} = GrowRight(tc.dmpo{site}, tc.impo, tc.iRight{site}, rowSz, colSz, tc.HILBY, 1);
+                tc.lRight{site - 1} = GrowRight(tc.dmpo{site}, tc.lmpo{site}, tc.lRight{site}, rowSz, colSz, tc.HILBY, OP_ROW);
             end
 
             % build Liouvillian
@@ -145,7 +145,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function vecNormTest(tc)
             % calculate vector norm by using LeftGrow past the end of the system
             [rowSz, colSz, ~, ~] = size(tc.dmpo{1});
-            testVecNorm = GrowRight(tc.dmpo{1}, tc.impo, tc.iRight{1}, rowSz, colSz, tc.HILBY, 1, 1);
+            testVecNorm = GrowRight(tc.dmpo{1}, tc.impo, tc.iRight{1}, rowSz, colSz, tc.HILBY, 1);
 
             % calculate the vector norm the old fashioned way...
             vecNorm = ctranspose(tc.rhoVec) * tc.rhoVec;
@@ -157,7 +157,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function liouvExpTest(tc)
             % calculate Liouvillian expectation by growin g past the last site
             [rowSz, colSz, ~, ~] = size(tc.dmpo{1});
-            testRExp = GrowRight(tc.dmpo{1}, tc.lmpo{1}, tc.lRight{1}, rowSz, colSz, tc.HILBY, 1, 6);
+            testRExp = GrowRight(tc.dmpo{1}, tc.lmpo{1}, tc.lRight{1}, rowSz, colSz, tc.HILBY, 1);
 
             % calculate the Liouvillian expectation the old-fashioned way
             lExp = ctranspose(tc.rhoVec) * tc.L * tc.rhoVec;

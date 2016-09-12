@@ -43,7 +43,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
         [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
         dmpoStat = RCan(dmpoStat, site);
         right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, right{site}, ...
-                                    ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
+                                    ROW_SIZE, COL_SIZE, HILBY, OP_ROW);
     end
 
     % Run the search
@@ -81,7 +81,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
                     [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
                     [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
                     right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, right{site}, ...
-                                         ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
+                                         ROW_SIZE, COL_SIZE, HILBY, OP_ROW);
                 end
             else
                 if site ~= LENGTH
