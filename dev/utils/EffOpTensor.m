@@ -30,7 +30,7 @@
 % OP_COL          : double, the size of the second virtual dimension of the
 %                   matrix product operator for the target site
 
-function [effOpTensor] = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
+function [effOpTensor] = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, HILBY)
     % effOpTensor(row, col, conjRow, conjCol, conjBra, conjKet, bra, ket)
     effOpTensor = zeros(ROW_SIZE, COL_SIZE, COL_SIZE, ROW_SIZE, ...
                         HILBY, HILBY, HILBY, HILBY);

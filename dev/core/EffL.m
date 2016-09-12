@@ -23,13 +23,11 @@ function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
     % collate arguments for EffOpTensor
     [ROW_SIZE, COL_SIZE, HILBY, ~] = size(dmpo{TARGET});
     siteMPO = mpo{TARGET};
-    [~, ~, ~, ~, OP_ROW, OP_COL] = size(siteMPO);
     lBlock = left{TARGET};
     rBlock = right{TARGET};
 
     % get effective operator from EffOpTensor
-    effTensor = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, ...
-                            HILBY, OP_ROW, OP_COL);
+    effTensor = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, HILBY);
 
     % reshape and return
     %effTensor = permute(effTensor, [3, 4, 8, 7, 1, 2, 6, 5]);

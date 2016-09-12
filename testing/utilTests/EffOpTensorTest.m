@@ -46,7 +46,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{tc.TEST_SITE});
             tc.effTen = EffOpTensor(tc.left{tc.TEST_SITE}, tc.impo, ...
-            tc.right{tc.TEST_SITE}, ROW_SIZE, COL_SIZE, tc.HILBY, 1, 1);
+            tc.right{tc.TEST_SITE}, ROW_SIZE, COL_SIZE, tc.HILBY);
         end
     end
 
