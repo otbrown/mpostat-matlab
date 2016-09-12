@@ -27,41 +27,41 @@
 % OP_COL            : integer, the size of the second virtual dimension of mpo
 
 function [updateBlock] = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
-    updateBlock = zeros(ROW_SIZE, OP_ROW, ROW_SIZE);
+    updateBlock = zeros(ROW_SIZE, ROW_SIZE, OP_ROW);
 
-    conjTensor = zeros(COL_SIZE, ROW_SIZE, HILBY, HILBY);
+    conjTensor = zeros(ROW_SIZE, COL_SIZE, HILBY, HILBY);
     for bra = 1 : 1 : HILBY
         for ket = 1 : 1 : HILBY
-            conjTensor(:, :, bra, ket) = ctranspose(siteTensor(:, :, bra, ket));
+            conjTensor(:, :, bra, ket) = conj(siteTensor(:, :, bra, ket));
         end
     end
 
-    for conjCol = 1 : 1 : ROW_SIZE
-        for opRow = 1 : 1 : OP_ROW
-            for row = 1 : 1 : ROW_SIZE
-                BWFB = 0;
-                for conjBra = 1 : 1 : HILBY
-                    for conjKet = 1 : 1 : HILBY
-                        for conjRow = 1 : 1 : COL_SIZE
-                            WFB = 0;
-                            for bra = 1 : 1 : HILBY
-                                for ket = 1 : 1 : HILBY
-                                    for opCol = 1 : 1 : OP_COL
-                                        FB = 0;
-                                        for col = 1 : 1 : COL_SIZE
-                                            FB = FB + rightBlock(conjRow, opCol, col) * siteTensor(row, col, bra, ket);
-                                        end
-                                        %WFB = WFB + mpo(bra, ket, conjBra, conjKet, opRow, opCol) * FB;
-                                        WFB = WFB + mpo(conjBra, conjKet, bra, ket, opRow, opCol) * FB;
-                                    end
-                                end
-                            end
-                            BWFB = BWFB + conjTensor(conjRow, conjCol, conjBra, conjKet) * WFB;
-                        end
+    % permute input arrays to aid optimisation
+    % original indexing:
+    %   siteTensor(row, col, bra, ket)
+    %   rightBlock(conjRow, opCol, col)
+    %   mpo(conjBra, conjKet, bra, ket, opRow, opCol)
+    %   conjTensor(conjRow, conjCol, conjBra, conjKet)
+    siteTensor = permute(siteTensor, [2, 1, 3, 4]);
+    rightBlock = permute(rightBlock, [2, 3, 1]);
+    mpo = permute(mpo, [1, 6, 2, 3, 4, 5]);
+    conjTensor = permute(conjTensor, [1, 3, 2, 4]);
+
+    for opRow = 1 : 1 : OP_ROW
+        BWFB = 0;
+        for conjKet = 1 : 1 : HILBY
+            for conjRow = 1 : 1 : COL_SIZE
+                WFB = 0;
+                for bra = 1 : 1 : HILBY
+                    for ket = 1 : 1 : HILBY
+                        WFB = WFB + mpo(:, :, conjKet, bra, ket, opRow) * rightBlock(:, :, conjRow) * siteTensor(:, :, bra, ket);
                     end
                 end
-                updateBlock(conjCol, opRow, row) = BWFB;
+                BWFB = BWFB + conjTensor(:, :, conjRow, conjKet) * WFB;
             end
         end
+        updateBlock(:, :, opRow) = BWFB;
     end
+
+    updateBlock = permute(updateBlock, [1, 3, 2]);
 end
