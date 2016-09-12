@@ -93,8 +93,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             for site = 1 : 1 : (tc.LENGTH - 1)
                 [rowSz, colSz, ~, ~] = size(tc.dmpo{site});
                 [~, ~, ~, ~, OP_ROW, OP_COL] = size(tc.lmpo{site});
-                tc.iLeft{site + 1} = GrowLeft(tc.dmpo{site}, tc.impo, tc.iLeft{site}, rowSz, colSz, tc.HILBY, 1, 1);
-                tc.lLeft{site + 1} = GrowLeft(tc.dmpo{site}, tc.lmpo{site}, tc.lLeft{site}, rowSz, colSz, tc.HILBY, OP_ROW, OP_COL);
+                tc.iLeft{site + 1} = GrowLeft(tc.dmpo{site}, tc.impo, tc.iLeft{site}, rowSz, colSz, tc.HILBY, 1);
+                tc.lLeft{site + 1} = GrowLeft(tc.dmpo{site}, tc.lmpo{site}, tc.lLeft{site}, rowSz, colSz, tc.HILBY, OP_COL);
             end
 
             % build Liouvillian
@@ -145,7 +145,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function vecNormTest(tc)
             % calculate vector norm by using LeftGrow past the end of the system
             [rowSz, colSz, ~, ~] = size(tc.dmpo{tc.LENGTH});
-            testVecNorm = GrowLeft(tc.dmpo{tc.LENGTH}, tc.impo, tc.iLeft{tc.LENGTH}, rowSz, colSz, tc.HILBY, 1, 1);
+            testVecNorm = GrowLeft(tc.dmpo{tc.LENGTH}, tc.impo, tc.iLeft{tc.LENGTH}, rowSz, colSz, tc.HILBY, 1);
 
             % calculate the vector norm the old fashioned way...
             vecNorm = ctranspose(tc.rhoVec) * tc.rhoVec;
@@ -157,7 +157,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function liouvExpTest(tc)
             % calculate Liouvillian expectation by growin g past the last site
             [rowSz, colSz, ~, ~] = size(tc.dmpo{tc.LENGTH});
-            testLExp = GrowLeft(tc.dmpo{tc.LENGTH}, tc.lmpo{tc.LENGTH}, tc.lLeft{tc.LENGTH}, rowSz, colSz, tc.HILBY, 6, 1);
+            testLExp = GrowLeft(tc.dmpo{tc.LENGTH}, tc.lmpo{tc.LENGTH}, tc.lLeft{tc.LENGTH}, rowSz, colSz, tc.HILBY, 1);
 
             % calculate the Liouvillian expectation the old-fashioned way
             lExp = ctranspose(tc.rhoVec) * tc.L * tc.rhoVec;

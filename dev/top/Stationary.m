@@ -90,7 +90,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
                 [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
                 [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
                 left{site + 1} = GrowLeft(dmpoStat{site}, mpo{site}, left{site}, ...
-                                         ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
+                                         ROW_SIZE, COL_SIZE, HILBY, OP_COL);
                 end
             end
 
