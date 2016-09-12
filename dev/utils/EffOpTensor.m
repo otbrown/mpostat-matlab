@@ -5,7 +5,7 @@
 % Oliver Thomson Brown
 % 2016-05-04
 %
-% [effOpTensor] = EffOpTensor(lBlock, mpo, rBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL)
+% [effOpTensor] = EffOpTensor(lBlock, mpo, rBlock, ROW_SIZE, COL_SIZE, HILBY)
 %
 % RETURN
 % effOpTensor     : 8-dimensional complex double array, rank-6 effective
@@ -25,10 +25,6 @@
 % COL_SIZE        : double, the size of the second virtual dimension of the
 %                   density matrix product operator for the target site
 % HILBY           : double, the size of the local state space
-% OP_ROW          : double, the size of the first virtual dimension of the
-%                   matrix product operator for the target site
-% OP_COL          : double, the size of the second virtual dimension of the
-%                   matrix product operator for the target site
 
 function [effOpTensor] = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, HILBY)
     % effOpTensor(row, col, conjRow, conjCol, conjBra, conjKet, bra, ket)
