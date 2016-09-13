@@ -11,7 +11,7 @@
 %
 % INPUTS
 % dmpo      : cell array, dmpo{site}(row, col, braState, ketState)
-% op        : double array, op(braState, ketState, site);
+% op        : double array, op(ketState, braState, site);
 
 function [expect] = DMPOExp(dmpo, op)
     % pull constants
@@ -25,7 +25,7 @@ function [expect] = DMPOExp(dmpo, op)
         physCon{site} = zeros(size(dmpo{site}(:, :, 1, 1)));
         for bra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
-                physCon{site} = physCon{site} + op(bra, ket, site) * dmpo{site}(:, :, bra, ket);
+                physCon{site} = physCon{site} + op(ket, bra, site) * dmpo{site}(:, :, bra, ket);
             end
         end
     end
