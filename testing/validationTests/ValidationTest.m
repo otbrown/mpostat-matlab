@@ -95,6 +95,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             eigTrack = eigTrack(~isnan(eigTrack));
 
             % calculate observables
+            load(fname);
+
             % allocate
             testN = zeros(LENGTH,1);
             testAdAdAA = zeros(LENGTH,1);
@@ -139,7 +141,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % be assertive!
-            load(fname);
             tc.assertLessThan(abs(N - testN), tc.THRESHOLD);
             tc.assertLessThan(abs(AdAdAA - testAdAdAA), tc.THRESHOLD);
             tc.assertLessThan(abs(G1 - testG1), tc.THRESHOLD);
@@ -223,6 +224,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             eigTrack = eigTrack(~isnan(eigTrack));
 
             % calculate observables
+            load(fname);
+
             % allocate
             testSite = 5;
             testG1 = zeros(LENGTH);
@@ -265,7 +268,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % be assertive!
-            load(fname);
             tc.assertLessThan(abs(N - testN), tc.THRESHOLD);
             tc.assertLessThan(abs(AdAdAA - testAdAdAA), tc.THRESHOLD);
             tc.assertLessThan(abs(G1 - testG1), tc.THRESHOLD);
@@ -332,6 +334,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             eigTrack = eigTrack(~isnan(eigTrack));
 
             % calculate observables
+            load(fname);
+
             testSite = 8;
             testCorXX = zeros(4, 1);
             XOp = zeros(HILBY, HILBY, LENGTH);
@@ -348,7 +352,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % be assertive!
-            load(fname);
             for l = 1 : 1 : 4
                 tc.assertLessThan(abs(CorXX(l) - testCorXX(l)), tc.THRESHOLD);
             end
