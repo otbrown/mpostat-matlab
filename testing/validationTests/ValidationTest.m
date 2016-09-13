@@ -28,7 +28,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             detuning02 = 0;
             diss21 = 1;
             diss10 = 0.1;
-            fname = 'testing/validationTests/data/FourSiteExact.mat';
+            fname = 'data/FourSiteExact.mat';
 
             % inputs
             dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
@@ -140,7 +140,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 end
             end
 
+            tr = DMPOTrace(dmpoStat);
+
             % be assertive!
+            tc.assertLessThan(abs(tr) - 1, tc.THRESHOLD);
             tc.assertLessThan(abs(N - testN), tc.THRESHOLD);
             tc.assertLessThan(abs(AdAdAA - testAdAdAA), tc.THRESHOLD);
             tc.assertLessThan(abs(G1 - testG1), tc.THRESHOLD);
@@ -157,7 +160,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             detuning02 = 0;
             diss21 = 1;
             diss10 = 0.1;
-            fname = 'testing/validationTests/data/ElevenSiteTEBD.mat';
+            fname = 'data/ElevenSiteTEBD.mat';
 
             % inputs
             dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
@@ -267,7 +270,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 end
             end
 
+            tr = DMPOTrace(dmpoStat);
+
             % be assertive!
+            tc.assertLessThan(abs(tr) - 1, tc.THRESHOLD);
             tc.assertLessThan(abs(N - testN), tc.THRESHOLD);
             tc.assertLessThan(abs(AdAdAA - testAdAdAA), tc.THRESHOLD);
             tc.assertLessThan(abs(G1 - testG1), tc.THRESHOLD);
@@ -282,7 +288,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             h = J;
             V = 0.5 * J;
             diss = 0.1 * J;
-            fname = 'testing/validationTests/data/MFS15.mat';
+            fname = 'data/MFS15.mat';
 
             % inputs
             dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
@@ -292,6 +298,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             X = [0, 1; 1, 0];
             Y = [0, -1i; 1i, 0];
             Z = [1, 0; 0, -1];
+            K = sqrt(diss) * (X - 1i*Y) / 2;
 
             % mpo building blocks
             ident = kron(I, I);
@@ -351,7 +358,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 op = XOp;
             end
 
+            tr = DMPOTrace(dmpoStat);
+
             % be assertive!
+            tc.assertLessThan(abs(tr) - 1, tc.THRESHOLD);
             for l = 1 : 1 : 4
                 tc.assertLessThan(abs(CorXX(l) - testCorXX(l)), tc.THRESHOLD);
             end
