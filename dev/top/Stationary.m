@@ -47,7 +47,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     end
 
     % Run the search
-    opts.p = 50;
     opts.maxit = 1000;
     opts.tol = 10*eps;
     convFlag = 0;
