@@ -33,4 +33,6 @@ function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
     effTensor = permute(effTensor, [3, 4, 7, 8, 2, 1, 5, 6]);
     effectiveLiouv = reshape(effTensor, [ROW_SIZE*COL_SIZE*HILBY*HILBY, ...
                                          ROW_SIZE*COL_SIZE*HILBY*HILBY]);
+
+    effectiveLiouv = sparse(effectiveLiouv);
 end
