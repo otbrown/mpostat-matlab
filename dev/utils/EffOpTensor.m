@@ -27,7 +27,7 @@
 % HILBY           : double, the size of the local state space
 
 function [effOpTensor] = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, HILBY)
-    % effOpTensor(row, col, conjRow, conjCol, conjBra, conjKet, bra, ket)
+    % effOpTensor(row, col, conjRow, conjCol, bra, ket, conjBra, conjKet)
     effOpTensor = zeros(ROW_SIZE, COL_SIZE, COL_SIZE, ROW_SIZE, ...
                         HILBY, HILBY, HILBY, HILBY);
 
