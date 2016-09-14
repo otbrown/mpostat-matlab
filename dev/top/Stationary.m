@@ -16,8 +16,6 @@
 %                 initial state
 % mpo           : cell array, Liouvillian for the system in matrix product
 %                 operator form
-% MAX_DIM       : double, the maximum size of virtual dimension for the sie
-%                 tensors
 % THRESHOLD     : double, the convergence threshold
 % RUNMAX        : integer, the maximum number of updates before the code fails
 
@@ -25,6 +23,15 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     % gather up system parameters
     LENGTH = length(dmpoInit);
     HILBY = size(dmpoInit{1}, 3);
+    MIDDLE = floor(LENGTH/2);
+    MAX_DIM = size(dmpoInit{MIDDLE}, 2);
+    MAX_LDIM = (MAX_DIM * HILBY)^4;
+
+    % print some info about the calculation
+    fprintf('Variational Stationary State Search\n');
+    fprintf('%s\n\n', datestr(datetime('now'), 31));
+    fprintf('System Parameters:\n\tSystem size: %g\n\tLocal states: %g\n', LENGTH, HILBY);
+    fprintf('Calculation Parameters:\n\tConvergence threshold: %g\n\tMaximum number of updates: %g\n\tMaximum MPS matrix size: %g\n\tMaximum effective Liouvillian size: %g\n\n', THRESHOLD, RUNMAX, MAX_DIM, MAX_LDIM);
 
     % allocate return variables
     % CLEAN UP INITIAL STATE
@@ -94,7 +101,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
             end
 
             % evaluate convergence
-            [convFlag, ~] = ConvTest(eigTrack, updCount, 2 * LENGTH, THRESHOLD);
+            [convFlag, convergence] = ConvTest(eigTrack, updCount, 2 * LENGTH, THRESHOLD);
 
             updCount = updCount + 1;
 
@@ -105,7 +112,9 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
             end
         end
 
+        % add to sweepCount and report on progress
         sweepCount = sweepCount + 1;
+        fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', sweepCount, eigTrack(updCount - 1), convergence);
 
         % flip it and reverse it
         route = flip(route);
