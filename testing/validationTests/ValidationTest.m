@@ -13,8 +13,9 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
     properties
         THRESHOLD = 1E-7;
+        OBS_TOL = 1E-5;
         RUNMAX = 500;
-        COMPRESS = 100;
+        COMPRESS = 70;
     end
 
     methods (Test)
@@ -144,10 +145,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % be assertive!
             tc.assertLessThan(abs(tr) - 1, tc.THRESHOLD);
-            tc.assertLessThan(abs(N - testN), tc.THRESHOLD);
-            tc.assertLessThan(abs(AdAdAA - testAdAdAA), tc.THRESHOLD);
-            tc.assertLessThan(abs(G1 - testG1), tc.THRESHOLD);
-            tc.assertLessThan(abs(G2 - testG2), tc.THRESHOLD);
+            tc.assertLessThan(abs(N - testN), tc.OBS_TOL);
+            tc.assertLessThan(abs(AdAdAA - testAdAdAA), tc.OBS_TOL);
+            tc.assertLessThan(abs(G1 - testG1), tc.OBS_TOL);
+            tc.assertLessThan(abs(G2 - testG2), tc.OBS_TOL);
         end
 
         function ElevenSiteTEBD(tc)
@@ -274,10 +275,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % be assertive!
             tc.assertLessThan(abs(tr) - 1, tc.THRESHOLD);
-            tc.assertLessThan(abs(N - testN), tc.THRESHOLD);
-            tc.assertLessThan(abs(AdAdAA - testAdAdAA), tc.THRESHOLD);
-            tc.assertLessThan(abs(G1 - testG1), tc.THRESHOLD);
-            tc.assertLessThan(abs(G2 - testG2), tc.THRESHOLD);
+            tc.assertLessThan(abs(N - testN), tc.OBS_TOL);
+            tc.assertLessThan(abs(AdAdAA - testAdAdAA), tc.OBS_TOL);
+            tc.assertLessThan(abs(G1 - testG1), tc.OBS_TOL);
+            tc.assertLessThan(abs(G2 - testG2), tc.OBS_TOL);
         end
 
         function MFS15(tc)
@@ -363,7 +364,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             % be assertive!
             tc.assertLessThan(abs(tr) - 1, tc.THRESHOLD);
             for l = 1 : 1 : 4
-                tc.assertLessThan(abs(CorXX(l) - testCorXX(l)), tc.THRESHOLD);
+                tc.assertLessThan(abs(CorXX(l) - testCorXX(l)), tc.OBS_TOL);
             end
         end
     end
