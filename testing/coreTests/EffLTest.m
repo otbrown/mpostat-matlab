@@ -59,6 +59,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             tc.fatalAssertClass(tc.effL, 'double');
         end
 
+        function testSparse(tc)
+            tc.fatalAssertTrue(issparse(tc.effL));
+        end
+
         function testShape(tc)
             [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{tc.TEST_SITE});
             tc.fatalAssertSize(tc.effL, [ROW_SIZE*COL_SIZE*tc.HILBY*tc.HILBY,...
@@ -76,7 +80,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 for ket = 0 : 1 : (tc.HILBY - 1)
                     joindex = ket * tc.HILBY * ROW_SIZE * COL_SIZE ...
                             + bra * ROW_SIZE * COL_SIZE + 1;
-                    tc.assertEqual(tc.effL(joindex, joindex), 1);
+                    tc.assertEqual(tc.effL(joindex, joindex), sparse(1));
                 end
             end
         end
