@@ -19,8 +19,8 @@ savePath = sprintf('%s/%s_PROFILE.mat', resultDir, dateStamp);
 
 % set up system to be solved
 HILBY = 3;
-LENGTH = 3;
-COMPRESS = 50;
+LENGTH = 4;
+COMPRESS = 100;
 THRESHOLD = 1E-7;
 RUNMAX = 1000;
 
