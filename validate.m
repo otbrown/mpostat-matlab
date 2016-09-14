@@ -12,7 +12,7 @@ end
 utilResult = runtests('testing/utilTests');
 coreResult = runtests('testing/coreTests');
 topResult = runtests('testing/topTests');
-valResult = runtests('testing/validationTests');
+valResult = runtests('testing/validationTests', 'Name', 'ValidationTest/FourSiteExact', 'Name', 'ValidationTest/MFS15');
 
 failCount = sum([utilResult.Failed]) + sum([coreResult.Failed]) ...
             + sum([topResult.Failed]) + sum([valResult.Failed]);
