@@ -12,11 +12,11 @@ end
 utilResult = runtests('testing/utilTests');
 coreResult = runtests('testing/coreTests');
 topResult = runtests('testing/topTests');
-val4SResult = runtests('testing/validationTests', 'Name', 'ValidationTest/FourSiteExact');
-valMFS15Result = runtests('testing/validationTests', 'Name', 'ValidationTest/MFS15')
+valResult = runtests('testing/validationTests');
 
 failCount = sum([utilResult.Failed]) + sum([coreResult.Failed]) ...
-            + sum([topResult.Failed]) + sum([val4SResult.Failed]) + sum([valMFS15Result.Failed]);
+            + sum([topResult.Failed]) + sum([valResult.Failed]);
+
 if failCount
     dateStamp = datestr(datetime('now'), 30);
     savePath = sprintf('%s/%s_VALIDATE.mat', resultDir, dateStamp);

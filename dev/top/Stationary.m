@@ -54,8 +54,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     end
 
     % Run the search
-    opts.maxit = 1000;
-    opts.tol = 10*eps;
+    opts.maxit = 500;
     convFlag = 0;
     sweepCount = 0;
     updCount = 1;
@@ -64,7 +63,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     while ~convFlag && updCount < RUNMAX
         for site = route
             effL = EffL(site, dmpoStat, mpo, left, right);
-            effL(abs(effL) < eps) = 0;
             [update, eigTrack(updCount)] = eigs(effL, 1, 'lr', opts);
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
@@ -101,7 +99,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
             end
 
             % evaluate convergence
-            [convFlag, convergence] = ConvTest(eigTrack, updCount, 2 * LENGTH, THRESHOLD);
+            [convFlag, convergence] = ConvTest(eigTrack, updCount, LENGTH, THRESHOLD);
 
             updCount = updCount + 1;
 
