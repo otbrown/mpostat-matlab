@@ -34,5 +34,6 @@ function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
     effectiveLiouv = reshape(effTensor, [ROW_SIZE*COL_SIZE*HILBY*HILBY, ...
                                          ROW_SIZE*COL_SIZE*HILBY*HILBY]);
 
+    effectiveLiouv(abs(effectiveLiouv) < 10*eps) = 0;
     effectiveLiouv = sparse(effectiveLiouv);
 end
