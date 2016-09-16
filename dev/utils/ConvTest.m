@@ -1,6 +1,5 @@
 % ConvTest.m
-% function which checks if the last sampleSize eigenvalues have been below
-% threshold
+% function which checks if the supplied values have converged below threshold
 % Oliver Thomson Brown
 % 2016-08-30
 %
@@ -18,7 +17,7 @@ function [ convFlag, convergence ] = ConvTest(eigTracker, threshold)
 	convergence = NaN;
 
 	if ~isnan(eigTracker)
-		convergence = abs(mean(diff(eigTracker)));
+		convergence = mean(abs(diff(eigTracker)));
 		if convergence < threshold
 			convFlag = 1;
 		end
