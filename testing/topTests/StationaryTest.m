@@ -1,5 +1,5 @@
 % StationaryTest.m
-% note that these tests should test the control flow of Statioanry, but not
+% note that these tests should test the control flow of Stationary, but not
 % whether or not it finds the correct answers
 % Oliver Thomson Brown
 % 2016-05-09
@@ -17,7 +17,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         dmpoInit;
         mpo;
         THRESHOLD = 1E-7;
-        RUNMAX = 50;
         MAX_DIM = 100;
     end
 
@@ -56,7 +55,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % solve using Stationary
             [tc.dmpoStat, tc.eigTrack] = Stationary(tc.dmpoInit, tc.mpo, ...
-                                                    tc.THRESHOLD, tc.RUNMAX);
+                                                    tc.THRESHOLD);
         end
     end
 
