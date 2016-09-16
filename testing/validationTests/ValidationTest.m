@@ -12,9 +12,8 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) ValidationTest < matlab.unittest.TestCase
 
     properties
-        THRESHOLD = 1E-7;
+        THRESHOLD = 1E-4;
         OBS_TOL = 1E-4;
-        RUNMAX = 500;
         COMPRESS = 70;
     end
 
@@ -92,7 +91,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, tc.THRESHOLD, tc.RUNMAX);
+            [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, tc.THRESHOLD);
 
             % calculate observables
             load(fname);
@@ -216,7 +215,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, tc.THRESHOLD, tc.RUNMAX);
+            [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, tc.THRESHOLD);
 
             % calculate observables
             load(fname);
