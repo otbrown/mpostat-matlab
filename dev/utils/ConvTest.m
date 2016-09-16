@@ -13,13 +13,13 @@
 % threshold	    : double, convergence threshold
 
 function [ convFlag, convergence ] = ConvTest(eigTracker, threshold)
-	convFlag = 0;
+	convFlag = false;
 	convergence = NaN;
 
 	if ~isnan(eigTracker)
 		convergence = mean(abs(diff(eigTracker)));
 		if convergence < threshold
-			convFlag = 1;
+			convFlag = true;
 		end
 	end
 end
