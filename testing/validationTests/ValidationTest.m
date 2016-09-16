@@ -13,7 +13,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
     properties
         THRESHOLD = 1E-7;
-        OBS_TOL = 1E-5;
+        OBS_TOL = 1E-4;
         RUNMAX = 500;
         COMPRESS = 70;
     end
