@@ -36,7 +36,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     % allocate return variables
     % CLEAN UP INITIAL STATE
     dmpoStat = dmpoInit;
-    eigTrack = NaN(RUNMAX, 1);
+    eigTrack = NaN(LENGTH, 1);
 
     % build left and right blocks
     % MAKE AN INTERFACE FUNCTION LIKE GROWBLOCK
@@ -57,13 +57,13 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     opts.maxit = 500;
     convFlag = 0;
     sweepCount = 0;
-    updCount = 1;
+    updCount = 0;
     route = 1 : 1 : LENGTH;
 
     while ~convFlag && updCount < RUNMAX
         for site = route
             effL = EffL(site, dmpoStat, mpo, left, right);
-            [update, eigTrack(updCount)] = eigs(effL, 1, 'lr', opts);
+            [update, eigTrack(LENGTH)] = eigs(effL, 1, 'lr', opts);
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
 
@@ -99,7 +99,10 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
             end
 
             % evaluate convergence
-            [convFlag, convergence] = ConvTest(eigTrack, updCount, LENGTH, THRESHOLD);
+            [convFlag, convergence] = ConvTest(eigTrack, THRESHOLD);
+
+            % drop oldest eigenvalue from eigTrack and move elements back
+            eigTrack(1 : LENGTH - 1) = eigTrack(2 : LENGTH);
 
             updCount = updCount + 1;
 
@@ -112,7 +115,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
 
         % add to sweepCount and report on progress
         sweepCount = sweepCount + 1;
-        fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', sweepCount, eigTrack(updCount - 1), convergence);
+        fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', sweepCount, eigTrack(LENGTH), convergence);
 
         % flip it and reverse it
         route = flip(route);
