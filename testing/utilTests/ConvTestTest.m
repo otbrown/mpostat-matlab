@@ -7,8 +7,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
     properties
         THRESHOLD = 1E-7;
         LENGTH = 30;
-        FALSE = 0;
-        TRUE = 1;
+        FALSE = false;
+        TRUE = true;
     end
 
     methods (Test)
