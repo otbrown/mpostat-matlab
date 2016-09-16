@@ -19,7 +19,7 @@
 % THRESHOLD     : double, the convergence threshold
 % RUNMAX        : integer, the maximum number of updates before the code fails
 
-function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
+function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
     % gather up system parameters
     LENGTH = length(dmpoInit);
     HILBY = size(dmpoInit{1}, 3);
@@ -27,11 +27,21 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
     MAX_DIM = size(dmpoInit{MIDDLE}, 2);
     MAX_LDIM = (MAX_DIM * HILBY)^4;
 
+    % set internal calculation parameters
+    RUNMAX = 1000;
+    CONVERGENCE_THRESHOLD = THRESHOLD / (10 * LENGTH);
+    convFlag = false;
+    success = false;
+    sweepCount = 0;
+    updCount = 0;
+    opts.maxit = 500;
+    route = 1 : 1 : LENGTH;
+
     % print some info about the calculation
     fprintf('Variational Stationary State Search\n');
     fprintf('%s\n\n', datestr(datetime('now'), 31));
     fprintf('System Parameters:\n\tSystem size: %g\n\tLocal states: %g\n', LENGTH, HILBY);
-    fprintf('Calculation Parameters:\n\tConvergence threshold: %g\n\tMaximum number of updates: %g\n\tMaximum MPS matrix size: %g\n\tMaximum effective Liouvillian size: %g\n\n', THRESHOLD, RUNMAX, MAX_DIM, MAX_LDIM);
+    fprintf('Calculation Parameters:\n\tEigenvalue threshold: %g\n\tMaximum MPS matrix size: %g\n\tMaximum effective Liouvillian size: %g\n\n', THRESHOLD, MAX_DIM, MAX_LDIM);
 
     % allocate return variables
     % CLEAN UP INITIAL STATE
@@ -52,13 +62,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
         right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, right{site}, ...
                                     ROW_SIZE, COL_SIZE, HILBY, OP_ROW);
     end
-
-    % Run the search
-    opts.maxit = 500;
-    convFlag = 0;
-    sweepCount = 0;
-    updCount = 0;
-    route = 1 : 1 : LENGTH;
 
     while ~convFlag && updCount < RUNMAX
         for site = route
@@ -99,18 +102,24 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
             end
 
             % evaluate convergence
-            [convFlag, convergence] = ConvTest(eigTrack, THRESHOLD);
-
-            % drop oldest eigenvalue from eigTrack and move elements back
-            eigTrack(1 : LENGTH - 1) = eigTrack(2 : LENGTH);
-
-            updCount = updCount + 1;
+            [convFlag, convergence] = ConvTest(eigTrack, CONVERGENCE_THRESHOLD);
 
             % stop following route if RUNMAX is reached or if the calculation
             % has converged to desired threshold
             if convFlag || updCount == RUNMAX
-                break;
+                if abs(eigTrack(LENGTH)) < THRESHOLD
+                    fprintf('Calculation successful.\n');
+                    success = true;
+                    break;
+                else
+                    fprintf('Calculation failed to reach desired accuracy.\n');
+                    break;
+                end
             end
+
+            % drop oldest eigenvalue from eigTrack and move elements back
+            eigTrack(1 : LENGTH - 1) = eigTrack(2 : LENGTH);
+            updCount = updCount + 1;
         end
 
         % add to sweepCount and report on progress
