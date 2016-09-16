@@ -11,22 +11,15 @@
 % [INPUTS]
 % eigTracker	: complex array, contains the eigenvalue of the effective
 %                 Liouvillian solved for each site update
-% updCount      : double, the number of site updates performed so far
-% sampleSize	: double, the number of results to check for convergence
 % threshold	    : double, convergence threshold
 
-function [ convFlag, worstCase ] = ConvTest(eigTracker, updCount, sampleSize, threshold)
+function [ convFlag, convergence ] = ConvTest(eigTracker, threshold)
 	convFlag = 0;
-	worstCase = NaN;
+	convergence = NaN;
 
-	if updCount <= sampleSize
-        % total number of updates is still less than sampleSize
-        % do nothing
-	else
-		sample = eigTracker(updCount - sampleSize : updCount) - ...
-                 eigTracker(updCount);
-		worstCase = max( abs(sample) );
-		if worstCase < threshold
+	if ~isnan(eigTracker)
+		convergence = abs(mean(diff(eigTracker)));
+		if convergence < threshold
 			convFlag = 1;
 		end
 	end
