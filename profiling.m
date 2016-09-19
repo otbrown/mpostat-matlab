@@ -92,7 +92,7 @@ end
 profile on;
 
 % solve using Stationary
-[dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX);
+[dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD);
 
 profinfo = profile('info');
 
