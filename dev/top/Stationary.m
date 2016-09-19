@@ -17,7 +17,6 @@
 % mpo           : cell array, Liouvillian for the system in matrix product
 %                 operator form
 % THRESHOLD     : double, the convergence threshold
-% RUNMAX        : integer, the maximum number of updates before the code fails
 
 function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
     % gather up system parameters
@@ -32,6 +31,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
     CONVERGENCE_THRESHOLD = THRESHOLD / (10 * LENGTH);
     convFlag = false;
     success = false;
+    finished = false;
     sweepCount = 0;
     updCount = 0;
     opts.maxit = 500;
@@ -107,12 +107,13 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
             % stop following route if RUNMAX is reached or if the calculation
             % has converged to desired threshold
             if convFlag || updCount == RUNMAX
+                finished = true;
                 if abs(eigTrack(LENGTH)) < THRESHOLD
-                    fprintf('Calculation successful.\n');
+                    fprintf('\nCalculation successful.\n');
                     success = true;
                     break;
                 else
-                    fprintf('Calculation failed to reach desired accuracy.\n');
+                    fprintf('\nCalculation failed to reach desired accuracy. Larger matrix dimensions may be required.\n');
                     break;
                 end
             end
@@ -122,9 +123,13 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
             updCount = updCount + 1;
         end
 
-        % add to sweepCount and report on progress
-        sweepCount = sweepCount + 1;
-        fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', sweepCount, eigTrack(LENGTH), convergence);
+        if finished
+            fprintf('[ Eigenvalue: %g, Convergence: %g ]\n', eigTrack(LENGTH), convergence);
+        else
+            % add to sweepCount and report on progress
+            sweepCount = sweepCount + 1;
+            fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', sweepCount, eigTrack(LENGTH), convergence);
+        end
 
         % flip it and reverse it
         route = flip(route);
