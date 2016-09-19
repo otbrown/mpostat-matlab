@@ -6,9 +6,9 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
     properties
         absTol = 1E-14;
-        HILBY = 2;
-        LENGTH = 7;
-        COMPRESS = 100;
+        HILBY;
+        LENGTH;
+        COMPRESS = 50;
         SAMPLE_MAX = 100;
         dmpo;
         canDMPO;
