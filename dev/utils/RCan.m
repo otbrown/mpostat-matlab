@@ -11,9 +11,9 @@
 % INPUTS
 % dmpo      : cell array, a density-matrix product operator
 % route     : integer array, the sites which should be brought into
-%             right-canonical form, in decreasing order. The last site cannot be
-%             the first site in the system since the next site along is also
-%             affected by this procedure
+%             right-canonical form, in decreasing order. The last site cannot
+%             be the first site in the system since the next site along is
+%             also affected by this procedure
 
 function [rdmpo] = RCan(dmpo, route)
     % gather constants
@@ -37,12 +37,10 @@ function [rdmpo] = RCan(dmpo, route)
         M = reshape(rdmpo{site}, [rowSz, colSz * HILBY^2]);
 
         % SVD decomposition
-        % ISSUE! This uses a lot of mem compared to the LCan QR
         [U, S, V] = svd(M, 'econ');
-        V = ctranspose(V);
-        vr = size(V, 1);
+        vr = size(V, 2);
         V2 = zeros(rowSz, colSz * HILBY^2);
-        V2(1 : vr, :) = V;
+        V2(1 : vr, :) = ctranspose(V);
 
         % manipulate V back into a rank-4 tensor and embed
         rdmpo{site} = reshape(V2, [rowSz, colSz, HILBY, HILBY]);
@@ -51,14 +49,13 @@ function [rdmpo] = RCan(dmpo, route)
         colSz = rowSz;
         rowSz = size(rdmpo{site - 1}, 1);
 
-        [sr, sc] = size(S);
-        S2 = zeros(sr, colSz);
-        S2(:, 1 : sc) = S;
+        US = zeros(colSz);
+        US(:, 1 : vr) = U * S;
 
         for bra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
                 rdmpo{site - 1}(:, :, bra, ket) = ...
-                rdmpo{site - 1}(:, :, bra, ket) * U * S2;
+                rdmpo{site - 1}(:, :, bra, ket) * US;
             end
         end
     end
