@@ -27,8 +27,8 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
     MAX_LDIM = (MAX_DIM * HILBY)^4;
 
     % set internal calculation parameters
-    RUNMAX = 1000;
-    CONVERGENCE_THRESHOLD = THRESHOLD / (10 * LENGTH);
+    RUNMAX = 50*LENGTH;
+    CONVERGENCE_THRESHOLD = THRESHOLD / (2 * LENGTH);
     convFlag = false;
     success = false;
     finished = false;
