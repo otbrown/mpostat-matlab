@@ -124,7 +124,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
         end
 
         if finished
-            fprintf('[ Eigenvalue: %g, Convergence: %g ]\n', eigTrack(LENGTH), convergence);
+            fprintf('Finished at %s.\n[ Eigenvalue: %g, Convergence: %g ]\n', datestr(datetime('now'), 31), eigTrack(LENGTH), convergence);
         else
             % add to sweepCount and report on progress
             sweepCount = sweepCount + 1;
