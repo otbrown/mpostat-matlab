@@ -35,6 +35,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
     sweepCount = 0;
     updCount = 0;
     opts.maxit = 500;
+    opts.tol = max((CONVERGENCE_THRESHOLD / 1000), eps);
     route = 1 : 1 : LENGTH;
 
     % print some info about the calculation
