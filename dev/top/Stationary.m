@@ -24,7 +24,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
     HILBY = size(dmpoInit{1}, 3);
     MIDDLE = floor(LENGTH/2);
     MAX_DIM = size(dmpoInit{MIDDLE}, 2);
-    MAX_LDIM = (MAX_DIM * HILBY)^4;
+    MAX_LDIM = (MAX_DIM * HILBY)^2;
 
     % set internal calculation parameters
     RUNMAX = 50*LENGTH;
