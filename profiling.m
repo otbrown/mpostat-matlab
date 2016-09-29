@@ -14,15 +14,15 @@ if ~exist(resultDir, 'dir')
     mkdir(resultDir);
 end
 
-dateStamp = datestr(datetime('now'), 30);
-savePath = sprintf('%s/%s_PROFILE.mat', resultDir, dateStamp);
-
 % set up system to be solved
 HILBY = 3;
 LENGTH = 4;
-COMPRESS = 100;
-THRESHOLD = 1E-7;
-RUNMAX = 1000;
+COMPRESS = 75;
+THRESHOLD = 1E-5;
+variant = 'sparse';
+
+dateStamp = datestr(datetime('now'), 30);
+savePath = sprintf('%s/%s_%sPROFILE.mat', resultDir, dateStamp, variant);
 
 dmpoInit = SuperDMPO(HILBY, LENGTH, COMPRESS);
 
@@ -92,7 +92,7 @@ end
 profile on;
 
 % solve using Stationary
-[dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD);
+[dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant);
 
 profinfo = profile('info');
 
