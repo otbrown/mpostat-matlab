@@ -3,7 +3,8 @@
 % Oliver Thomson Brown
 % 2016-05-06
 %
-% [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, RUNMAX)
+% [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
+% [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
 %
 % RETURN
 % dmpoStat      : cell array, density matrix product operator representing the
@@ -17,9 +18,30 @@
 % mpo           : cell array, Liouvillian for the system in matrix product
 %                 operator form
 % THRESHOLD     : double, the convergence threshold
+% variant       : string, optional argument, may specify whether to build the
+%                 effective Liouvillian in full or as a sparse array -- valid
+%                 strings are 'full' and 'sparse' -- 'sparse' is default
 
-function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
-    % gather up system parameters
+function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
+    % check for optional arguments
+    switch nargin
+        case 3
+            MEMSAVE = true;
+        case 4
+            if strcmpi(varargin{1}, 'full')
+                MEMSAVE = false;
+            elseif strcmpi(varargin{1}, 'sparse')
+                MEMSAVE = true;
+            else
+                ME = MException('Stationary:badMEMSAVE', 'The last argument was invalid: %s. Type help Stationary.', varargin{1});
+                throw(ME);
+            end
+        otherwise
+            ME = MException('Stationary:badArguments', 'Stationary accepts 3 or 4 arguments, but %g were supplied. Type help Stationary.', nargin);
+            throw(ME);
+    end
+
+    % gather up physical system parameters
     LENGTH = length(dmpoInit);
     HILBY = size(dmpoInit{1}, 3);
     MIDDLE = floor(LENGTH/2);
@@ -29,13 +51,17 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
     % set internal calculation parameters
     RUNMAX = 50*LENGTH;
     CONVERGENCE_THRESHOLD = THRESHOLD / (2 * LENGTH);
+
+    % set some parameters for 'finessing' eigs
+    opts.maxit = 500;
+    opts.tol = max((CONVERGENCE_THRESHOLD / 1000), eps);
+
+    % initialise flags and counters
     convFlag = false;
     success = false;
     finished = false;
     sweepCount = 0;
     updCount = 0;
-    opts.maxit = 500;
-    opts.tol = max((CONVERGENCE_THRESHOLD / 1000), eps);
     route = 1 : 1 : LENGTH;
 
     % print some info about the calculation
@@ -45,7 +71,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
     fprintf('Calculation Parameters:\n\tEigenvalue threshold: %g\n\tMaximum MPS matrix size: %g\n\tMaximum effective Liouvillian size: %g\n\n', THRESHOLD, MAX_DIM, MAX_LDIM);
 
     % allocate return variables
-    % CLEAN UP INITIAL STATE
     dmpoStat = dmpoInit;
     eigTrack = NaN(LENGTH, 1);
 
@@ -66,7 +91,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
 
     while ~convFlag && updCount < RUNMAX
         for site = route
-            effL = EffL(site, dmpoStat, mpo, left, right);
+            effL = EffL(site, dmpoStat, mpo, left, right, MEMSAVE);
             [update, eigTrack(LENGTH)] = eigs(effL, 1, 'lr', opts);
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
