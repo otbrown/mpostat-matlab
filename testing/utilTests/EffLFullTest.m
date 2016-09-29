@@ -9,9 +9,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         LENGTH;
         COMPRESS = 0;
         dmpo;
-        left;
         impo;
-        right;
         TEST_SITE;
         effL;
     end
@@ -32,26 +30,29 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 tc.impo{site} = reshape(eye(tc.HILBY^2), ...
                                 [tc.HILBY, tc.HILBY, tc.HILBY, tc.HILBY]);
             end
-            tc.left = cell(tc.LENGTH, 1);
-            tc.left{1} = 1;
-            tc.right = cell(tc.LENGTH, 1);
-            tc.right{tc.LENGTH} = 1;
+            left = cell(tc.LENGTH, 1);
+            left{1} = 1;
+            right = cell(tc.LENGTH, 1);
+            right{tc.LENGTH} = 1;
             for site = 1 : 1 : (tc.LENGTH - 1)
                 [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{site});
-                tc.left{site + 1} = GrowLeft(tc.dmpo{site}, ...
-                tc.impo{tc.TEST_SITE}, tc.left{site}, ROW_SIZE, COL_SIZE, ...
+                left{site + 1} = GrowLeft(tc.dmpo{site}, ...
+                tc.impo{tc.TEST_SITE}, left{site}, ROW_SIZE, COL_SIZE, ...
                 tc.HILBY, 1);
             end
             for site = tc.LENGTH : -1 : 2
                 [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{site});
-                tc.right{site - 1} = GrowRight(tc.dmpo{site}, ...
-                tc.impo{tc.TEST_SITE}, tc.right{site}, ROW_SIZE, COL_SIZE, ...
+                right{site - 1} = GrowRight(tc.dmpo{site}, ...
+                tc.impo{tc.TEST_SITE}, right{site}, ROW_SIZE, COL_SIZE, ...
                 tc.HILBY, 1);
             end
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{tc.TEST_SITE});
-            tc.effL = EffLFull(tc.TEST_SITE, tc.dmpo, tc.impo, ...
-                               tc.left, tc.right);
+            lBlock = left{tc.TEST_SITE};
+            siteMPO = tc.impo{tc.TEST_SITE};
+            rBlock = right{tc.TEST_SITE};
+            tc.effL = EffLFull(lBlock, siteMPO, rBlock, ...
+                               ROW_SIZE, COL_SIZE, tc.HILBY);
         end
     end
 
