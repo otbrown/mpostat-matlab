@@ -7,7 +7,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
     properties
         HILBY;
         LENGTH;
-        COMPRESS = 0;
+        COMPRESS = 50;
         dmpo;
         left;
         impo;
@@ -17,8 +17,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
     end
 
     properties (MethodSetupParameter)
-        testHILBY = {2, 3}
-        testLENGTH = {3, 4}
+        testHILBY = {2, 2, 3}
+        testLENGTH = {7, 9, 6}
     end
 
     methods (TestMethodSetup)
