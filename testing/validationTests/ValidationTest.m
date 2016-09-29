@@ -91,7 +91,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, tc.THRESHOLD);
+            [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, ...
+                                              tc.THRESHOLD, 'sparse');
 
             % calculate observables
             load(fname);
@@ -215,7 +216,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, tc.THRESHOLD);
+            [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, ...
+                                              tc.THRESHOLD, 'full');
 
             % calculate observables
             load(fname);

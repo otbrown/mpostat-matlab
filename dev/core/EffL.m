@@ -1,14 +1,14 @@
 % EffL.m
-% function which returns the effective Liouvillian for a particular site
-% in the form of a matrix, ready to be eigensolved
-% Oliver Thomson Brown
-% 2016-05-05
+% accessor method which returns the effective Liouvillian built by either
+% EffLFull or EffLSparse, depending on the value of logical MEMSAVE
+% 2016-09-29
 %
-% [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
+% [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right, MEMSAVE)
 %
 % RETURN
 % effectiveLiouv    : complex double matrix, the effective Liovillian for the
-%                     site specified by TARGET, reshaped to be a matrix
+%                     site specified by TARGET, reshaped to be a matrix, may be
+%                     full or space, depending on MEMSAVE
 %
 % INPUTS
 % TARGET            : integer, the site for which the effective Liouvillian
@@ -18,22 +18,21 @@
 %                     product operator tensor for the site n
 % left              : cell array, contains the left blocks for each site
 % right             : cell array, contains the right blocks for each site
+% MEMSAVE           : if true EffL passes on input to EffLSparse, otherwise it
+%                     calls EffLFull
 
-function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
-    % collate arguments for EffOpTensor
+function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right, MEMSAVE)
+    % gather pass-forward variables
     [ROW_SIZE, COL_SIZE, HILBY, ~] = size(dmpo{TARGET});
     siteMPO = mpo{TARGET};
     lBlock = left{TARGET};
     rBlock = right{TARGET};
 
-    % get effective operator from EffOpTensor
-    effTensor = EffOpTensor(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, HILBY);
-
-    % reshape and return
-    effTensor = permute(effTensor, [3, 4, 7, 8, 2, 1, 5, 6]);
-    effectiveLiouv = reshape(effTensor, [ROW_SIZE*COL_SIZE*HILBY*HILBY, ...
-                                         ROW_SIZE*COL_SIZE*HILBY*HILBY]);
-
-    effectiveLiouv(abs(effectiveLiouv) < eps) = 0;
-    effectiveLiouv = sparse(effectiveLiouv);
+    if MEMSAVE
+        effectiveLiouv = EffLSparse(lBlock, siteMPO, rBlock, ...
+                                    ROW_SIZE, COL_SIZE, HILBY);
+    else
+        effectiveLiouv = EffLFull(lBlock, siteMPO, rBlock, ...
+                                  ROW_SIZE, COL_SIZE, HILBY);
+    end
 end

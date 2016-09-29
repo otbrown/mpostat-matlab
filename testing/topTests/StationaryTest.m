@@ -55,7 +55,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % solve using Stationary
             [tc.dmpoStat, tc.eigTrack] = Stationary(tc.dmpoInit, tc.mpo, ...
-                                                    tc.THRESHOLD);
+                                                    tc.THRESHOLD, 'full');
         end
     end
 
@@ -63,6 +63,20 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testClass(tc)
             tc.fatalAssertClass(tc.dmpoStat, 'cell');
             tc.fatalAssertClass(tc.eigTrack, 'double');
+        end
+
+        function testThrowBadMEMSAVE(tc)
+            BAD_MEMSAVE = 'test';
+            tc.fatalAssertError(@()Stationary(tc.dmpoInit, tc.mpo, ...
+                                              tc.THRESHOLD, BAD_MEMSAVE), ...
+                                'Stationary:badMEMSAVE');
+        end
+
+        function testThrowBadArguments(tc)
+            MEMSAVE = 'sparse';
+            tc.fatalAssertError(@()Stationary(tc.dmpoInit, tc.mpo, ...
+                                              tc.THRESHOLD, MEMSAVE, 1), ...
+                                'Stationary:badArguments');
         end
 
         function testShape(tc)

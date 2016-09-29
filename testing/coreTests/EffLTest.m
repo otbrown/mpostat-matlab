@@ -1,88 +1,73 @@
+
 % EffLTest.m
 % Oliver Thomson Brown
-% 2016-05-05
+% 2016-09-29
 
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) EffLTest < matlab.unittest.TestCase
 
     properties
-        HILBY;
-        LENGTH;
+        HILBY = 2;
+        LENGTH = 5;
         COMPRESS = 0;
-        dmpo;
-        left;
-        impo;
-        right;
-        TEST_SITE;
-        effL;
-    end
-
-    properties (MethodSetupParameter)
-        testHILBY = {2, 3}
-        testLENGTH = {3, 4}
+        LDIM;
+        effLFull;
+        effLSparse;
     end
 
     methods (TestMethodSetup)
-        function MethodSetup(tc, testHILBY, testLENGTH)
-            tc.HILBY = testHILBY;
-            tc.LENGTH = testLENGTH;
-            tc.TEST_SITE = ceil(tc.LENGTH / 2);
-            tc.dmpo = ProdDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS, 0);
-            tc.impo = cell(tc.LENGTH, 1);
+        function MethodSetup(tc)
+            TARGET = ceil(tc.LENGTH / 2);
+            dmpo = SuperDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            impo = cell(tc.LENGTH, 1);
             for site = 1 : 1 : tc.LENGTH
-                tc.impo{site} = reshape(eye(tc.HILBY^2), ...
-                                [tc.HILBY, tc.HILBY, tc.HILBY, tc.HILBY]);
+                impo{site} = reshape(eye(tc.HILBY^2), ...
+                                    [tc.HILBY, tc.HILBY, tc.HILBY, tc.HILBY]);
             end
-            tc.left = cell(tc.LENGTH, 1);
-            tc.left{1} = 1;
-            tc.right = cell(tc.LENGTH, 1);
-            tc.right{tc.LENGTH} = 1;
+            left = cell(tc.LENGTH, 1);
+            left{1} = 1;
+            right = cell(tc.LENGTH, 1);
+            right{tc.LENGTH} = 1;
             for site = 1 : 1 : (tc.LENGTH - 1)
-                [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{site});
-                tc.left{site + 1} = GrowLeft(tc.dmpo{site}, ...
-                tc.impo{tc.TEST_SITE}, tc.left{site}, ROW_SIZE, COL_SIZE, ...
+                [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpo{site});
+                left{site + 1} = GrowLeft(dmpo{site}, ...
+                impo{site}, left{site}, ROW_SIZE, COL_SIZE, ...
                 tc.HILBY, 1);
             end
             for site = tc.LENGTH : -1 : 2
-                [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{site});
-                tc.right{site - 1} = GrowRight(tc.dmpo{site}, ...
-                tc.impo{tc.TEST_SITE}, tc.right{site}, ROW_SIZE, COL_SIZE, ...
+                [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpo{site});
+                right{site - 1} = GrowRight(dmpo{site}, ...
+                impo{site}, right{site}, ROW_SIZE, COL_SIZE, ...
                 tc.HILBY, 1);
             end
 
-            [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{tc.TEST_SITE});
-            tc.effL = EffL(tc.TEST_SITE, tc.dmpo, tc.impo, tc.left, tc.right);
+            [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpo{TARGET});
+            tc.LDIM = ROW_SIZE * COL_SIZE * tc.HILBY^2;
+
+            tc.effLFull = EffL(TARGET, dmpo, impo, left, right, false);
+            tc.effLSparse = EffL(TARGET, dmpo, impo, left, right, true);
         end
     end
 
     methods (Test)
         function testClass(tc)
-            tc.fatalAssertClass(tc.effL, 'double');
+            tc.fatalAssertClass(tc.effLFull, 'double');
+            tc.fatalAssertClass(tc.effLSparse, 'double');
         end
 
-        function testSparse(tc)
-            tc.fatalAssertTrue(issparse(tc.effL));
+        function testSparseReturn(tc)
+            tc.assertTrue(issparse(tc.effLSparse));
         end
 
-        function testShape(tc)
-            [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{tc.TEST_SITE});
-            tc.fatalAssertSize(tc.effL, [ROW_SIZE*COL_SIZE*tc.HILBY*tc.HILBY,...
-                                    ROW_SIZE*COL_SIZE*tc.HILBY*tc.HILBY]);
+        function testSparseSize(tc)
+            tc.assertSize(tc.effLSparse, [tc.LDIM, tc.LDIM]);
         end
 
-        function testNumNonZeroes(tc)
-            numNonZeroes = nnz(tc.effL);
-            tc.assertEqual(numNonZeroes, tc.HILBY^2);
+        function testFullReturn(tc)
+            tc.assertFalse(issparse(tc.effLFull));
         end
 
-        function testOnes(tc)
-            [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{tc.TEST_SITE});
-            for bra = 0 : 1 : (tc.HILBY - 1)
-                for ket = 0 : 1 : (tc.HILBY - 1)
-                    joindex = ket * tc.HILBY * ROW_SIZE * COL_SIZE ...
-                            + bra * ROW_SIZE * COL_SIZE + 1;
-                    tc.assertEqual(tc.effL(joindex, joindex), sparse(1));
-                end
-            end
+        function testFullSize(tc)
+            tc.assertSize(tc.effLFull, [tc.LDIM, tc.LDIM]);
         end
     end
 end
