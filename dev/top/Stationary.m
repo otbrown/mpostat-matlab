@@ -68,7 +68,12 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     fprintf('Variational Stationary State Search\n');
     fprintf('%s\n\n', datestr(datetime('now'), 31));
     fprintf('System Parameters:\n\tSystem size: %g\n\tLocal states: %g\n', LENGTH, HILBY);
-    fprintf('Calculation Parameters:\n\tEigenvalue threshold: %g\n\tMaximum MPS matrix size: %g\n\tMaximum effective Liouvillian size: %g\n\n', THRESHOLD, MAX_DIM, MAX_LDIM);
+    fprintf('Calculation Parameters:\n\tEigenvalue threshold: %g\n\tMaximum MPS matrix size: %g\n\tMaximum effective Liouvillian size: %g\n', THRESHOLD, MAX_DIM, MAX_LDIM);
+    if MEMSAVE
+        fprintf('\tEffective Liouvillian representation: Sparse\n\n');
+    else
+        fprintf('\tEffective Liouvillian representation: Full\n\n');
+    end
 
     % allocate return variables
     dmpoStat = dmpoInit;
