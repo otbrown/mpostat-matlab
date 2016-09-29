@@ -1,8 +1,8 @@
-% EffLTest.m
+% EffLFullTest.m
 % Oliver Thomson Brown
 % 2016-05-05
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) EffLTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) EffLFullTest < matlab.unittest.TestCase
 
     properties
         HILBY;
@@ -50,17 +50,14 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(tc.dmpo{tc.TEST_SITE});
-            tc.effL = EffL(tc.TEST_SITE, tc.dmpo, tc.impo, tc.left, tc.right);
+            tc.effL = EffLFull(tc.TEST_SITE, tc.dmpo, tc.impo, ...
+                               tc.left, tc.right);
         end
     end
 
     methods (Test)
         function testClass(tc)
             tc.fatalAssertClass(tc.effL, 'double');
-        end
-
-        function testSparse(tc)
-            tc.fatalAssertTrue(issparse(tc.effL));
         end
 
         function testShape(tc)
@@ -80,7 +77,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 for ket = 0 : 1 : (tc.HILBY - 1)
                     joindex = ket * tc.HILBY * ROW_SIZE * COL_SIZE ...
                             + bra * ROW_SIZE * COL_SIZE + 1;
-                    tc.assertEqual(tc.effL(joindex, joindex), sparse(1));
+                    tc.assertEqual(tc.effL(joindex, joindex), 1);
                 end
             end
         end
