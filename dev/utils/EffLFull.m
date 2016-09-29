@@ -1,10 +1,10 @@
-% EffL.m
+% EffLFull.m
 % function which returns the effective Liouvillian for a particular site
 % in the form of a matrix, ready to be eigensolved
 % Oliver Thomson Brown
 % 2016-05-05
 %
-% [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
+% [effectiveLiouv] = EffLFull(TARGET, dmpo, mpo, left, right)
 %
 % RETURN
 % effectiveLiouv    : complex double matrix, the effective Liovillian for the
@@ -19,7 +19,7 @@
 % left              : cell array, contains the left blocks for each site
 % right             : cell array, contains the right blocks for each site
 
-function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
+function [effectiveLiouv] = EffLFull(TARGET, dmpo, mpo, left, right)
     % collate arguments for EffOpTensor
     [ROW_SIZE, COL_SIZE, HILBY, ~] = size(dmpo{TARGET});
     siteMPO = mpo{TARGET};
@@ -33,7 +33,4 @@ function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
     effTensor = permute(effTensor, [3, 4, 7, 8, 2, 1, 5, 6]);
     effectiveLiouv = reshape(effTensor, [ROW_SIZE*COL_SIZE*HILBY*HILBY, ...
                                          ROW_SIZE*COL_SIZE*HILBY*HILBY]);
-
-    effectiveLiouv(abs(effectiveLiouv) < eps) = 0;
-    effectiveLiouv = sparse(effectiveLiouv);
 end
