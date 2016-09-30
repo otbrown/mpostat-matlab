@@ -54,7 +54,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
 
     % set some parameters for 'finessing' eigs
     opts.maxit = 500;
-    opts.tol = max((CONVERGENCE_THRESHOLD / 1000), eps);
 
     % initialise flags and counters
     convFlag = false;
@@ -63,6 +62,9 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     sweepCount = 0;
     updCount = 0;
     route = 1 : 1 : LENGTH;
+
+    % make mpo hermitian
+    mpo = MPOHermProd(mpo);
 
     % print some info about the calculation
     fprintf('Variational Stationary State Search\n');
@@ -97,7 +99,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     while ~convFlag && updCount < RUNMAX
         for site = route
             effL = EffL(site, dmpoStat, mpo, left, right, MEMSAVE);
-            [update, eigTrack(LENGTH)] = eigs(effL, 1, 'lr', opts);
+            [update, eigTrack(LENGTH)] = eigs(effL, 1, 'sm', opts);
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
 
