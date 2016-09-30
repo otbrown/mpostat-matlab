@@ -12,9 +12,9 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) ValidationTest < matlab.unittest.TestCase
 
     properties
-        THRESHOLD = 1E-4;
+        THRESHOLD = 1E-5;
         OBS_TOL = 1E-4;
-        COMPRESS = 70;
+        COMPRESS = 80;
     end
 
     methods (Test)
