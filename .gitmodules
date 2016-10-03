@@ -1,0 +1,3 @@
+[submodule "external/primme"]
+	path = external/primme
+	url = https://github.com/primme/primme.git
