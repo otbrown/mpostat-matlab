@@ -14,12 +14,16 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         COMPRESS = 100;
         dmpoInit;
         THRESHOLD = 1E-7;
-        HIGH_MEM = 'full';
-        LOW_MEM = 'sparse';
+        variant;
+    end
+
+    properties (MethodSetupParameter)
+        testVariant = {'direct', 'hermitian'};
     end
 
     methods (TestMethodSetup)
-        function MethodSetup(tc)
+        function MethodSetup(tc, testVariant)
+            tc.variant = testVariant;
             tc.dmpoInit = SuperDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
         end
     end
@@ -58,7 +62,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % solve using Stationary
             [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
-                                              tc.THRESHOLD, tc.HIGH_MEM);
+                                              tc.THRESHOLD, tc.variant);
 
             % calculate some values to assert against
             SPACE = tc.HILBY ^ tc.LENGTH;
@@ -169,7 +173,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % solve using Stationary
             [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
-                                              tc.THRESHOLD, tc.LOW_MEM);
+                                              tc.THRESHOLD, tc.variant);
 
             % calculate some values to assert against
             SPACE = tc.HILBY ^ tc.LENGTH;
@@ -280,7 +284,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, tc.THRESHOLD);
+            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
+                                              tc.THRESHOLD, tc.variant);
 
             % calculate some values to assert against
             tr = DMPOTrace(dmpoStat);
