@@ -17,12 +17,12 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         variant;
     end
 
-    properties (MethodSetupParameter)
+    properties (ClassSetupParameter)
         testVariant = {'direct', 'hermitian'};
     end
 
-    methods (TestMethodSetup)
-        function MethodSetup(tc, testVariant)
+    methods (TestClassSetup)
+        function ClassSetup(tc, testVariant)
             tc.variant = testVariant;
             tc.dmpoInit = SuperDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
         end
