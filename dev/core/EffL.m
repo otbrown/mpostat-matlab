@@ -1,14 +1,13 @@
 % EffL.m
-% accessor method which returns the effective Liouvillian built by either
-% EffLFull or EffLSparse, depending on the value of logical MEMSAVE
+% accessor method which returns the effective Liouvillian
 % 2016-09-29
 %
-% [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right, MEMSAVE)
+% [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
 %
 % RETURN
-% effectiveLiouv    : complex double matrix, the effective Liovillian for the
-%                     site specified by TARGET, reshaped to be a matrix, may be
-%                     full or space, depending on MEMSAVE
+% effectiveLiouv    : sparse complex double matrix, the effective Liovillian
+%                     for the site specified by TARGET, reshaped to be a
+%                     matrix
 %
 % INPUTS
 % TARGET            : integer, the site for which the effective Liouvillian
@@ -18,8 +17,6 @@
 %                     product operator tensor for the site n
 % left              : cell array, contains the left blocks for each site
 % right             : cell array, contains the right blocks for each site
-% MEMSAVE           : if true EffL passes on input to EffLSparse, otherwise it
-%                     calls EffLFull
 
 function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
     % gather pass-forward variables
