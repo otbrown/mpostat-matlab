@@ -21,18 +21,13 @@
 % MEMSAVE           : if true EffL passes on input to EffLSparse, otherwise it
 %                     calls EffLFull
 
-function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right, MEMSAVE)
+function [effectiveLiouv] = EffL(TARGET, dmpo, mpo, left, right)
     % gather pass-forward variables
     [ROW_SIZE, COL_SIZE, HILBY, ~] = size(dmpo{TARGET});
     siteMPO = mpo{TARGET};
     lBlock = left{TARGET};
     rBlock = right{TARGET};
 
-    if MEMSAVE
-        effectiveLiouv = EffLSparse(lBlock, siteMPO, rBlock, ...
-                                    ROW_SIZE, COL_SIZE, HILBY);
-    else
-        effectiveLiouv = EffLFull(lBlock, siteMPO, rBlock, ...
-                                  ROW_SIZE, COL_SIZE, HILBY);
-    end
+    effectiveLiouv = EffLSparse(lBlock, siteMPO, rBlock, ...
+                                ROW_SIZE, COL_SIZE, HILBY);
 end

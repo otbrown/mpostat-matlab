@@ -10,8 +10,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         LENGTH = 5;
         COMPRESS = 0;
         LDIM;
-        effLFull;
-        effLSparse;
+        effL;
     end
 
     methods (TestMethodSetup)
@@ -43,31 +42,21 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpo{TARGET});
             tc.LDIM = ROW_SIZE * COL_SIZE * tc.HILBY^2;
 
-            tc.effLFull = EffL(TARGET, dmpo, impo, left, right, false);
-            tc.effLSparse = EffL(TARGET, dmpo, impo, left, right, true);
+            tc.effL = EffL(TARGET, dmpo, impo, left, right);
         end
     end
 
     methods (Test)
         function testClass(tc)
-            tc.fatalAssertClass(tc.effLFull, 'double');
-            tc.fatalAssertClass(tc.effLSparse, 'double');
+            tc.fatalAssertClass(tc.effL, 'double');
         end
 
         function testSparseReturn(tc)
-            tc.assertTrue(issparse(tc.effLSparse));
+            tc.assertTrue(issparse(tc.effL));
         end
 
-        function testSparseSize(tc)
-            tc.assertSize(tc.effLSparse, [tc.LDIM, tc.LDIM]);
-        end
-
-        function testFullReturn(tc)
-            tc.assertFalse(issparse(tc.effLFull));
-        end
-
-        function testFullSize(tc)
-            tc.assertSize(tc.effLFull, [tc.LDIM, tc.LDIM]);
+        function testSize(tc)
+            tc.assertSize(tc.effL, [tc.LDIM, tc.LDIM]);
         end
     end
 end
