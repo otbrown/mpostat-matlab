@@ -1,5 +1,6 @@
 % DMPO.m
-% function which generates an arbitrary density matrix product operator
+% function which generates an arbitrary complex valued density matrix
+% product operator, which is trace-normed
 % Oliver Thomson Brown
 % 2016-02-05
 %
@@ -29,8 +30,9 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 	dmpo = cell(LENGTH, 1);
 
 	% first and last site
-	dmpo{1} = rand(1, HILBY^2, HILBY, HILBY) + 1i*rand(1, HILBY^2, HILBY, HILBY);
-	dmpo{LENGTH} = rand(HILBY^2, 1, HILBY, HILBY) + 1i*rand(HILBY^2, 1, HILBY, HILBY);
+	Z = (1 + 1i) / sqrt(2);
+	dmpo{1} = Z * ones(1, HILBY^2, HILBY, HILBY);
+	dmpo{LENGTH} = Z * ones(HILBY^2, 1, HILBY, HILBY);
 
 	% and the rest
 	colSz = HILBY^2;
@@ -44,17 +46,8 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 		rowSz = colSz;
 		colSz = min(HILBY^(2*len), COMPRESS);
 
-		dmpo{site} = rand(rowSz, colSz, HILBY, HILBY) + 1i*rand(rowSz, colSz, HILBY, HILBY);
+		dmpo{site} = Z * ones(rowSz, colSz, HILBY, HILBY);
 	end
-
-	% SVD normalise -- This normalises the tensors NOT THE STATE
-	dmpo = SVDNorm(dmpo);
-
-	% make Hermitian
-	dmpo = DMPOHerm(dmpo);
-
-	% recompress, since DMPOHerm doubles virtual dimensions
-	dmpo = DMPOCompress(dmpo, COMPRESS);
 
 	% trace norm
 	dmpo = TrNorm(dmpo);
