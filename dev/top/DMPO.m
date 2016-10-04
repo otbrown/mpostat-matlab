@@ -1,6 +1,6 @@
 % DMPO.m
-% function which generates an unphhysical all-ones density matrix
-% product operator
+% function which generates an arbitrary complex valued density matrix
+% product operator, which is trace-normed
 % Oliver Thomson Brown
 % 2016-02-05
 %
@@ -30,8 +30,9 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 	dmpo = cell(LENGTH, 1);
 
 	% first and last site
-	dmpo{1} = ones(1, HILBY^2, HILBY, HILBY);
-	dmpo{LENGTH} = ones(HILBY^2, 1, HILBY, HILBY);
+	Z = (1 + 1i) / sqrt(2);
+	dmpo{1} = Z * ones(1, HILBY^2, HILBY, HILBY);
+	dmpo{LENGTH} = Z * ones(HILBY^2, 1, HILBY, HILBY);
 
 	% and the rest
 	colSz = HILBY^2;
@@ -45,7 +46,7 @@ function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
 		rowSz = colSz;
 		colSz = min(HILBY^(2*len), COMPRESS);
 
-		dmpo{site} = ones(rowSz, colSz, HILBY, HILBY);
+		dmpo{site} = Z * ones(rowSz, colSz, HILBY, HILBY);
 	end
 
 	% trace norm

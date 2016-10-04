@@ -7,6 +7,7 @@
 % 2016-09-09
 
 addpath(genpath('dev'));
+addpath('external/primme/Matlab');
 
 % set up result area
 resultDir = 'profiling';
@@ -19,7 +20,7 @@ HILBY = 3;
 LENGTH = 4;
 COMPRESS = 75;
 THRESHOLD = 1E-5;
-variant = 'sparse';
+variant = 'direct';
 
 dateStamp = datestr(datetime('now'), 30);
 savePath = sprintf('%s/%s_%sPROFILE.mat', resultDir, dateStamp, variant);
