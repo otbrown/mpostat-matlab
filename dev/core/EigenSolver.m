@@ -7,9 +7,8 @@
 
 function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN)
     if HERMITIAN
-        % clean effL a bit...
-        delta = effL - ctranspose(effL);
-        epsilon = full(max(max(abs(delta))));
+        % clean effL as primme has no tolerance for non-hermitian input
+        epsilon = full(max(max(abs(effL - ctranspose(effL)))));
         fprintf('Hermiticity error: %g\n', epsilon);
         effL = (effL + ctranspose(effL))/2;
 
