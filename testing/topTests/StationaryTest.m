@@ -4,10 +4,10 @@
 % Oliver Thomson Brown
 % 2016-05-09
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) StationaryTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true), matlab.unittest.fixtures.PathFixture('../../external/primme/Matlab')}) StationaryTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-15;
+        absTol = 1E-11;
         sampleSz = 200;
         dmpoStat;
         dmpoStatH;
