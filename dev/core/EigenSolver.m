@@ -7,6 +7,12 @@
 
 function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN)
     if HERMITIAN
+        % clean effL a bit...
+        delta = effL - ctranspose(effL);
+        epsilon = full(max(max(abs(delta))));
+        fprintf('Hermiticity error: %g\n', epsilon);
+        effL = (effL + ctranspose(effL))/2;
+
         opts.eps = 1E-12;
         [eigVector, eigValue] = primme_eigs(effL, 1, 'SA', opts);
     else
