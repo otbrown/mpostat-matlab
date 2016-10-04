@@ -4,10 +4,10 @@
 % Oliver Thomson Brown
 % 2016-05-12
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) SystemTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true), matlab.unittest.fixtures.PathFixture('../../external/primme/Matlab')}) SystemTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-14;
+        absTol;
         dispTol = 1E-4;
         HILBY = 3;
         LENGTH = 3;
@@ -24,6 +24,13 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
     methods (TestClassSetup)
         function ClassSetup(tc, testVariant)
             tc.variant = testVariant;
+
+            if strcmpi(tc.variant, 'hermitian')
+                tc.absTol = 2E-11;
+            else
+                tc.absTol = 1E-14;
+            end
+
             tc.dmpoInit = SuperDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
         end
     end
