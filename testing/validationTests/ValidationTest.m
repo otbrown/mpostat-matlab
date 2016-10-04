@@ -9,12 +9,23 @@
 %   - MFS15.mat
 % These files contain the results we validate against.
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) ValidationTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true), matlab.unittest.fixtures.PathFixture('../../external/primme/Matlab')}) ValidationTest < matlab.unittest.TestCase
 
     properties
         THRESHOLD = 1E-5;
         OBS_TOL = 1E-4;
         COMPRESS = 80;
+        variant;
+    end
+
+    properties (ClassSetupParameter)
+        testVariant = {'direct', 'hermitian'};
+    end
+
+    methods (TestClassSetup)
+        function ClassSetup(tc, testVariant)
+            tc.variant = testVariant;
+        end
     end
 
     methods (Test)
@@ -92,7 +103,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % solve using Stationary
             [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, ...
-                                              tc.THRESHOLD, 'sparse');
+                                              tc.THRESHOLD, tc.variant);
 
             % calculate observables
             load(fname);
@@ -217,7 +228,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % solve using Stationary
             [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, ...
-                                              tc.THRESHOLD, 'full');
+                                              tc.THRESHOLD, tc.variant);
 
             % calculate observables
             load(fname);
