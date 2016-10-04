@@ -4,22 +4,33 @@
 % Oliver Thomson Brown
 % 2016-05-12
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) SystemTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true), matlab.unittest.fixtures.PathFixture('../../external/primme/Matlab')}) SystemTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-14;
+        absTol;
         dispTol = 1E-4;
         HILBY = 3;
         LENGTH = 3;
         COMPRESS = 100;
         dmpoInit;
         THRESHOLD = 1E-7;
-        HIGH_MEM = 'full';
-        LOW_MEM = 'sparse';
+        variant;
     end
 
-    methods (TestMethodSetup)
-        function MethodSetup(tc)
+    properties (ClassSetupParameter)
+        testVariant = {'direct', 'hermitian'};
+    end
+
+    methods (TestClassSetup)
+        function ClassSetup(tc, testVariant)
+            tc.variant = testVariant;
+
+            if strcmpi(tc.variant, 'hermitian')
+                tc.absTol = 2E-11;
+            else
+                tc.absTol = 1E-14;
+            end
+
             tc.dmpoInit = SuperDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
         end
     end
@@ -58,7 +69,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % solve using Stationary
             [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
-                                              tc.THRESHOLD, tc.HIGH_MEM);
+                                              tc.THRESHOLD, tc.variant);
 
             % calculate some values to assert against
             SPACE = tc.HILBY ^ tc.LENGTH;
@@ -169,7 +180,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             % solve using Stationary
             [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
-                                              tc.THRESHOLD, tc.LOW_MEM);
+                                              tc.THRESHOLD, tc.variant);
 
             % calculate some values to assert against
             SPACE = tc.HILBY ^ tc.LENGTH;
@@ -280,7 +291,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, tc.THRESHOLD);
+            [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
+                                              tc.THRESHOLD, tc.variant);
 
             % calculate some values to assert against
             tr = DMPOTrace(dmpoStat);

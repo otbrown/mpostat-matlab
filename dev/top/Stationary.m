@@ -18,22 +18,24 @@
 % mpo           : cell array, Liouvillian for the system in matrix product
 %                 operator form
 % THRESHOLD     : double, the convergence threshold
-% variant       : string, optional argument, may specify whether to build the
-%                 effective Liouvillian in full or as a sparse array -- valid
-%                 strings are 'full' and 'sparse' -- 'sparse' is default
+% variant       : string, optional argument, may specify whether to solve the
+%                 non-Hermitian Liovillian, or the Hermitian product L^(T*)L
+%                 'hermitian' or 'direct' are the two accepted values
 
 function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     % check for optional arguments
     switch nargin
         case 3
-            MEMSAVE = true;
+            HERMITIAN = false;
         case 4
-            if strcmpi(varargin{1}, 'full')
-                MEMSAVE = false;
-            elseif strcmpi(varargin{1}, 'sparse')
-                MEMSAVE = true;
+            if strcmpi(varargin{1}, 'hermitian')
+                HERMITIAN = true;
+                warning('off', 'MATLAB:nearlySingularMatrix');
+                warning('off', 'MATLAB:eigs:SigmaNearExactEig');
+            elseif strcmpi(varargin{1}, 'direct')
+                HERMITIAN = false;
             else
-                ME = MException('Stationary:badMEMSAVE', 'The last argument was invalid: %s. Type help Stationary.', varargin{1});
+                ME = MException('Stationary:badHERMITIAN', 'The last argument was invalid: %s. Type help Stationary.', varargin{1});
                 throw(ME);
             end
         otherwise
@@ -52,10 +54,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     RUNMAX = 50*LENGTH;
     CONVERGENCE_THRESHOLD = THRESHOLD / (2 * LENGTH);
 
-    % set some parameters for 'finessing' eigs
-    opts.maxit = 500;
-    opts.tol = max((CONVERGENCE_THRESHOLD / 1000), eps);
-
     % initialise flags and counters
     convFlag = false;
     success = false;
@@ -64,15 +62,20 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     updCount = 0;
     route = 1 : 1 : LENGTH;
 
+    if HERMITIAN
+        % make mpo hermitian
+        mpo = MPOHermProd(mpo);
+    end
+
     % print some info about the calculation
     fprintf('Variational Stationary State Search\n');
     fprintf('%s\n\n', datestr(datetime('now'), 31));
     fprintf('System Parameters:\n\tSystem size: %g\n\tLocal states: %g\n', LENGTH, HILBY);
     fprintf('Calculation Parameters:\n\tEigenvalue threshold: %g\n\tMaximum MPS matrix size: %g\n\tMaximum effective Liouvillian size: %g\n', THRESHOLD, MAX_DIM, MAX_LDIM);
-    if MEMSAVE
-        fprintf('\tEffective Liouvillian representation: Sparse\n\n');
+    if HERMITIAN
+        fprintf('\tEffective Liouvillian: Hermitian Product\n\n');
     else
-        fprintf('\tEffective Liouvillian representation: Full\n\n');
+        fprintf('\tEffective Liouvillian: Non-Hermitian\n\n');
     end
 
     % allocate return variables
@@ -96,8 +99,8 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
 
     while ~convFlag && updCount < RUNMAX
         for site = route
-            effL = EffL(site, dmpoStat, mpo, left, right, MEMSAVE);
-            [update, eigTrack(LENGTH)] = eigs(effL, 1, 'lr', opts);
+            effL = EffL(site, dmpoStat, mpo, left, right);
+            [update, eigTrack(LENGTH)] = EigenSolver(effL, HERMITIAN);
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
 
