@@ -6,11 +6,12 @@
 % 2016-10-03
 
 function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN)
-    opts.maxit = 500;
-
     if HERMITIAN
-        [eigVector, eigValue] = eigs(effL, 1, 'sm', opts);
+        opts.eps = 1E-12;
+        [eigVector, eigValue] = primme_eigs(effL, 1, 'SA', opts);
     else
+        opts.maxit = 500;
+        opts.tol = eps;
         [eigVector, eigValue] = eigs(effL, 1, 'lr', opts);
     end
 end
