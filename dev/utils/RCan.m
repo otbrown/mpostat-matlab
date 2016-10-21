@@ -17,7 +17,6 @@
 
 function [rdmpo] = RCan(dmpo, route)
     % gather constants
-    LENGTH = size(dmpo, 1);
     HILBY = size(dmpo{1}, 3);
 
     if route(end) <= 1

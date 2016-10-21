@@ -53,7 +53,9 @@ function [updateBlock] = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SI
                 WFB = 0;
                 for bra = 1 : 1 : HILBY
                     for ket = 1 : 1 : HILBY
-                        WFB = WFB + mpo(:, :, conjKet, bra, ket, opRow) * rightBlock(:, :, conjRow) * siteTensor(:, :, bra, ket);
+                        WFB = WFB + mpo(:, :, conjKet, bra, ket, opRow) ...
+                                    * rightBlock(:, :, conjRow) ...
+                                    * siteTensor(:, :, bra, ket);
                     end
                 end
                 BWFB = BWFB + conjTensor(:, :, conjRow, conjKet) * WFB;

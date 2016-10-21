@@ -24,7 +24,8 @@ function hmpo = MPOHermProd(mpo)
             A = reshape(dagger{1}(:,:,:,:,1,opCol1), [HILBY^2, HILBY^2]);
             B = reshape(mpo{1}(:,:,:,:,1,opCol2), [HILBY^2, HILBY^2]);
 
-            hmpo{1}(:, :, :, :, 1, jOpCol) = reshape(A*B, [HILBY, HILBY, HILBY, HILBY]);
+            hmpo{1}(:, :, :, :, 1, jOpCol) = reshape(A*B, ...
+                                             [HILBY, HILBY, HILBY, HILBY]);
         end
     end
 
@@ -37,10 +38,13 @@ function hmpo = MPOHermProd(mpo)
                     for opCol2 = 1 : 1 : OP_COL
                         jOpCol = (opCol1-1) * OP_COL + opCol2;
 
-                        A = reshape(dagger{site}(:,:,:,:,opRow1,opCol1), [HILBY^2, HILBY^2]);
-                        B = reshape(mpo{site}(:,:,:,:,opRow2,opCol2), [HILBY^2, HILBY^2]);
+                        A = reshape(dagger{site}(:,:,:,:,opRow1,opCol1), ...
+                                    [HILBY^2, HILBY^2]);
+                        B = reshape(mpo{site}(:,:,:,:,opRow2,opCol2), ...
+                                    [HILBY^2, HILBY^2]);
 
-                        hmpo{site}(:, :, :, :, jOpRow, jOpCol) = reshape(A*B, [HILBY, HILBY, HILBY, HILBY]);
+                        hmpo{site}(:,:,:,:,jOpRow,jOpCol) = ...
+                        reshape(A*B, [HILBY, HILBY, HILBY, HILBY]);
                     end
                 end
             end
@@ -55,7 +59,8 @@ function hmpo = MPOHermProd(mpo)
             A = reshape(dagger{LENGTH}(:,:,:,:,opRow1), [HILBY^2, HILBY^2]);
             B = reshape(mpo{LENGTH}(:,:,:,:,opRow2), [HILBY^2, HILBY^2]);
 
-            hmpo{LENGTH}(:, :, :, :, jOpRow) = reshape(A*B, [HILBY, HILBY, HILBY, HILBY]);
+            hmpo{LENGTH}(:, :, :, :, jOpRow) = ...
+            reshape(A*B, [HILBY, HILBY, HILBY, HILBY]);
         end
     end
 end

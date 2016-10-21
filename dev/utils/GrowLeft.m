@@ -52,7 +52,9 @@ function [updateBlock] = GrowLeft(siteTensor, mpo, leftBlock, ROW_SIZE, COL_SIZE
                 WFA = 0;
                 for bra = 1 : 1 : HILBY
                     for ket = 1 : 1 : HILBY
-                        WFA = WFA + mpo(:, :, conjKet, bra, ket, opCol) * leftBlock(:, :, conjCol) * siteTensor(:, :, bra, ket);
+                        WFA = WFA + mpo(:, :, conjKet, bra, ket, opCol) ...
+                                    * leftBlock(:, :, conjCol) ...
+                                    * siteTensor(:, :, bra, ket);
                     end
                 end
                 AWFA = AWFA + conjTensor(:, :, conjCol, conjKet) * WFA;

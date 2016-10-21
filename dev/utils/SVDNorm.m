@@ -44,7 +44,7 @@ function [normDMPO] = SVDNorm(dmpo)
     M = permute(M, [1, 3, 2]);
     M = reshape(M, [rowSz * HILBY^2, colSz]);
 
-    [U, S, V] = svd(M, 0);
+    [U, ~, ~] = svd(M, 0);
 
     U = reshape(U, [rowSz, HILBY^2, 1]);
     U = permute(U, [1, 3, 2]);
