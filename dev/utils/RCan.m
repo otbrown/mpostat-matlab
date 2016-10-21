@@ -38,19 +38,16 @@ function [rdmpo] = RCan(dmpo, route)
 
         % SVD decomposition
         [U, S, V] = svd(M, 'econ');
-        vr = size(V, 2);
-        V2 = zeros(rowSz, colSz * HILBY^2);
-        V2(1 : vr, :) = ctranspose(V);
+        V = ctranspose(V);
 
         % manipulate V back into a rank-4 tensor and embed
-        rdmpo{site} = reshape(V2, [rowSz, colSz, HILBY, HILBY]);
+        rdmpo{site} = reshape(V, [rowSz, colSz, HILBY, HILBY]);
 
         % multiply U * S into the next site along
         colSz = rowSz;
         rowSz = size(rdmpo{site - 1}, 1);
 
-        US = zeros(colSz);
-        US(:, 1 : vr) = U * S;
+        US = U * S;
 
         for bra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY

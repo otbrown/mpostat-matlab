@@ -43,22 +43,18 @@ function [ldmpo] = LCan(dmpo, route)
         M = reshape(M, [rowSz * HILBY^2, colSz]);
 
         % SVD Decomposition
-        [U, S, V] = svd(M, 'econ');
-        uc = size(U, 2);
+        [U, S, V] = svd(M, 0);
 
         % manipulate U into rank-4 tensor and embed in site
-        U2 = zeros(rowSz * HILBY^2, colSz);
-        U2(:, 1 : uc) = U;
-        U2 = reshape(U2, [rowSz, HILBY^2, colSz]);
-        U2 = permute(U2, [1, 3, 2]);
-        ldmpo{site} = reshape(U2, [rowSz, colSz, HILBY, HILBY]);
+        U = reshape(U, [rowSz, HILBY^2, colSz]);
+        U = permute(U, [1, 3, 2]);
+        ldmpo{site} = reshape(U, [rowSz, colSz, HILBY, HILBY]);
 
         % multiply R into the next site along
         rowSz = colSz;
         colSz = size(ldmpo{site + 1}, 2);
 
-        SV = zeros(rowSz);
-        SV(1 : uc, :) = S * ctranspose(V);
+        SV = S * ctranspose(V);
 
         for bra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
