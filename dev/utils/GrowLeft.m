@@ -1,7 +1,6 @@
 % GrowLeft.m
-% contracts a given dmpo site tensor into the left block -- a contraction from the
-% first site through to the site prior to this one.
-% NAIEVE IMPLEMENTATION -- OPTIMISE!
+% contracts a given dmpo site tensor into the left block -- a contraction
+% from the first site through to the site prior to this one.
 % Oliver Thomson Brown
 % 2016-03-22
 %
