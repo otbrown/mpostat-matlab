@@ -88,8 +88,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testShape(tc)
             tc.fatalAssertSize(tc.dmpoStat, [tc.LENGTH, 1]);
             tc.fatalAssertSize(tc.dmpoStatH, [tc.LENGTH, 1]);
-            tc.fatalAssertSize(tc.eigTrack, [tc.LENGTH, 1]);
-            tc.fatalAssertSize(tc.eigTrackH, [tc.LENGTH, 1]);
+            tc.fatalAssertSize(tc.eigTrack, [2*tc.LENGTH, 1]);
+            tc.fatalAssertSize(tc.eigTrackH, [2*tc.LENGTH, 1]);
         end
 
         function testTrace(tc)
@@ -100,8 +100,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         end
 
         function testEigZero(tc)
-            tc.assertLessThan(abs(tc.eigTrack(tc.LENGTH)), tc.THRESHOLD);
-            tc.assertLessThan(abs(tc.eigTrackH(tc.LENGTH)), tc.THRESHOLD);
+            tc.assertLessThan(abs(tc.eigTrack(end)), tc.THRESHOLD);
+            tc.assertLessThan(abs(tc.eigTrackH(end)), tc.THRESHOLD);
         end
 
         function testZZZ(tc)

@@ -80,7 +80,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
 
     % allocate return variables
     dmpoStat = dmpoInit;
-    eigTrack = NaN(LENGTH, 1);
+    eigTrack = NaN(2 * LENGTH, 1);
 
     % build left and right blocks
     % MAKE AN INTERFACE FUNCTION LIKE GROWBLOCK
@@ -99,20 +99,17 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
 
     while ~convFlag && updCount < RUNMAX
         for site = route
+
             effL = EffL(site, dmpoStat, mpo, left, right);
-            [update, eigTrack(LENGTH)] = EigenSolver(effL, HERMITIAN);
 
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
+            siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
+            siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
 
-            for bra = 0 : 1 : (HILBY - 1)
-                for ket = 0 : 1 : (HILBY - 1)
-                    for row = 0 : 1 : (ROW_SIZE - 1)
-                        for col = 1 : 1 : COL_SIZE
-                            dmpoStat{site}(row+1, col, bra+1, ket+1) = update(ket*HILBY*ROW_SIZE*COL_SIZE + bra*ROW_SIZE*COL_SIZE + row*COL_SIZE + col);
-                        end
-                    end
-                end
-            end
+            [update, eigTrack(end)] = EigenSolver(effL, siteVec, HERMITIAN);
+
+            update = reshape(update, [COL_SIZE, ROW_SIZE, HILBY, HILBY]);
+            dmpoStat{site} = permute(update, [2, 1, 3, 4]);
 
             % canonicalise & include new site in block tensor
             if mod(sweepCount, 2)
@@ -142,7 +139,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
             % has converged to desired threshold
             if convFlag || updCount == RUNMAX
                 finished = true;
-                if abs(eigTrack(LENGTH)) < THRESHOLD
+                if abs(eigTrack(end)) < THRESHOLD
                     fprintf('\nCalculation successful.\n');
                     success = true;
                     break;
@@ -153,16 +150,16 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
             end
 
             % drop oldest eigenvalue from eigTrack and move elements back
-            eigTrack(1 : LENGTH - 1) = eigTrack(2 : LENGTH);
+            eigTrack(1 : (2*LENGTH - 1)) = eigTrack(2 : 2*LENGTH);
             updCount = updCount + 1;
         end
 
         if finished
-            fprintf('Finished at %s.\n[ Eigenvalue: %g, Convergence: %g ]\n', datestr(datetime('now'), 31), eigTrack(LENGTH), convergence);
+            fprintf('Finished at %s.\n[ Eigenvalue: %g, Convergence: %g ]\n', datestr(datetime('now'), 31), eigTrack(end), convergence);
         else
             % add to sweepCount and report on progress
             sweepCount = sweepCount + 1;
-            fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', sweepCount, eigTrack(LENGTH), convergence);
+            fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', sweepCount, eigTrack(end), convergence);
         end
 
         % flip it and reverse it
