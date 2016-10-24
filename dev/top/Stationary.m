@@ -30,8 +30,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
         case 4
             if strcmpi(varargin{1}, 'hermitian')
                 HERMITIAN = true;
-                warning('off', 'MATLAB:nearlySingularMatrix');
-                warning('off', 'MATLAB:eigs:SigmaNearExactEig');
             elseif strcmpi(varargin{1}, 'direct')
                 HERMITIAN = false;
             else
