@@ -99,14 +99,18 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
 
     while ~convFlag && updCount < RUNMAX
         for site = route
-
+            [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
             effL = EffL(site, dmpoStat, mpo, left, right);
 
-            [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-            siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
-            siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
-
-            [update, eigTrack(end)] = EigenSolver(effL, siteVec, HERMITIAN);
+            if HERMITIAN
+                [update, eigTrack(end)] = EigenSolver(effL, HERMITIAN);
+            else
+                % we can supply an initial guess to eigs, so we use the current
+                % site tensor, to aid convergence
+                siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
+                siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
+                [update, eigTrack(end)] = EigenSolver(effL, HERMITIAN, siteVec);
+            end
 
             update = reshape(update, [COL_SIZE, ROW_SIZE, HILBY, HILBY]);
             dmpoStat{site} = permute(update, [2, 1, 3, 4]);
