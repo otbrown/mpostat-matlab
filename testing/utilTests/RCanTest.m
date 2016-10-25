@@ -5,7 +5,7 @@
 classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) RCanTest < matlab.unittest.TestCase
 
     properties
-        absTol = 2E-14;
+        absTol = 1E-14;
         HILBY;
         LENGTH;
         COMPRESS = 50;
@@ -24,7 +24,15 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
             tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
-            tc.canDMPO = RCan(tc.dmpo, [tc.LENGTH : -1 : 2]);
+            tc.canDMPO = tc.dmpo;
+            for site = tc.LENGTH : -1 : 2
+                siteTensor = tc.canDMPO{site};
+                nextSiteTensor = tc.canDMPO{site-1};
+                [ROW_SIZE, COL_SIZE, ~, ~] = size(siteTensor);
+                NEXT_ROW = size(nextSiteTensor, 1);
+                [tc.canDMPO{site}, tc.canDMPO{site-1}] = RCan(siteTensor, ...
+                    nextSiteTensor, tc.HILBY, ROW_SIZE, COL_SIZE, NEXT_ROW);
+            end
         end
     end
 
@@ -37,13 +45,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
         function testSystemSize(tc)
             tc.fatalAssertSize(tc.canDMPO, size(tc.dmpo));
-        end
-
-        function testThrowBadRoute(tc)
-            % this should be expanded at some point to check the route goes
-            % through the system in the right direction
-            badRoute = [tc.LENGTH : -1 : 1];
-            tc.fatalAssertError(@()RCan(tc.dmpo, badRoute), 'RCan:BadRoute');
         end
 
         function testTensorShape(tc)
