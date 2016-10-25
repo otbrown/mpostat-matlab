@@ -19,48 +19,28 @@
 %             supplied, only that site is into canonical form, but the next
 %             site along is still affected
 
-function [ldmpo] = LCan(dmpo, route)
-    % gather constants
-    LENGTH = size(dmpo, 1);
-    HILBY = size(dmpo{1}, 3);
+function [canSite, SVNextSite] = LCan(siteTensor, nextSiteTensor, HILBY, ROW_SIZE, COL_SIZE, NEXT_COL)
+    % manipulate site tensor into a matrix
+    siteTensor = reshape(siteTensor, [ROW_SIZE, COL_SIZE, HILBY^2]);
+    siteTensor = permute(siteTensor, [1, 3, 2]);
+    siteTensor = reshape(siteTensor, [ROW_SIZE * HILBY^2, COL_SIZE]);
 
-    if route(end) >= LENGTH
-		msgID = 'LCan:BadRoute';
-		msg = sprintf('Route cannnot extend to (or exceed) the last site in the system. System has %d sites, your route ended at %d.', LENGTH, route(end));
-		badRouteException = MException(msgID, msg);
-		throw(badRouteException);
-    end
+    % SVD Decomposition
+    [U, S, V] = svd(siteTensor, 0);
 
-    % allocate return
-    ldmpo = dmpo;
+    % manipulate U into rank-4 tensor and embed in site
+    U = reshape(U, [ROW_SIZE, HILBY^2, COL_SIZE]);
+    U = permute(U, [1, 3, 2]);
+    canSite = reshape(U, [ROW_SIZE, COL_SIZE, HILBY, HILBY]);
 
-    [rowSz, colSz, ~, ~] = size(ldmpo{route(1)});
+    % multiply SV into the next site
+    SV = S * ctranspose(V);
 
-    for site = route
-        % manipulate site tensor into a matrix
-        M = reshape(ldmpo{site}, [rowSz, colSz, HILBY^2]);
-        M = permute(M, [1, 3, 2]);
-        M = reshape(M, [rowSz * HILBY^2, colSz]);
-
-        % SVD Decomposition
-        [U, S, V] = svd(M, 0);
-
-        % manipulate U into rank-4 tensor and embed in site
-        U = reshape(U, [rowSz, HILBY^2, colSz]);
-        U = permute(U, [1, 3, 2]);
-        ldmpo{site} = reshape(U, [rowSz, colSz, HILBY, HILBY]);
-
-        % multiply R into the next site along
-        rowSz = colSz;
-        colSz = size(ldmpo{site + 1}, 2);
-
-        SV = S * ctranspose(V);
-
-        for bra = 1 : 1 : HILBY
-            for ket = 1 : 1 : HILBY
-                ldmpo{site + 1}(:, :, bra, ket) = ...
-                SV * ldmpo{site + 1}(:, :, bra, ket);
-            end
+    SVNextSite = zeros(COL_SIZE, NEXT_COL, HILBY, HILBY);
+    for bra = 1 : 1 : HILBY
+        for ket = 1 : 1 : HILBY
+            SVNextSite(:, :, bra, ket) = ...
+            SV * nextSiteTensor(:, :, bra, ket);
         end
     end
 end

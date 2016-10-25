@@ -15,44 +15,23 @@
 %             be the first site in the system since the next site along is
 %             also affected by this procedure
 
-function [rdmpo] = RCan(dmpo, route)
-    % gather constants
-    HILBY = size(dmpo{1}, 3);
+function [canSite, nextSiteUS] = RCan(siteTensor, nextSiteTensor, HILBY, ROW_SIZE, COL_SIZE, NEXT_ROW);
+    siteTensor = reshape(siteTensor, [ROW_SIZE, COL_SIZE * HILBY^2]);
 
-    if route(end) <= 1
-		msgID = 'RCan:BadRoute';
-		msg = sprintf('Route cannnot extend to (or exceed) the first site in the system. Your route ended at %d.', route(end));
-		badRouteException = MException(msgID, msg);
-		throw(badRouteException);
-    end
+    % SVD decomposition
+    [U, S, V] = svd(siteTensor, 'econ');
 
-    % allocate return
-    rdmpo = dmpo;
+    % manipulate V back into a rank-4 tensor and embed
+    canSite = reshape(ctranspose(V), [ROW_SIZE, COL_SIZE, HILBY, HILBY]);
 
-    [rowSz, colSz, ~, ~] = size(rdmpo{route(1)});
+    % multiply U * S into the next site along
+    US = U * S;
 
-    for site = route
-        % manipulate site tensor into matrix
-        M = reshape(rdmpo{site}, [rowSz, colSz * HILBY^2]);
-
-        % SVD decomposition
-        [U, S, V] = svd(M, 'econ');
-        V = ctranspose(V);
-
-        % manipulate V back into a rank-4 tensor and embed
-        rdmpo{site} = reshape(V, [rowSz, colSz, HILBY, HILBY]);
-
-        % multiply U * S into the next site along
-        colSz = rowSz;
-        rowSz = size(rdmpo{site - 1}, 1);
-
-        US = U * S;
-
-        for bra = 1 : 1 : HILBY
-            for ket = 1 : 1 : HILBY
-                rdmpo{site - 1}(:, :, bra, ket) = ...
-                rdmpo{site - 1}(:, :, bra, ket) * US;
-            end
+    nextSiteUS = zeros(NEXT_ROW, ROW_SIZE, HILBY, HILBY);
+    for bra = 1 : 1 : HILBY
+        for ket = 1 : 1 : HILBY
+            nextSiteUS(:, :, bra, ket) = ...
+            nextSiteTensor(:, :, bra, ket) * US;
         end
     end
 end
