@@ -38,8 +38,11 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
         function testLCanBadRoute(tc)
             direction = 'L';
+            badSite = tc.LENGTH;
             badEndRoute = 1 : 1 : tc.LENGTH;
             wrongWayRoute = (tc.LENGTH-1) : -1 : 2;
+            tc.assertError(@()Can(tc.dmpo, badSite, direction), ...
+                                    'Can:LCan:BadRoute');
             tc.assertError(@()Can(tc.dmpo, badEndRoute, direction), ...
                                     'Can:LCan:BadRoute');
             tc.assertError(@()Can(tc.dmpo, wrongWayRoute, direction), ...
@@ -48,8 +51,11 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
         function testRCanBadRoute(tc)
             direction = 'R';
+            badSite = 1;
             badEndRoute = tc.LENGTH : -1 : 1;
             wrongWayRoute = 2 : 1 : (tc.LENGTH - 1);
+            tc.assertError(@()Can(tc.dmpo, badSite, direction), ...
+                                    'Can:RCan:BadRoute');
             tc.assertError(@()Can(tc.dmpo, badEndRoute, direction), ...
                                     'Can:RCan:BadRoute');
             tc.assertError(@()Can(tc.dmpo, wrongWayRoute, direction), ...
