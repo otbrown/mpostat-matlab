@@ -88,8 +88,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testShape(tc)
             tc.fatalAssertSize(tc.dmpoStat, [tc.LENGTH, 1]);
             tc.fatalAssertSize(tc.dmpoStatH, [tc.LENGTH, 1]);
-            tc.fatalAssertSize(tc.eigTrack, [2*tc.LENGTH, 1]);
-            tc.fatalAssertSize(tc.eigTrackH, [2*tc.LENGTH, 1]);
+            tc.fatalAssertSize(tc.eigTrack, [2*(tc.LENGTH-1), 1]);
+            tc.fatalAssertSize(tc.eigTrackH, [2*(tc.LENGTH-1), 1]);
         end
 
         function testTrace(tc)
