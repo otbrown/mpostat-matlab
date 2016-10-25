@@ -30,10 +30,10 @@ function [compDMPO] = DMPOCompress(dmpo, COMPRESS)
 	compDMPO = dmpo;
 
 	% bring to right-canonical
-	compDMPO = RCan(compDMPO, LENGTH : -1 : 2);
+	compDMPO = Can(compDMPO, LENGTH : -1 : 2, 'R');
 
 	for site = 1 : 1 : LENGTH - 1
-		compDMPO = LCan(compDMPO, site);
+		compDMPO = Can(compDMPO, site, 'L');
 		[rowSz, colSz, ~, ~] = size(compDMPO{site});
 		% only need to modify tensors that are too large
 		if colSz > COMPRESS
