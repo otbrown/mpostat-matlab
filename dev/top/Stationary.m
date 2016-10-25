@@ -52,14 +52,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     RUNMAX = 50*LENGTH;
     CONVERGENCE_THRESHOLD = THRESHOLD / (2 * LENGTH);
 
-    % initialise flags and counters
-    convFlag = false;
-    success = false;
-    finished = false;
-    sweepCount = 0;
-    updCount = 0;
-    route = 1 : 1 : LENGTH;
-
     if HERMITIAN
         % make mpo hermitian
         mpo = MPOHermProd(mpo);
@@ -78,25 +70,34 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
 
     % allocate return variables
     dmpoStat = dmpoInit;
-    eigTrack = NaN(2 * LENGTH, 1);
+    eigTrack = NaN(2 * (LENGTH-1), 1);
 
     % build left and right blocks
-    % MAKE AN INTERFACE FUNCTION LIKE GROWBLOCK
     left = cell(LENGTH,1);
     right = cell(LENGTH, 1);
     left{1} = 1;
     right{LENGTH} = 1;
 
     for site = LENGTH : -1 : 2
-        [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-        [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
-        dmpoStat = RCan(dmpoStat, site);
-        right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, right{site}, ...
-                                    ROW_SIZE, COL_SIZE, HILBY, OP_ROW);
+        direction = 'R';
+        dmpoStat = Can(dmpoStat, site, direction);
+        right{site - 1} = GrowBlock(dmpoStat, mpo, left, right, site, ...
+                                    direction);
     end
 
+    % initialise flags and counters
+    convFlag = false;
+    success = false;
+    finished = false;
+    sweepCount = 0;
+    updCount = 0;
+    route = 1 : 1 : LENGTH;
+    direction = 'L';
+
     while ~convFlag && updCount < RUNMAX
-        for site = route
+        for sitedex = 1 : 1 : (LENGTH - 1)
+            site = route(sitedex);
+
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
             effL = EffL(site, dmpoStat, mpo, left, right);
 
@@ -114,24 +115,14 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
             dmpoStat{site} = permute(update, [2, 1, 3, 4]);
 
             % canonicalise & include new site in block tensor
-            if mod(sweepCount, 2)
-                if site ~= 1
-                    % RCAN
-                    dmpoStat = RCan(dmpoStat, site);
-                    [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-                    [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
-                    right{site - 1} = GrowRight(dmpoStat{site}, mpo{site}, right{site}, ...
-                                         ROW_SIZE, COL_SIZE, HILBY, OP_ROW);
-                end
+            dmpoStat = Can(dmpoStat, site, direction);
+
+            if direction == 'L'
+                left{site + 1} = GrowBlock(dmpoStat, mpo, left, right, ...
+                                            site, direction);
             else
-                if site ~= LENGTH
-                % LCAN
-                dmpoStat = LCan(dmpoStat, site);
-                [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-                [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpo{site});
-                left{site + 1} = GrowLeft(dmpoStat{site}, mpo{site}, left{site}, ...
-                                         ROW_SIZE, COL_SIZE, HILBY, OP_COL);
-                end
+                right{site - 1} = GrowBlock(dmpoStat, mpo, left, right, ...
+                                            site, direction);
             end
 
             % evaluate convergence
@@ -152,7 +143,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
             end
 
             % drop oldest eigenvalue from eigTrack and move elements back
-            eigTrack(1 : (2*LENGTH - 1)) = eigTrack(2 : 2*LENGTH);
+            eigTrack(1 : (end - 1)) = eigTrack(2 : end);
             updCount = updCount + 1;
         end
 
@@ -166,6 +157,11 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
 
         % flip it and reverse it
         route = flip(route);
+        if direction == 'L'
+            direction = 'R';
+        else
+            direction = 'L';
+        end
     end
     % trace normalise the state
     dmpoStat = TrNorm(dmpoStat);
