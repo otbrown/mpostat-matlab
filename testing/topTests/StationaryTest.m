@@ -25,7 +25,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
     methods (TestClassSetup)
         function ClassSetup(tc)
             % initialise dmpo
-            tc.dmpoInit = SuperDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpoInit = MixDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
 
             % build liouvillian mpo for dissipation only
             gamma = 1;

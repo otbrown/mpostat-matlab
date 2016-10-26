@@ -1,8 +1,8 @@
-% SuperDMPOTest.m
+% MixDMPOTest.m
 % Oliver Thomson Brown
 % 2016-03-14
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) SuperDMPOTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) MixDMPOTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-15;
@@ -22,7 +22,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function MethodSetup(tc, testHILBY, testLENGTH)
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
-            tc.dmpo = SuperDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = MixDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
         end
     end
 
@@ -35,7 +35,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             % have to anonymise function to ensure that error is caught
             % by fatal assert
             BAD_COMPRESS = tc.HILBY^2 - 1;
-            tc.fatalAssertError(@()SuperDMPO(tc.HILBY, tc.LENGTH, BAD_COMPRESS), 'SuperDMPO:BadCOMPRESS');
+            tc.fatalAssertError(@()MixDMPO(tc.HILBY, tc.LENGTH, BAD_COMPRESS), 'MixDMPO:BadCOMPRESS');
         end
 
         function testSystemSize(tc)
@@ -43,9 +43,9 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         end
 
         function testTensorShape(tc)
-            % since this function forms the DMPO virtual dimensions are tested for
-            % validity, rather than 'correctness' -- that is that each tensor can
-            % be multiplied into the next
+            % since this function forms the DMPO virtual dimensions are
+            % tested for validity, rather than 'correctness' -- that is
+            % that each tensor can be multiplied into the next
             rowSz = 1;
             for site = 1 : 1 : (tc.LENGTH - 1)
                 colSz = size(tc.dmpo{site+1}, 1);
@@ -69,9 +69,9 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         end
 
         function testElements(tc)
-            % similar to the method used to test DMPOHerm, and DMPOConj, the
-            % density matrix is sampled, and it is checked that the elements equal
-            % 1 / (HILBY^LENGTH)
+            % similar to the method used to test DMPOHerm, and DMPOConj,
+            % the density matrix is sampled, and it is checked that the
+            % elements equal 1 / (HILBY^LENGTH)
             SPACE = tc.HILBY^tc.LENGTH;
             sampleSz = min(floor(0.1 * SPACE^2), tc.SAMPLE_MAX);
             for testNum = 1 : 1 : sampleSz

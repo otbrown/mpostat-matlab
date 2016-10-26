@@ -42,7 +42,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             fname = 'data/FourSiteExact.mat';
 
             % inputs
-            dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
+            dmpoInit = MixDMPO(HILBY, LENGTH, tc.COMPRESS);
 
             % local operators
             I = eye(HILBY);
@@ -176,7 +176,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             fname = 'data/MFS15_FiveSite.mat';
 
             % inputs
-            dmpoInit = SuperDMPO(HILBY, LENGTH, tc.COMPRESS);
+            dmpoInit = MixDMPO(HILBY, LENGTH, tc.COMPRESS);
 
             % local operators
             I = eye(HILBY);
