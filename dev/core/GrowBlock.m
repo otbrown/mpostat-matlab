@@ -12,7 +12,6 @@ function [updateBlock] = GrowBlock(dmpo, mpo, left, right, site, direction)
     mpoTensor = mpo{site};
 
     % pull dimensions
-    LENGTH = length(dmpo);
     [ROW_SIZE, COL_SIZE, HILBY, ~] = size(siteTensor);
     [~, ~, ~, ~, OP_ROW, OP_COL] = size(mpoTensor);
 

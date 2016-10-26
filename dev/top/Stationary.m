@@ -87,7 +87,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
 
     % initialise flags and counters
     convFlag = false;
-    success = false;
     finished = false;
     sweepCount = 0;
     updCount = 0;
@@ -134,7 +133,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
                 finished = true;
                 if abs(eigTrack(end)) < THRESHOLD
                     fprintf('\nCalculation successful.\n');
-                    success = true;
                     break;
                 else
                     fprintf('\nCalculation failed to reach desired accuracy. Larger matrix dimensions may be required.\n');

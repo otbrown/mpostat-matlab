@@ -15,7 +15,7 @@
 %             be the first site in the system since the next site along is
 %             also affected by this procedure
 
-function [canSite, nextSiteUS] = RCan(siteTensor, nextSiteTensor, HILBY, ROW_SIZE, COL_SIZE, NEXT_ROW);
+function [canSite, nextSiteUS] = RCan(siteTensor, nextSiteTensor, HILBY, ROW_SIZE, COL_SIZE, NEXT_ROW)
     siteTensor = reshape(siteTensor, [ROW_SIZE, COL_SIZE * HILBY^2]);
 
     % SVD decomposition

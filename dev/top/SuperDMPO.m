@@ -25,7 +25,7 @@ function [dmpo] = SuperDMPO(HILBY, LENGTH, COMPRESS)
 		msg = sprintf('Minimum matrix dimension is %d. Supplied COMPRESS value was %d.', HILBY^2, COMPRESS);
 		badCOMPRESSException = MException(msgID, msg);
 		throw(badCOMPRESSException);
-	end
+    end
 
     % allocate return
     dmpo = cell(LENGTH, 1);
@@ -38,7 +38,7 @@ function [dmpo] = SuperDMPO(HILBY, LENGTH, COMPRESS)
 
     % and the rest
 	colSz = HILBY^2;
-	for site = 2 : 1 : LENGTH - 1
+    for site = 2 : 1 : LENGTH - 1
 		if site < ceil(LENGTH / 2)
 			len = site;
 		else
