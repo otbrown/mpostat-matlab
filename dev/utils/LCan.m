@@ -1,23 +1,28 @@
 % LCan.m
-% function which returns the a dmpo with the requested sites in left
-% canonical form
+% function which returns a site tensor in left-canonical form and its
+% neighbour which has the norm carried into it
 % Oliver Thomson Brown
 % 2016-03-15
 %
-% ldmpo = LCan(dmpo, route)
+% [ canSite, SVNextSite ] = LCan(siteTensor, nextSiteTensor, HILBY, ...
+%                                   ROW_SIZE, COL_SIZE, NEXT_COL)
 %
 % RETURN
-% ldmpo     : cell array, the dmpo in left-canonical form along the specified
-%             route
+% canSite:      complex double, rank-4, the site tensor which has been
+%               made left-canonical
+% SVNextSite:   complex double, rank-4, the site tensor for the site which
+%               follows canSite -- has been modified in the process of
+%               making canSite left-canonical
 %
-% INPUTS
-% dmpo      : cell array, a density matrix product operator
-% route     : integer array, the sites which should be brought into
-%             left-canonical form, in increasing order -- note that the last
-%             site cannot be the last site in the system, as the routine
-%             multiplies into the next site along. If a single integer is
-%             supplied, only that site is into canonical form, but the next
-%             site along is still affected
+% INPUT
+% siteTensor:       complex double, rank-4, the site tensor which is to be
+%                   made left-canonical
+% nextSiteTensor:   complex double, rank-4, the site tensor for the site
+%                   which follows siteTensor
+% HILBY:            integer, physical dimension of the system
+% ROW_SIZE:         integer, the first virtual dimension of siteTensor
+% COL_SIZE:         integer, the second virtual dimension of siteTensor
+% NEXT_COL:         integer, the second virtual dimension of nextSiteTensor
 
 function [canSite, SVNextSite] = LCan(siteTensor, nextSiteTensor, HILBY, ROW_SIZE, COL_SIZE, NEXT_COL)
     % manipulate site tensor into a matrix

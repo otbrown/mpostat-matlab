@@ -1,17 +1,17 @@
 % DMPOCompress.m
 % truncates the virtual dimensions of a density matrix product operator to
-% be no greater than COMPRESS on each side
+% be no greater than COMPRESS, SVD norms in the process
 % THIS IS NOT A TRACE PRESERVING OPERATION
 % Oliver Thomson Brown
 % 2016-02-08
 %
-% compDMPO = DMPOCompress(dmpo, COMPRESS)
+% [ compDMPO ] = DMPOCompress(dmpo, COMPRESS)
 %
 % RETURN
-% compDMPO:		cell array, compressed dmpo representation
+% compDMPO:		cell array, compressed dmpo
 %
-% INPUTS
-% dmpo:			cell array, uncompressed dmpo representation
+% INPUT
+% dmpo:			cell array, uncompressed dmpo
 % COMPRESS:		integer, the maximum matrix dimension to be allowed in the
 %				compressed dmpo
 

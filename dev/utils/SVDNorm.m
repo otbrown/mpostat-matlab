@@ -1,10 +1,17 @@
 % SVDNorm.m
 % normalises the tensors in a density matrix product operator
-% NOTE: This is strictly not the same as  normalising the density matrix itself
-% it WILL alter the density matrix and should only be used during initialisation
-% of an arbitrary state, not for normalisation
+% NOTE: This is equivalent to vector normalisation. Should only be used at
+% dmpo initialisation or after resizing.
 % Oliver Thomson Brown
 % 2016-02-16
+%
+% [ normDMPO ] = SVDNorm(dmpo)
+%
+% RETURN
+% normDMPO: cell, a density matrix product operator with normalised tensors
+%
+% INPUT
+% dmpo: cell, a density matrix product operator
 
 function [normDMPO] = SVDNorm(dmpo)
     % allocate return

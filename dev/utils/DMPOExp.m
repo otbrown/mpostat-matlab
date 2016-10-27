@@ -1,17 +1,17 @@
 % DMPOExp.m
-% function which calculates an expectation value from an operator and
-% a density matrix product operator <O> = Tr{O*rho}
+% function which calculates an expectation value from an operator and a
+% density matrix product operator <O> = Tr{O*rho}
 % Oliver Thomson Brown
 % 2016-03-11
 %
-% expect = DMPOExp(dmpo, op)
+% [ expect ] = DMPOExp(dmpo, op)
 %
 % RETURN
-% expect    : double, the expectation value Tr{O*rho}
+% expect:   (complex) double, the expectation value Tr{O*rho}
 %
-% INPUTS
-% dmpo      : cell array, dmpo{site}(row, col, braState, ketState)
-% op        : double array, op(ketState, braState, site);
+% INPUT
+% dmpo:     cell array, a density matrix product operator
+% op:       double array, op(ketState, braState, site);
 
 function [expect] = DMPOExp(dmpo, op)
     % pull constants
@@ -20,7 +20,6 @@ function [expect] = DMPOExp(dmpo, op)
 
     % array allocate
     physCon = cell(LENGTH, 1);
-
     for site = 1 : 1 : LENGTH
         physCon{site} = zeros(size(dmpo{site}(:, :, 1, 1)));
         for bra = 1 : 1 : HILBY

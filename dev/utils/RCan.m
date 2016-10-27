@@ -1,19 +1,28 @@
 % RCan.m
+% function which returns a site tensor in right-canonical form and its
+% neighbour which has the norm carried into it
 % Oliver Thomson Brown
 % 2016-03-16
 %
-% rdmpo = RCan(dmpo, route)
+% [ canSite, nextSiteUS ] = RCan(siteTensor, nextSiteTensor, HILBY, ...
+%                                   ROW_SIZE, COL_SIZE, NEXT_ROW)
 %
 % RETURN
-% rdmpo     : cell array, the dmpo in right-canonical form along the specified
-%             route
+% canSite:      complex double, rank-4, the site tensor which has been made
+%               right-canonical
+% nextSiteUS:   complex double, rank-4, the site tensor which follows
+%               canSite in the system -- has been modified in the process
+%               of making canSite right-canonical
 %
-% INPUTS
-% dmpo      : cell array, a density-matrix product operator
-% route     : integer array, the sites which should be brought into
-%             right-canonical form, in decreasing order. The last site cannot
-%             be the first site in the system since the next site along is
-%             also affected by this procedure
+% INPUT
+% siteTensor:       complex double, rank-4, the site tensor which is to be
+%                   made right-canonical
+% nextSiteTensor:   complex double, rank-4, the site tensor for the site
+%                   which follows siteTensor
+% HILBY:            integer, the physical dimension of the system
+% ROW_SIZE:         integer, the first virtual dimension of siteTensor
+% COL_SIZE:         integer, the second virtual dimension of siteTensor
+% NEXT_ROW:         integer, the first virtual dimension of nextSiteTensor
 
 function [canSite, nextSiteUS] = RCan(siteTensor, nextSiteTensor, HILBY, ROW_SIZE, COL_SIZE, NEXT_ROW)
     siteTensor = reshape(siteTensor, [ROW_SIZE, COL_SIZE * HILBY^2]);

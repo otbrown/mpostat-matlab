@@ -5,25 +5,25 @@
 % Oliver Thomson Brown
 % 2016-03-22
 %
-% updateBlock = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW)
+% [ updateBlock ] = GrowRight(siteTensor, mpo, rightBlock, ...
+%                               ROW_SIZE, COL_SIZE, HILBY, OP_ROW)
 %
 % RETURN
-% updateBlock       : rank-3 complex double array, contains the contraction from
-%                     the last site through to this one
+% updateBlock:  rank-3 complex double, contains the contraction from the
+%               last site through to this one
 %
-% INPUTS
-% siteTensor        : rank-4 complex double array, the dmpo tensor for the
-%                     specified site
-% mpo               : rank-6 complex double array, mpo for the operator being
-%                     evaluated in the form <rho|| O ||rho>
-% rightBlock        : rank-3 complex double array, contains the contraction from
-%                     the last site through to the site immediately after this
-%                     one
-% ROW_SIZE          : integer, the size of the first virtual dimension of
-%                     siteTensor
-% COL_SIZE          : integer, the size of the second virtual dimension of
-%                     siteTensor
-% OP_ROW            : integer, the size of the first virtual dimension of mpo
+% INPUT
+% siteTensor:   complex double, rank-4, the dmpo tensor for the specified
+%               site
+% mpo:          complex double, rank-6, mpo for the operator being
+%               evaluated in the form <rho|| O ||rho>
+% rightBlock:   complex double, rank-3, contains the contraction from the
+%               last site through to the site immediately after this one
+% ROW_SIZE:     integer, the size of the first virtual dimension of
+%               siteTensor
+% COL_SIZE:     integer, the size of the second virtual dimension of
+%               siteTensor
+% OP_ROW:       integer, the size of the first virtual dimension of mpo
 
 function [updateBlock] = GrowRight(siteTensor, mpo, rightBlock, ROW_SIZE, COL_SIZE, HILBY, OP_ROW)
     updateBlock = zeros(ROW_SIZE, ROW_SIZE, OP_ROW);

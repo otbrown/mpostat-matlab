@@ -5,26 +5,26 @@
 % Oliver Thomson Brown
 % 2016-09-28
 %
-% [effectiveLiouv] = EffLSparse(TARGET, dmpo, mpo, left, right)
+% [ effectiveLiouv ] = EffLSparse(lBlock, siteMPO, rBlock, ROW_SIZE, ...
+%                                   COL_SIZE, HILBY)
 %
 % RETURN
-% effectiveLiouv    : sparse complex double matrix, the effective Liovillian
-%                     for the site specified by TARGET, reshaped to be a matrix
+% effectiveLiouv:   sparse complex double, the effective Liouvillian for
+%                   the site specified by TARGET
 %
-% INPUTS
-% lBlock          : 3-dimensional complex double array, rank-3 left block tensor
-%                   which contains the contraction through the system from the
-%                   first site up to the target site
-% siteMPO         : 6-dimensional complex double array, rank-6 matrix product
-%                   operator tensor for the target site
-% rBlock          : 3-dimensional complex double array, rank-3 right block
-%                   right block tensor which contains the contraction through
-%                   the sytem from the target site to the last
-% ROW_SIZE        : double, the size of the first virtual dimension of the
-%                   density matrix product operator for the target site
-% COL_SIZE        : double, the size of the second virtual dimension of the
-%                   density matrix product operator for the target site
-% HILBY           : double, the size of the local state space
+% INPUT
+% lBlock:   complex double, rank-3 left block tensor which contains the
+%           contraction through the system from the first site up to the
+%           target site
+% siteMPO:  complex double, rank-6 matrix product operator tensor for the
+%           target site
+% rBlock:   complex double, rank-3 right block tensor which contains the
+%           contraction through the sytem from the target site to the last
+% ROW_SIZE: double, the size of the first virtual dimension of the density
+%           matrix product operator for the target site
+% COL_SIZE: double, the size of the second virtual dimension of the
+%           density matrix product operator for the target site
+% HILBY:    double, the size of the local state space
 
 function [effectiveLiouv] = EffLSparse(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SIZE, HILBY)
     LDIM = ROW_SIZE * COL_SIZE * HILBY^2;
@@ -48,17 +48,19 @@ function [effectiveLiouv] = EffLSparse(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SI
                     % check if our mpo slice is non-zero
                     mpoSlice = siteMPO(:, :, conjBra, conjKet, bra, ket);
                     if any(mpoSlice(:))
-                        chunkCol = (ket - 1) * HILBY * ROW_SIZE * COL_SIZE ...
-                                    + (bra - 1) * ROW_SIZE * COL_SIZE;
+                        chunkCol = (ket - 1) * HILBY * ROW_SIZE ...
+                                    * COL_SIZE + (bra - 1) * ROW_SIZE ...
+                                    * COL_SIZE;
                         for conjRow = 1 : 1 : COL_SIZE
                             for conjCol = 1 : 1 : ROW_SIZE
                                 chunkRow = ...
-                                (conjKet - 1) * HILBY * ROW_SIZE * COL_SIZE ...
-                                + (conjBra - 1) * ROW_SIZE * COL_SIZE ...
-                                + (conjCol - 1) * COL_SIZE + (conjRow - 1);
+                                (conjKet - 1) * HILBY * ROW_SIZE * ...
+                                COL_SIZE + (conjBra - 1) * ROW_SIZE * ...
+                                COL_SIZE + (conjCol - 1) * COL_SIZE + ...
+                                (conjRow - 1);
                                 % put together a 2d slice
-                                chunk = lBlock(:, :, conjCol) * mpoSlice ...
-                                        * rBlock(:, :, conjRow);
+                                chunk = lBlock(:, :, conjCol) ...
+                                        * mpoSlice * rBlock(:, :, conjRow);
 
                                 % make sure the zeros are zero
                                 chunk(abs(chunk) < eps) = 0;

@@ -1,24 +1,29 @@
 % ConvTest.m
-% function which checks if the supplied values have converged below threshold
+% function which checks for convergence of a set of values below some
+% threshold -- uses the mean of the absolute difference between successive
+% values
 % Oliver Thomson Brown
 % 2016-08-30
 %
-% [RETURN]
-% convFlag	: test result, convFlag == 1.0 if successful and convFlag == 0.0 if
-%             test is failed
+% [ convFlag, convergence ] = ConvTest(data, THRESHOLD)
 %
-% [INPUTS]
-% eigTracker	: complex array, contains the eigenvalue of the effective
-%                 Liouvillian solved for each site update
-% threshold	    : double, convergence threshold
+% RETURN
+% convFlag: 	bool, true if convergence is below threshold
+% convergence: 	double, the mean absolute change between successive values
+%				in data
+%
+% INPUT
+% data: 		(complex) double array, the set of values to be tested for
+%				convergence
+% THRESHOLD: 	double, convergence threshold
 
-function [ convFlag, convergence ] = ConvTest(eigTracker, threshold)
+function [ convFlag, convergence ] = ConvTest(data, THRESHOLD)
 	convFlag = false;
 	convergence = NaN;
 
-	if ~isnan(eigTracker)
-		convergence = mean(abs(diff(eigTracker)));
-		if convergence < threshold
+	if ~isnan(data)
+		convergence = mean(abs(diff(data)));
+		if convergence < THRESHOLD
 			convFlag = true;
 		end
 	end

@@ -1,6 +1,18 @@
 % MPOHermProd.m
+% function which returns the MPO representation of ctranspose(O)*O when
+% supplied with the mpo representation of O
 % Oliver Thomson Brown
 % 2016-09-30
+%
+% [ hmpo ] = MPOHermProd(mpo)
+%
+% RETURN
+% hmpo: cell, mpo representation of the product of the hermitian conjugate
+%       of the supplied mpo and itself -- virtual dimensions of the mpo
+%       are squared during this process
+%
+% INPUT
+% mpo: cell, a matrix product operator representing a Liouvillian
 
 function hmpo = MPOHermProd(mpo)
     % gather sizes
@@ -38,10 +50,11 @@ function hmpo = MPOHermProd(mpo)
                     for opCol2 = 1 : 1 : OP_COL
                         jOpCol = (opCol1-1) * OP_COL + opCol2;
 
-                        A = reshape(dagger{site}(:,:,:,:,opRow1,opCol1), ...
-                                    [HILBY^2, HILBY^2]);
+                        A = reshape( ...
+                                dagger{site}(:,:,:,:,opRow1,opCol1), ...
+                                [HILBY^2, HILBY^2]);
                         B = reshape(mpo{site}(:,:,:,:,opRow2,opCol2), ...
-                                    [HILBY^2, HILBY^2]);
+                                [HILBY^2, HILBY^2]);
 
                         hmpo{site}(:,:,:,:,jOpRow,jOpCol) = ...
                         reshape(A*B, [HILBY, HILBY, HILBY, HILBY]);
@@ -56,7 +69,7 @@ function hmpo = MPOHermProd(mpo)
         for opRow2 = 1 : 1 : OP_ROW
             jOpRow = (opRow1-1) * OP_ROW + opRow2;
 
-            A = reshape(dagger{LENGTH}(:,:,:,:,opRow1), [HILBY^2, HILBY^2]);
+            A = reshape(dagger{LENGTH}(:,:,:,:,opRow1),[HILBY^2,HILBY^2]);
             B = reshape(mpo{LENGTH}(:,:,:,:,opRow2), [HILBY^2, HILBY^2]);
 
             hmpo{LENGTH}(:, :, :, :, jOpRow) = ...

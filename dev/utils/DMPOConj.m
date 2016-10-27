@@ -1,17 +1,17 @@
 % DMPOConj.m
-% function which returns the Hermitian conjugate of 
-% a density matrix product operator
-% (Hermitian conjugate is the complex conjuagte of the transpose)
+% function which returns the Hermitian conjugate of a density matrix
+% product operator
 % Oliver Thomson Brown
 % 2016-02-08
 %
-% conjDMPO = DMPOConj(dmpo)
+% [ conjDMPO ] = DMPOConj(dmpo)
 %
 % RETURN
-% conjDMPO:		cell array		
+% conjDMPO:	cell array, the Hermitian conjugate of the input density
+%			matrix product operator
 %
 % INPUT
-% dmpo:			cell array
+% dmpo:		cell array, a density matrix product operator
 
 function [conjDMPO] = DMPOConj(dmpo)
 	% gather constants
@@ -28,5 +28,4 @@ function [conjDMPO] = DMPOConj(dmpo)
 			end
 		end
 	end
-			
 end
