@@ -1,62 +1,46 @@
 % RCan.m
+% function which returns a site tensor in right-canonical form and its
+% neighbour which has the norm carried into it
 % Oliver Thomson Brown
 % 2016-03-16
 %
-% rdmpo = RCan(dmpo, route)
+% [ canSite, nextSiteUS ] = RCan(siteTensor, nextSiteTensor, HILBY, ...
+%                                   ROW_SIZE, COL_SIZE, NEXT_ROW)
 %
 % RETURN
-% rdmpo     : cell array, the dmpo in right-canonical form along the specified
-%             route
+% canSite:      complex double, rank-4, the site tensor which has been made
+%               right-canonical
+% nextSiteUS:   complex double, rank-4, the site tensor which follows
+%               canSite in the system -- has been modified in the process
+%               of making canSite right-canonical
 %
-% INPUTS
-% dmpo      : cell array, a density-matrix product operator
-% route     : integer array, the sites which should be brought into
-%             right-canonical form, in decreasing order. The last site cannot
-%             be the first site in the system since the next site along is
-%             also affected by this procedure
+% INPUT
+% siteTensor:       complex double, rank-4, the site tensor which is to be
+%                   made right-canonical
+% nextSiteTensor:   complex double, rank-4, the site tensor for the site
+%                   which follows siteTensor
+% HILBY:            integer, the physical dimension of the system
+% ROW_SIZE:         integer, the first virtual dimension of siteTensor
+% COL_SIZE:         integer, the second virtual dimension of siteTensor
+% NEXT_ROW:         integer, the first virtual dimension of nextSiteTensor
 
-function [rdmpo] = RCan(dmpo, route)
-    % gather constants
-    LENGTH = size(dmpo, 1);
-    HILBY = size(dmpo{1}, 3);
+function [canSite, nextSiteUS] = RCan(siteTensor, nextSiteTensor, HILBY, ROW_SIZE, COL_SIZE, NEXT_ROW)
+    siteTensor = reshape(siteTensor, [ROW_SIZE, COL_SIZE * HILBY^2]);
 
-    if route(end) <= 1
-		msgID = 'RCan:BadRoute';
-		msg = sprintf('Route cannnot extend to (or exceed) the first site in the system. Your route ended at %d.', route(end));
-		badRouteException = MException(msgID, msg);
-		throw(badRouteException);
-    end
+    % SVD decomposition
+    [U, S, V] = svd(siteTensor, 'econ');
 
-    % allocate return
-    rdmpo = dmpo;
+    % manipulate V back into a rank-4 tensor and embed
+    canSite = reshape(ctranspose(V), [ROW_SIZE, COL_SIZE, HILBY, HILBY]);
 
-    [rowSz, colSz, ~, ~] = size(rdmpo{route(1)});
+    % multiply U * S into the next site along
+    US = U * S;
 
-    for site = route
-        % manipulate site tensor into matrix
-        M = reshape(rdmpo{site}, [rowSz, colSz * HILBY^2]);
-
-        % SVD decomposition
-        [U, S, V] = svd(M, 'econ');
-        vr = size(V, 2);
-        V2 = zeros(rowSz, colSz * HILBY^2);
-        V2(1 : vr, :) = ctranspose(V);
-
-        % manipulate V back into a rank-4 tensor and embed
-        rdmpo{site} = reshape(V2, [rowSz, colSz, HILBY, HILBY]);
-
-        % multiply U * S into the next site along
-        colSz = rowSz;
-        rowSz = size(rdmpo{site - 1}, 1);
-
-        US = zeros(colSz);
-        US(:, 1 : vr) = U * S;
-
-        for bra = 1 : 1 : HILBY
-            for ket = 1 : 1 : HILBY
-                rdmpo{site - 1}(:, :, bra, ket) = ...
-                rdmpo{site - 1}(:, :, bra, ket) * US;
-            end
+    nextSiteUS = zeros(NEXT_ROW, ROW_SIZE, HILBY, HILBY);
+    for bra = 1 : 1 : HILBY
+        for ket = 1 : 1 : HILBY
+            nextSiteUS(:, :, bra, ket) = ...
+            nextSiteTensor(:, :, bra, ket) * US;
         end
     end
 end

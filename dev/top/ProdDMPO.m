@@ -1,20 +1,22 @@
 % ProdDMPO.m
-% function which builds the dmpo representation of the density matrix of a product
-% state -- not terribly useful, except for testing
+% function which builds a dmpo representing the density matrix of a
+% product state
 % Oliver Thomson Brown
 % 2016-02-26
 %
-% prodDMPO = SuperDMPO(HILBY, LENGTH, COMPRESS, STATE)
+% [ prodDMPO ] = ProdDMPO(HILBY, LENGTH, COMPRESS, STATE)
 %
-% [RETURN]
-% prodDMPO:     LENGTH x 1 cell array, format is prodDMPO{site}(row, column, braState, ketState)
-%				as in < braState | rho | ketState>
+% RETURN
+% prodDMPO: cell, a density matrix product operator representing a product
+%           state of the system
 %
-% [INPUTS]
-% HILBY:        integer, the dimension of the local state space (i.e. for qubits, HILBY = 2)
-% LENGTH:       integer, the size of the 1-D system
-% COMPRESS:     integer, the maximum dimension of the matrices, enter 0 for an uncompressed MPS
-% STATE:        integer, the decimal representation of the product state you wish to form
+% INPUT
+% HILBY:    integer, the dimension of the local state space
+% LENGTH:   integer, the size of the 1-D system
+% COMPRESS: integer, the maximum dimension of the matrices, enter 0 for an
+%           uncompressed MPS
+% STATE:    integer, the decimal representation of the product state you
+%           wish to form
 
 function [prodDMPO] = ProdDMPO(HILBY, LENGTH, COMPRESS, STATE)
     % COMPRESS == 0 means no compression
@@ -22,7 +24,8 @@ function [prodDMPO] = ProdDMPO(HILBY, LENGTH, COMPRESS, STATE)
         COMPRESS = Inf;
     elseif COMPRESS < HILBY^2
 		msgID = 'ProdDMPO:BadCOMPRESS';
-		msg = sprintf('Minimum matrix dimension is %d. Supplied COMPRESS value was %d.', HILBY^2, COMPRESS);
+		msg = sprintf(['Minimum matrix dimension is %d. Supplied ', ...
+                        'COMPRESS value was %d.'], HILBY^2, COMPRESS);
 		badCOMPRESSException = MException(msgID, msg);
 		throw(badCOMPRESSException);
     end

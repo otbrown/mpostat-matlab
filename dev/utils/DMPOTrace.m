@@ -1,15 +1,17 @@
 % DMPOTrace.m
-% calculates the trace of a supplied density matrix product operator
+% calculates the trace of a density matrix product operator
 % Oliver Thomson Brown
 % 2016-02-17
 %
-% trace = DMPOTrace(dmpo)
+% [ trace ] = DMPOTrace(dmpo)
 %
 % RETURN
-% trace     : complex double, the trace of the density matrix described by dmpo
+% trace:    (complex) double, the trace of the density matrix described
+%           by dmpo -- ought to always be real-valued and one for
+%           normalisation
 %
-% INPUTS
-% dmpo      : cell array, an arbitrary density matrix product operator
+% INPUT
+% dmpo:     cell array, a density matrix product operator
 
 function trace = DMPOTrace(dmpo)
     % pull constants

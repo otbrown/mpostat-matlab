@@ -24,7 +24,15 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
             tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
-            tc.canDMPO = LCan(tc.dmpo, [1 : 1 : tc.LENGTH - 1]);
+            tc.canDMPO = tc.dmpo;
+            for site = 1 : 1 : (tc.LENGTH - 1)
+                siteTensor = tc.canDMPO{site};
+                nextSiteTensor = tc.canDMPO{site+1};
+                [ROW_SIZE, COL_SIZE, ~, ~] = size(siteTensor);
+                NEXT_COL = size(nextSiteTensor, 2);
+                [tc.canDMPO{site}, tc.canDMPO{site+1}] = LCan(siteTensor, ...
+                    nextSiteTensor, tc.HILBY, ROW_SIZE, COL_SIZE, NEXT_COL);
+            end
         end
     end
 
@@ -35,11 +43,6 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
         function testSystemSize(tc)
             tc.fatalAssertSize(tc.canDMPO, size(tc.dmpo));
-        end
-
-        function testThrowBadRoute(tc)
-            badRoute = [1 : 1 : tc.LENGTH];
-            tc.fatalAssertError(@()LCan(tc.dmpo, badRoute), 'LCan:BadRoute');
         end
 
         function testTensorShape(tc)

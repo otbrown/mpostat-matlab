@@ -3,13 +3,13 @@
 % Oliver Thomson Brown
 % 2016-02-17
 %
-% normDMPO = TrNorm(dmpo)
+% [ normDMPO ] = TrNorm(dmpo)
 %
 % RETURN
-% normDMPO  : cell array, contains the trace normalised dmpo
+% normDMPO: cell, contains the trace normalised dmpo
 %
-% INPUTS
-% dmpo      : cell array, an arbitrary dmpo
+% INPUT
+% dmpo: cell, a density matrix product operator
 
 function [normDMPO] = TrNorm(dmpo)
     tr = DMPOTrace(dmpo);

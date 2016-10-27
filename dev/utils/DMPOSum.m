@@ -1,16 +1,17 @@
 % DMPOSum.m
-% computes the sum of to density matrix product operators
+% computes the sum of two density matrix product operators -- equivalent
+% to summing two density matrices
 % Oliver Thomson Brown
 % 2016-02-08
 %
-% sumDMPO = DMPOSum(rhoA, rhoB)
+% [ sumDMPO ] = DMPOSum(rhoA, rhoB)
 %
 % RETURN
-% sumDMPO:			cell array, rhoA + rhoB
+% sumDMPO:	cell array, a density matrix product operator -- rhoA + rhoB
 %
 % INPUTS
-% rhoA:			cell array, a density matrix expressed as an MPO
-% rhoB:			cell array, a density matrix expressed as an MPO
+% rhoA:		cell array, a density matrix product operator
+% rhoB:		cell array, a density matrix product operator
 
 function [sumDMPO] = DMPOSum(rhoA, rhoB)
 	% gather constants
@@ -23,7 +24,7 @@ function [sumDMPO] = DMPOSum(rhoA, rhoB)
 	if lengthA ~= lengthB || hilbyA ~= hilbyB
 		msgID = 'DMPOSum:BadArgs';
 		msg = sprintf('Arguments must describe systems with the same local state dimensions, and the same number of sites. lengthA = %d, lengthB = %d, hilbyA = %d, hilbyB = %d', lengthA, lengthB, hilbyA, hilbyB);
-		unmatchedDMPOSumArgs = MException(msgID, msg);		
+		unmatchedDMPOSumArgs = MException(msgID, msg);
 		throw(unmatchedDMPOSumArgs);
 	end
 
