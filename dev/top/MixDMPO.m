@@ -6,12 +6,12 @@
 % Oliver Thomson Brown
 % 2016-03-14
 %
-% dmpo = MixDMPO(HILBY, LENGTH, COMPRESS)
+% [ dmpo ] = MixDMPO(HILBY, LENGTH, COMPRESS)
 %
 % RETURN
-% dmpo      : cell array, the density matrix product operator
+% dmpo      : cell, a density matrix product operator
 %
-% INPUTS
+% INPUT
 % HILBY		: integer, size of the local state space
 % LENGTH	: integer, the number of sites in the system
 % COMPRESS	: integer, the maximum virtual dimension of any given tensor
@@ -22,7 +22,8 @@ function [dmpo] = MixDMPO(HILBY, LENGTH, COMPRESS)
         COMPRESS = Inf;
     elseif COMPRESS < HILBY^2
 		msgID = 'MixDMPO:BadCOMPRESS';
-		msg = sprintf('Minimum matrix dimension is %d. Supplied COMPRESS value was %d.', HILBY^2, COMPRESS);
+		msg = sprintf(['Minimum matrix dimension is %d. Supplied ', ...
+                        'COMPRESS value was %d.'], HILBY^2, COMPRESS);
 		badCOMPRESSException = MException(msgID, msg);
 		throw(badCOMPRESSException);
     end

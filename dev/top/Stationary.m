@@ -3,24 +3,26 @@
 % Oliver Thomson Brown
 % 2016-05-06
 %
-% [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD)
-% [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
+% [ dmpoStat, eigTrack ] = Stationary(dmpoInit, mpo, THRESHOLD)
+% [ dmpoStat, eigTrack ] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
 %
 % RETURN
-% dmpoStat      : cell array, density matrix product operator representing the
-%                 stationary state (hopefully)
-% eigTrack      : double array, contains the eigenvalues from each site update
-%                 monitored for convergence
+% dmpoStat: cell, density matrix product operator representing the
+%           stationary state (hopefully)
+% eigTrack: (complex) double, contains the eigenvalues from the last (2 *
+%           (LENGTH-1)) site updates which are monitored for convergence
 %
-% INPUTS
-% dmpoInit      : cell array, density matrix product operator containing some
-%                 initial state
-% mpo           : cell array, Liouvillian for the system in matrix product
-%                 operator form
-% THRESHOLD     : double, the convergence threshold
-% variant       : string, optional argument, may specify whether to solve the
-%                 non-Hermitian Liovillian, or the Hermitian product L^(T*)L
-%                 'hermitian' or 'direct' are the two accepted values
+% INPUT
+% dmpoInit:     cell, a density matrix product operator representing some
+%               initial state
+% mpo:          cell, Liouvillian for the system in matrix product
+%               operator form
+% THRESHOLD:    double, how close must L*rho be to zero for the
+%               calculation to be deemed successful
+% variant:      string, OPTIONAL, may specify whether to solve the
+%               non-Hermitian Liovillian, or the Hermitian product L^(T*)L
+%               -- 'hermitian' and 'direct' are the two accepted values --
+%               default value is 'direct'
 
 function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     % check for optional arguments
@@ -33,11 +35,15 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
             elseif strcmpi(varargin{1}, 'direct')
                 HERMITIAN = false;
             else
-                ME = MException('Stationary:badHERMITIAN', 'The last argument was invalid: %s. Type help Stationary.', varargin{1});
+                ME = MException('Stationary:badHERMITIAN', ['The last ',...
+                'argument was invalid: %s. Type help Stationary.'], ...
+                varargin{1});
                 throw(ME);
             end
         otherwise
-            ME = MException('Stationary:badArguments', 'Stationary accepts 3 or 4 arguments, but %g were supplied. Type help Stationary.', nargin);
+            ME = MException('Stationary:badArguments', ['Stationary ', ...
+            'accepts 3 or 4 arguments, but %g were supplied. Type ', ...
+            'help Stationary.'], nargin);
             throw(ME);
     end
 
@@ -60,8 +66,11 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     % print some info about the calculation
     fprintf('Variational Stationary State Search\n');
     fprintf('%s\n\n', datestr(datetime('now'), 31));
-    fprintf('System Parameters:\n\tSystem size: %g\n\tLocal states: %g\n', LENGTH, HILBY);
-    fprintf('Calculation Parameters:\n\tEigenvalue threshold: %g\n\tMaximum MPS matrix size: %g\n\tMaximum effective Liouvillian size: %g\n', THRESHOLD, MAX_DIM, MAX_LDIM);
+    fprintf(['System Parameters:\n\tSystem size: %g\n\tLocal ', ...
+            'states: %g\n'], LENGTH, HILBY);
+    fprintf(['Calculation Parameters:\n\tEigenvalue threshold: ', ...
+            '%g\n\tMaximum MPS matrix size: %g\n\tMaximum effective ', ...
+            'Liouvillian size: %g\n'], THRESHOLD, MAX_DIM, MAX_LDIM);
     if HERMITIAN
         fprintf('\tEffective Liouvillian: Hermitian Product\n\n');
     else
@@ -103,11 +112,12 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
             if HERMITIAN
                 [update, eigTrack(end)] = EigenSolver(effL, HERMITIAN);
             else
-                % we can supply an initial guess to eigs, so we use the current
-                % site tensor, to aid convergence
+                % we can supply an initial guess to eigs, so we use the
+                % current site tensor, to aid convergence
                 siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
                 siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
-                [update, eigTrack(end)] = EigenSolver(effL, HERMITIAN, siteVec);
+                [update, eigTrack(end)] = ...
+                    EigenSolver(effL, HERMITIAN, siteVec);
             end
 
             update = reshape(update, [COL_SIZE, ROW_SIZE, HILBY, HILBY]);
@@ -125,17 +135,20 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
             end
 
             % evaluate convergence
-            [convFlag, convergence] = ConvTest(eigTrack, CONVERGENCE_THRESHOLD);
+            [convFlag, convergence] = ...
+                ConvTest(eigTrack, CONVERGENCE_THRESHOLD);
 
-            % stop following route if RUNMAX is reached or if the calculation
-            % has converged to desired threshold
+            % stop following route if RUNMAX is reached or if the
+            % calculation has converged to desired threshold
             if convFlag || updCount == RUNMAX
                 finished = true;
                 if abs(eigTrack(end)) < THRESHOLD
                     fprintf('\nCalculation successful.\n');
                     break;
                 else
-                    fprintf('\nCalculation failed to reach desired accuracy. Larger matrix dimensions may be required.\n');
+                    fprintf(['\nCalculation failed to reach desired ', ...
+                            'accuracy. Larger matrix dimensions may ', ...
+                            'be required.\n']);
                     break;
                 end
             end
@@ -146,11 +159,15 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
         end
 
         if finished
-            fprintf('Finished at %s.\n[ Eigenvalue: %g, Convergence: %g ]\n', datestr(datetime('now'), 31), eigTrack(end), convergence);
+            fprintf(['Finished at %s.\n', ...
+                    '[ Eigenvalue: %g, Convergence: %g ]\n'], ...
+                    datestr(datetime('now'), 31), eigTrack(end), ...
+                    convergence);
         else
             % add to sweepCount and report on progress
             sweepCount = sweepCount + 1;
-            fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', sweepCount, eigTrack(end), convergence);
+            fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', ...
+                    sweepCount, eigTrack(end), convergence);
         end
 
         % flip it and reverse it
