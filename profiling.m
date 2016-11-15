@@ -25,7 +25,7 @@ variant = 'direct';
 dateStamp = datestr(datetime('now'), 30);
 savePath = sprintf('%s/%s_%sPROFILE.mat', resultDir, dateStamp, variant);
 
-dmpoInit = SuperDMPO(HILBY, LENGTH, COMPRESS);
+dmpoInit = MixDMPO(HILBY, LENGTH, COMPRESS);
 
 % build Liouvillian mpo
 % parameters
