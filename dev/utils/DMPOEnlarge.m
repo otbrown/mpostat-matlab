@@ -4,7 +4,7 @@
 % Oliver Thomson Brown
 % 2016-11-16
 
-function [bigDMPO] = DMPOEnlarge(dmpo, NEW_COMPRESS, HILBY, LENGTH)
+function [bigDMPO] = DMPOEnlarge(dmpo, COMPRESS, HILBY, LENGTH)
     bigDMPO = dmpo;
 
     rowSz = 1;
@@ -14,7 +14,7 @@ function [bigDMPO] = DMPOEnlarge(dmpo, NEW_COMPRESS, HILBY, LENGTH)
         else
             len = LENGTH - site;
         end
-        colSz = min(HILBY^(2*len), NEW_COMPRESS);
+        colSz = min(HILBY^(2*len), COMPRESS);
 
         dim = size(bigDMPO{site});
         if any(dim ~= [rowSz, colSz, HILBY, HILBY])
@@ -22,7 +22,7 @@ function [bigDMPO] = DMPOEnlarge(dmpo, NEW_COMPRESS, HILBY, LENGTH)
             A(1 : dim(1), 1 : dim(2), :, :) = bigDMPO{site};
             bigDMPO{site} = A;
         end
-        
+
         rowSz = colSz;
     end
 end
