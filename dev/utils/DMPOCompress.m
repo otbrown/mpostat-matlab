@@ -15,24 +15,7 @@
 % COMPRESS:		integer, the maximum matrix dimension to be allowed in the
 %				compressed dmpo
 
-function [compDMPO] = DMPOCompress(dmpo, COMPRESS)
-	% gather constants
-	LENGTH = size(dmpo, 1);
-	MIDSITE = ceil(LENGTH / 2);
-	[~, OLD_COMPRESS, HILBY, ~] = size(dmpo{MIDSITE});
-
-	if COMPRESS < HILBY^2
-		msgID = 'DMPOCompress:BadCOMPRESS';
-		msg = sprintf('Minimum matrix dimension is %d. Supplied COMPRESS value was %d.', HILBY^2, COMPRESS);
-		badCOMPRESSException = MException(msgID, msg);
-		throw(badCOMPRESSException);
-	elseif COMPRESS > OLD_COMPRESS
-		msgID = 'DMPOCompress:BadCOMPRESS';
-		msg = sprintf('Virtual dimension growth not currently supported. Current maximum virtual dimension is: %g.', OLD_COMPRESS);
-		badCOMPRESSException = MException(msgID, msg);
-		throw(badCOMPRESSException);
-	end
-
+function [compDMPO] = DMPOCompress(dmpo, COMPRESS, HILBY, LENGTH)
 	% allocate return
 	compDMPO = dmpo;
 
