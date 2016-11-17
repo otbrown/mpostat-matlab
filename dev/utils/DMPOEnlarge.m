@@ -3,6 +3,18 @@
 % the extra space is padded with zeros
 % Oliver Thomson Brown
 % 2016-11-16
+%
+% [ bigDMPO ] = DMPOEnlarge(dmpo, COMPRESS, HILBY, LENGTH)
+%
+% RETURN
+% bigDMPO:  cell, the density matrix product operator with enlarged virtual
+%           dimensions
+%
+% INPUT
+% dmpo:     cell, an arbitrary density matrix product operator
+% COMPRESS: integer, new maximum virtual dimension of the tensors of dmpo
+% HILBY:    integer, the size of the local state space
+% LENGTH:   integer, the number of sites in the system
 
 function [bigDMPO] = DMPOEnlarge(dmpo, COMPRESS, HILBY, LENGTH)
     bigDMPO = dmpo;

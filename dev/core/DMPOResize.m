@@ -1,6 +1,15 @@
 % DMPOResize.m
 % Oliver Thomson Brown
 % 2016-11-17
+%
+% [ rsDMPO ] = DMPOResize(dmpo, COMPRESS)
+%
+% RETURN
+% rsDMPO: cell, the resized density matrix product operator
+%
+% INPUT
+% dmpo:     cell, an arbitrary density matrix product operator
+% COMPRESS: integer, the new maximum virtual dimension of a tensor in dmpo
 
 function [rsDMPO] = DMPOResize(dmpo, COMPRESS)
     LENGTH = length(dmpo);

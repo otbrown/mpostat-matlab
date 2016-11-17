@@ -5,7 +5,7 @@
 % Oliver Thomson Brown
 % 2016-02-08
 %
-% [ compDMPO ] = DMPOCompress(dmpo, COMPRESS)
+% [ compDMPO ] = DMPOCompress(dmpo, COMPRESS, HILBY, LENGTH)
 %
 % RETURN
 % compDMPO:		cell array, compressed dmpo
@@ -14,6 +14,8 @@
 % dmpo:			cell array, uncompressed dmpo
 % COMPRESS:		integer, the maximum matrix dimension to be allowed in the
 %				compressed dmpo
+% HILBY:		integer, size of the local state space
+% LENGTH:		integer, the number of sites in the system
 
 function [compDMPO] = DMPOCompress(dmpo, COMPRESS, HILBY, LENGTH)
 	% allocate return
