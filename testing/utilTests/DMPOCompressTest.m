@@ -10,46 +10,35 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         pdmpo;
         cmdmpo;
         cpdmpo;
-        cTr;
-        systemSz;
+        LENGTH;
         HILBY;
         COMPRESS;
     end
 
     properties (MethodSetupParameter)
         testHILBY = {2, 2, 2, 3};
-        testSystemSz = {7, 4, 8, 5};
+        testLENGTH = {7, 4, 8, 5};
         testCOMPRESS = {48, 12, 128, 60};
     end
 
     methods (TestMethodSetup, ParameterCombination='sequential')
-        function MethodSetup(tc, testHILBY, testSystemSz, testCOMPRESS)
+        function MethodSetup(tc, testHILBY, testLENGTH, testCOMPRESS)
             % create density matrix mpo -- all at COMPRESS = 0
             tc.HILBY = testHILBY;
-            tc.systemSz = testSystemSz;
+            tc.LENGTH = testLENGTH;
             tc.COMPRESS = testCOMPRESS;
-            tc.mdmpo = MixDMPO(testHILBY, testSystemSz, 0);
-            tc.pdmpo = ProdDMPO(testHILBY, testSystemSz, 0, 0);
+            tc.mdmpo = MixDMPO(testHILBY, testLENGTH, 0);
+            tc.pdmpo = ProdDMPO(testHILBY, testLENGTH, 0, 0);
             tc.COMPRESS = testCOMPRESS;
-            tc.cmdmpo = DMPOCompress(tc.mdmpo, tc.COMPRESS);
+            tc.cmdmpo = DMPOCompress(tc.mdmpo, tc.COMPRESS, ...
+                                        tc.HILBY, tc.LENGTH);
             tc.cmdmpo = TrNorm(tc.cmdmpo);
-            tc.cpdmpo = DMPOCompress(tc.pdmpo, tc.HILBY^2);
+            tc.cpdmpo = DMPOCompress(tc.pdmpo, tc.HILBY^2, ...
+                                        tc.HILBY, tc.LENGTH);
         end
     end
 
     methods (Test)
-        function testThrowBadCompress(tc)
-            % have to anonymise DMPOCompress here to ensure that error is
-            % caught by fatal assert
-            SMALL_COMPRESS = tc.HILBY^2 - 1;
-            BIG_COMPRESS = tc.HILBY^tc.systemSz + 1;
-            tc.fatalAssertError(@()DMPOCompress(tc.mdmpo, ...
-                SMALL_COMPRESS), 'DMPOCompress:BadCOMPRESS');
-            tc.fatalAssertError(@()DMPOCompress(tc.mdmpo, ...
-                BIG_COMPRESS), 'DMPOCompress:BadCOMPRESS');
-
-        end
-
         function testClass(tc)
             tc.fatalAssertClass(tc.cmdmpo, 'cell');
             tc.fatalAssertClass(tc.cpdmpo, 'cell');
@@ -61,7 +50,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         end
 
         function testTensorShape(tc)
-            for site = 1 : 1 : tc.systemSz
+            for site = 1 : 1 : tc.LENGTH
                 mdim = min(size(tc.mdmpo{site}), tc.COMPRESS);
                 pdim = min(size(tc.pdmpo{site}), tc.HILBY^2);
 
@@ -75,16 +64,16 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testMixedElements(tc)
             % trace normalisation means every element should be 1/SPACE
             % -- the density matrix is just proportional to a ones matrix
-            SPACE = tc.HILBY^tc.systemSz;
+            SPACE = tc.HILBY^tc.LENGTH;
             sampleSz = min(floor(0.1 * SPACE^2), 100);
             for test = 1 : 1 : sampleSz
                 braState = randi([0, SPACE - 1]);
                 ketState = randi([0, SPACE - 1]);
-                braBits = FWBase(braState, tc.HILBY, tc.systemSz) + 1;
-                ketBits = FWBase(ketState, tc.HILBY, tc.systemSz) + 1;
+                braBits = FWBase(braState, tc.HILBY, tc.LENGTH) + 1;
+                ketBits = FWBase(ketState, tc.HILBY, tc.LENGTH) + 1;
 
                 compCoefft = 1;
-                for site = 1 : 1 : tc.systemSz
+                for site = 1 : 1 : tc.LENGTH
                     bra = braBits(site);
                     ket = ketBits(site);
                     compCoefft = compCoefft ...
@@ -108,7 +97,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testProductElement(tc)
             % again, 0s product state, so first element in DM should be 1
             coefft = 1;
-            for site = 1 : 1 : tc.systemSz
+            for site = 1 : 1 : tc.LENGTH
                 coefft = coefft * tc.cpdmpo{site}(:, :, 1, 1);
             end
             epsilon = abs(coefft - 1);

@@ -75,6 +75,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
         fprintf('\tEffective Liouvillian: Hermitian Product\n\n');
     else
         fprintf('\tEffective Liouvillian: Non-Hermitian\n\n');
+        ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
     end
 
     % allocate return variables
@@ -116,8 +117,24 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
                 % current site tensor, to aid convergence
                 siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
                 siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
-                [update, eigTrack(end)] = ...
-                    EigenSolver(effL, HERMITIAN, siteVec);
+                try
+                    [update, eigTrack(end)] = ...
+                        EigenSolver(effL, HERMITIAN, siteVec);
+                catch ME
+                    if strcmp(ME.identifier, ARPACK_msgID)
+                        fname = sprintf('mpostat%uX%u_failed.mat', ...
+                                        LENGTH, HILBY);
+                        save(fname);
+                        fprintf(['Unfortunately, the calculation has ' ...
+                                'failed while trying to find  ' ...
+                                'eigenvalues.\nPartial result saved in %s\nConsider using larger matrix ' ...
+                                'dimensions or the Hermitian ' ...
+                                'variant.\n'], fname);
+                        throw(ME);
+                    else
+                        throw(ME);
+                    end
+                end
             end
 
             update = reshape(update, [COL_SIZE, ROW_SIZE, HILBY, HILBY]);
