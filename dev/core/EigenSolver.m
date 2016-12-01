@@ -30,11 +30,10 @@ function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, varargin)
         fprintf('Hermiticity error: %g\n', epsilon);
         effL = (effL + ctranspose(effL))/2;
 
-        opts = struct('numTargetShifts', 1, 'targetShifts', 0, ...
-                        'eps', 1E-14);
+        opts = struct('eps', 1E-14);
 
         fprintf('\n');
-        [eigVector, eigValue] = primme_eigs(effL, 1, 'CT', opts);
+        [eigVector, eigValue] = primme_eigs(effL, 1, 'SM', opts);
         fprintf('\n');
     else
         if nargin > 2
