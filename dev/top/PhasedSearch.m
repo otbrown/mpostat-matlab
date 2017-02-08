@@ -11,7 +11,7 @@
 % RETURN
 % dmpoStat:     cell, density matrix product operator representing the
 %               stationary state (hopefully)
-% phaseEigs:    (complex) double, contains the final eigenvalue of each
+% phaseTrack:   (complex) double, contains the final eigenvalue of each
 %               phase ofthe calculation
 %
 % INPUT
@@ -28,7 +28,7 @@
 %                       non-Hermitian Liouvillian, or the Hermitian
 %                       product, 'direct' or 'hermitian'
 
-function [dmpoStat, phaseEigs] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRESHOLD, MAX_COMPRESS, VARIANT)
+function [dmpoStat, phaseTrack] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRESHOLD, MAX_COMPRESS, VARIANT)
     % set up
     threshold = 0.01;
     compress = HILBY^2;
@@ -37,9 +37,9 @@ function [dmpoStat, phaseEigs] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRES
     phaseEig = Inf;
     ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
 
-    dmpoStat = MixDMPO(HILBY, LENGTH, compress)
+    dmpoStat = MixDMPO(HILBY, LENGTH, compress);
 
-    while phaseEig > ULTIMATE THRESHOLD
+    while phaseEig > ULTIMATE_THRESHOLD
         fprintf('PHASE %g:\n[ THRESHOLD: %g, COMPRESS: %g]\n', ...
                 phaseCount, threshold, compress);
 
@@ -47,7 +47,7 @@ function [dmpoStat, phaseEigs] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRES
 
         try
             % solve using Stationary
-            [dmpoStat, eigTrack] = Stationary(dmpo, mpo, ...
+            [dmpoStat, eigTrack] = Stationary(dmpoStat, mpo, ...
                                                 threshold, VARIANT);
             phaseEig = abs(eigTrack(end));
         catch ME
@@ -60,7 +60,7 @@ function [dmpoStat, phaseEigs] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRES
 
         % Technically this is dangerous as phaseTrack could grow to
         % infinite length. Best hope not, eh.
-        phaseTrack(end + 1) = phaseEig;
+        phaseTrack(end + 1) = eigTrack(end);
 
         if phaseEig < threshold
             if phaseEig < ULTIMATE_THRESHOLD
@@ -80,5 +80,7 @@ function [dmpoStat, phaseEigs] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRES
                 compress = min(MAX_COMPRESS, compress + HILBY^2);
             end
         end
+
+        phaseCount = phaseCount + 1;
     end
 end
