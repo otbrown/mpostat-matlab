@@ -41,11 +41,14 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             lmpo = zeros(tc.HILBY, tc.HILBY, tc.HILBY, tc.HILBY, 2, 2);
             lmpo(:, :, :, :, 2, 1) = reshape(dissipator, ...
-                                     [tc.HILBY, tc.HILBY, tc.HILBY, tc.HILBY]);
+                                     [tc.HILBY, tc.HILBY, tc.HILBY, ...
+                                     tc.HILBY]);
             lmpo(:, :, :, :, 1, 1) = reshape(ident, ...
-                                     [tc.HILBY, tc.HILBY, tc.HILBY, tc.HILBY]);
+                                     [tc.HILBY, tc.HILBY, tc.HILBY, ...
+                                     tc.HILBY]);
             lmpo(:, :, :, :, 2, 2) = reshape(ident, ...
-                                     [tc.HILBY, tc.HILBY, tc.HILBY, tc.HILBY]);
+                                     [tc.HILBY, tc.HILBY, tc.HILBY, ...
+                                     tc.HILBY]);
 
             tc.mpo = cell(tc.LENGTH, 1);
             tc.mpo{1} = lmpo(:, :, :, :, 2, :);
@@ -55,10 +58,11 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             end
 
             % solve using Stationary
-            [tc.dmpoStat, tc.eigTrack] = Stationary(tc.dmpoInit, tc.mpo, ...
-                                                    tc.THRESHOLD, 'direct');
-            [tc.dmpoStatH, tc.eigTrackH] = Stationary(tc.dmpoInit, tc.mpo, ...
-                                                    tc.THRESHOLD, 'hermitian');
+            [tc.dmpoStat, tc.eigTrack] = Stationary(tc.dmpoInit, ...
+                                         tc.mpo, tc.THRESHOLD, 'direct');
+            [tc.dmpoStatH, tc.eigTrackH] = Stationary(tc.dmpoInit,  ...
+                                           tc.mpo, tc.THRESHOLD, ...
+                                           'hermitian');
         end
     end
 
@@ -73,15 +77,15 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testThrowBadHERMITIAN(tc)
             BAD_HERMITIAN = 'test';
             tc.fatalAssertError(@()Stationary(tc.dmpoInit, tc.mpo, ...
-                                              tc.THRESHOLD, BAD_HERMITIAN), ...
-                                'Stationary:badHERMITIAN');
+                                    tc.THRESHOLD, BAD_HERMITIAN), ...
+                                    'Stationary:badHERMITIAN');
         end
 
         function testThrowBadArguments(tc)
             HERMITIAN = 'hermitian';
             tc.fatalAssertError(@()Stationary(tc.dmpoInit, tc.mpo, ...
-                                              tc.THRESHOLD, HERMITIAN, 1), ...
-                                'Stationary:badArguments');
+                                    tc.THRESHOLD, HERMITIAN, 1), ...
+                                    'Stationary:badArguments');
         end
 
         function testShape(tc)
@@ -104,19 +108,22 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         end
 
         function testZZZ(tc)
-            % since we are using a purely dissipative Liouvillian, we expect
-            % the final state to be |000><000|, so we check that element is 1
-            zzz = tc.dmpoStat{1}(:, :, 1, 1) * tc.dmpoStat{2}(:, :, 1, 1) ...
-                  * tc.dmpoStat{3}(:, :, 1, 1);
-            zzzH = tc.dmpoStatH{1}(:, :, 1, 1) * tc.dmpoStatH{2}(:, :, 1, 1) ...
-                  * tc.dmpoStatH{3}(:, :, 1, 1);
+            % since we are using a purely dissipative Liouvillian, we
+            % expect the final state to be |000><000|, so we check that
+            % element is 1
+            zzz = tc.dmpoStat{1}(:, :, 1, 1)  ...
+                    * tc.dmpoStat{2}(:, :, 1, 1) ...
+                    * tc.dmpoStat{3}(:, :, 1, 1);
+            zzzH = tc.dmpoStatH{1}(:, :, 1, 1) ...
+                    * tc.dmpoStatH{2}(:, :, 1, 1) ...
+                    * tc.dmpoStatH{3}(:, :, 1, 1);
             tc.assertLessThan((zzz - 1), tc.absTol);
             tc.assertLessThan((zzzH - 1), tc.absTol);
         end
 
         function testZeroes(tc)
-            % since the density matrix should be zero everywhere but the first
-            % element, we test a sample of them
+            % since the density matrix should be zero everywhere but the
+            % first element, we test a sample of them
             SPACE = tc.HILBY^tc.LENGTH;
             for testNum = 1 : 1 : tc.sampleSz
                 % select random number starting at 1 for braState to avoid
