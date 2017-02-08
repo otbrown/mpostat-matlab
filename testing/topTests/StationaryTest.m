@@ -14,12 +14,11 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         eigTrack;
         eigTrackH;
         HILBY = 3;
-        LENGTH = 3;
-        COMPRESS = 0;
+        LENGTH = 5;
+        COMPRESS = 27;
         dmpoInit;
         mpo;
-        THRESHOLD = 1E-7;
-        MAX_DIM = 100;
+        THRESHOLD = 1E-11;
     end
 
     methods (TestClassSetup)
