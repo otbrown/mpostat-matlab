@@ -5,8 +5,8 @@
 % Oliver Thomson Brown
 % 2017-02-07
 %
-% [ dmpoStat, phaseEigs ] = PhasedSearch(dmpoInit, mpo, ULTIMATE_THRESHOLD,
-%                                         MAX_COMPRESS, variant)
+% [ dmpoStat, phaseEigs ] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRESHOLD,
+%                                         MAX_COMPRESS, VARIANT)
 %
 % RETURN
 % dmpoStat:     cell, density matrix product operator representing the
@@ -35,6 +35,7 @@ function [dmpoStat, phaseTrack] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRE
     phaseCount = 0;
     phaseTrack = [];
     phaseEig = Inf;
+    eigTrack = NaN;
     ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
 
     dmpoStat = MixDMPO(HILBY, LENGTH, compress);
