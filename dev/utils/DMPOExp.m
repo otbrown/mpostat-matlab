@@ -24,7 +24,8 @@ function [expect] = DMPOExp(dmpo, op)
         physCon{site} = zeros(size(dmpo{site}(:, :, 1, 1)));
         for bra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
-                physCon{site} = physCon{site} + op(ket, bra, site) * dmpo{site}(:, :, bra, ket);
+                physCon{site} = physCon{site} + op(ket, bra, site) ...
+                                * dmpo{site}(:, :, bra, ket);
             end
         end
     end

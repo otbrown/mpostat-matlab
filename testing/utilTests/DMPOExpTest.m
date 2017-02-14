@@ -66,5 +66,25 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             epsilon = abs(abs(nExp) - tc.LENGTH * (tc.HILBY - 1));
             tc.assertLessThan(epsilon, tc.absTol);
         end
+
+        function testNonHermState(tc)
+            dmpo = tc.dmpo;
+            midSite = ceil(tc.LENGTH/2);
+            op = tc.idOp;
+
+            op(:, :, midSite) = zeros(tc.HILBY);
+            for state = 1 : 1 : (tc.HILBY - 1)
+                op(state, state + 1, midSite) = sqrt(state);
+            end
+            exp0 = DMPOExp(dmpo, op);
+
+            % tamper with the DMPO slightly to ensure different results
+            % if the indices are the wrong way round
+            dmpo{midSite}(:, :, 2, 1) = -1 * dmpo{midSite}(:, :, 2, 1);
+
+            % the expectation value *should* now be different
+            exp1 = DMPOExp(dmpo, op);
+            tc.assertNotEqual(exp1, exp0);
+        end
     end
 end

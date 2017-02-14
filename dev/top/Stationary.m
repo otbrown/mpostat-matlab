@@ -111,15 +111,14 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
             effL = EffL(site, dmpoStat, mpo, left, right);
 
             if HERMITIAN
-                [update, eigTrack(end)] = EigenSolver(effL, HERMITIAN);
+                [update, eig] = EigenSolver(effL, HERMITIAN);
             else
                 % we can supply an initial guess to eigs, so we use the
                 % current site tensor, to aid convergence
                 siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
                 siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
                 try
-                    [update, eigTrack(end)] = ...
-                        EigenSolver(effL, HERMITIAN, siteVec);
+                    [update, eig] = EigenSolver(effL, HERMITIAN, siteVec);
                 catch ME
                     if strcmp(ME.identifier, ARPACK_msgID)
                         fname = sprintf('mpostat%uX%u_failed.mat', ...
@@ -137,8 +136,12 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
                 end
             end
 
-            update = reshape(update, [COL_SIZE, ROW_SIZE, HILBY, HILBY]);
-            dmpoStat{site} = permute(update, [2, 1, 3, 4]);
+            if ~(abs(eig) > abs(eigTrack(end)))
+                eigTrack(end) = eig;
+                update = reshape(update, ...
+                                    [COL_SIZE, ROW_SIZE, HILBY, HILBY]);
+                dmpoStat{site} = permute(update, [2, 1, 3, 4]);
+            end
 
             % canonicalise & include new site in block tensor
             dmpoStat = Can(dmpoStat, site, direction);

@@ -1,32 +1,30 @@
-% StationaryTest.m
-% note that these tests should test the control flow of Stationary, but not
-% whether or not it finds the correct answers
+% PhasedSearchTest.m
+% tests the basic functionality of PhasedSearch top-level control function
+% ought to devise some way to meaningfully test the different phase logic
+% conditions, but tricky since that only really reveals itself through
+% fprints, will ponder. For now just test it works...
 % Oliver Thomson Brown
-% 2016-05-09
+% 2017-02-08
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true), matlab.unittest.fixtures.PathFixture('../../external/primme/Matlab')}) StationaryTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true), matlab.unittest.fixtures.PathFixture('../../external/primme/Matlab')}) PhasedSearchTest < matlab.unittest.TestCase
 
     properties
-        absTol = 1E-11;
+        absTol = 1E-12;
         sampleSz = 200;
         dmpoStat;
         dmpoStatH;
-        eigTrack;
-        eigTrackH;
+        phaseTrack;
+        phaseTrackH;
         HILBY = 3;
         LENGTH = 5;
-        COMPRESS = 27;
-        dmpoInit;
+        MAX_COMPRESS = 27;
+        ULTIMATE_THRESHOLD = 1E-14;
         mpo;
-        THRESHOLD = 1E-11;
     end
 
     methods (TestClassSetup)
         function ClassSetup(tc)
-            % initialise dmpo
-            tc.dmpoInit = MixDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
-
-            % build liouvillian mpo for dissipation only
+            % build dissipation-only mpo
             gamma = 1;
             I = eye(tc.HILBY);
             exDwn = zeros(tc.HILBY);
@@ -41,14 +39,14 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
             lmpo = zeros(tc.HILBY, tc.HILBY, tc.HILBY, tc.HILBY, 2, 2);
             lmpo(:, :, :, :, 2, 1) = reshape(dissipator, ...
-                                     [tc.HILBY, tc.HILBY, tc.HILBY, ...
-                                     tc.HILBY]);
+                                        [tc.HILBY, tc.HILBY, tc.HILBY, ...
+                                        tc.HILBY]);
             lmpo(:, :, :, :, 1, 1) = reshape(ident, ...
-                                     [tc.HILBY, tc.HILBY, tc.HILBY, ...
-                                     tc.HILBY]);
+                                        [tc.HILBY, tc.HILBY, tc.HILBY, ...
+                                        tc.HILBY]);
             lmpo(:, :, :, :, 2, 2) = reshape(ident, ...
-                                     [tc.HILBY, tc.HILBY, tc.HILBY, ...
-                                     tc.HILBY]);
+                                        [tc.HILBY, tc.HILBY, tc.HILBY, ...
+                                        tc.HILBY]);
 
             tc.mpo = cell(tc.LENGTH, 1);
             tc.mpo{1} = lmpo(:, :, :, :, 2, :);
@@ -57,12 +55,15 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 tc.mpo{site} = lmpo;
             end
 
-            % solve using Stationary
-            [tc.dmpoStat, tc.eigTrack] = Stationary(tc.dmpoInit, ...
-                                         tc.mpo, tc.THRESHOLD, 'direct');
-            [tc.dmpoStatH, tc.eigTrackH] = Stationary(tc.dmpoInit,  ...
-                                           tc.mpo, tc.THRESHOLD, ...
-                                           'hermitian');
+            % solve using PhasedSearch
+            [tc.dmpoStat, tc.phaseTrack] = PhasedSearch(tc.HILBY, ...
+                                            tc.LENGTH, tc.mpo, ...
+                                            tc.ULTIMATE_THRESHOLD, ...
+                                            tc.MAX_COMPRESS, 'direct');
+            [tc.dmpoStatH, tc.phaseTrackH] = PhasedSearch(tc.HILBY, ...
+                                            tc.LENGTH, tc.mpo, ...
+                                            tc.ULTIMATE_THRESHOLD, ...
+                                            tc.MAX_COMPRESS, 'hermitian');
         end
     end
 
@@ -70,41 +71,27 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testClass(tc)
             tc.fatalAssertClass(tc.dmpoStat, 'cell');
             tc.fatalAssertClass(tc.dmpoStatH, 'cell');
-            tc.fatalAssertClass(tc.eigTrack, 'double');
-            tc.fatalAssertClass(tc.eigTrackH, 'double');
-        end
-
-        function testThrowBadHERMITIAN(tc)
-            BAD_HERMITIAN = 'test';
-            tc.fatalAssertError(@()Stationary(tc.dmpoInit, tc.mpo, ...
-                                    tc.THRESHOLD, BAD_HERMITIAN), ...
-                                    'Stationary:badHERMITIAN');
-        end
-
-        function testThrowBadArguments(tc)
-            HERMITIAN = 'hermitian';
-            tc.fatalAssertError(@()Stationary(tc.dmpoInit, tc.mpo, ...
-                                    tc.THRESHOLD, HERMITIAN, 1), ...
-                                    'Stationary:badArguments');
+            tc.fatalAssertClass(tc.phaseTrack, 'double');
+            tc.fatalAssertClass(tc.phaseTrackH, 'double');
         end
 
         function testShape(tc)
             tc.fatalAssertSize(tc.dmpoStat, [tc.LENGTH, 1]);
             tc.fatalAssertSize(tc.dmpoStatH, [tc.LENGTH, 1]);
-            tc.fatalAssertSize(tc.eigTrack, [2*(tc.LENGTH-1), 1]);
-            tc.fatalAssertSize(tc.eigTrackH, [2*(tc.LENGTH-1), 1]);
         end
 
         function testTrace(tc)
             tr = DMPOTrace(tc.dmpoStat);
             trH = DMPOTrace(tc.dmpoStatH);
-            tc.assertLessThan((tr-1), tc.absTol);
-            tc.assertLessThan((trH-1), tc.absTol);
+            tc.assertLessThan(abs(tr-1), tc.absTol);
+            tc.assertLessThan(abs(trH-1), tc.absTol);
         end
 
         function testEigZero(tc)
-            tc.assertLessThan(abs(tc.eigTrack(end)), tc.THRESHOLD);
-            tc.assertLessThan(abs(tc.eigTrackH(end)), tc.THRESHOLD);
+            tc.assertLessThan(abs(tc.phaseTrack(end)), ...
+                                tc.ULTIMATE_THRESHOLD);
+            tc.assertLessThan(abs(tc.phaseTrackH(end)), ...
+                                tc.ULTIMATE_THRESHOLD);
         end
 
         function testZZZ(tc)
