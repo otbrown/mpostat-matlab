@@ -41,7 +41,7 @@ function [updateBlock] = GrowLeft(siteTensor, mpo, leftBlock, ROW_SIZE, COL_SIZE
     % permute input arrays
     % original indexing:
     %   siteTensor(row, col, bra, ket)
-    %   conjTensor(conjRow, conjCol, conjBra, conjKet)
+    %   conjTensor(conjCol, conjRow, conjBra, conjKet)
     %   mpo(conjBra, conjKet, bra, ket, opRow, opCol)
     %   leftBlock(conjCol, opRow, row)
     conjTensor = permute(conjTensor, [2, 3, 1, 4]);
