@@ -8,3 +8,4 @@ results/*
 *.zip
 *.o*
 *.sh
+.mexa64
