@@ -28,7 +28,7 @@
 % HILBY:        integer, the size of the physical dimensions of siteTensor
 % OP_COL:       integer, the size of the second virtual dimension of mpo
 
-function [updateBlock] = GrowLeft(siteTensor, mpo, leftBlock, ROW_SIZE, COL_SIZE, HILBY, OP_COL)
+function [updateBlock] = GrowLeft_MCode(siteTensor, mpo, leftBlock, ROW_SIZE, COL_SIZE, HILBY, OP_COL)
     updateBlock = zeros(COL_SIZE, COL_SIZE, OP_COL);
 
     conjTensor = zeros(ROW_SIZE, COL_SIZE, HILBY, HILBY);
