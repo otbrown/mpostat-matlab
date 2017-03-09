@@ -35,7 +35,7 @@ function [updateBlock] = GrowBlock(dmpo, mpo, left, right, site, direction)
     if strcmpi(direction, 'L')
             lBlock = left{site};
             updateBlock = GrowLeft(siteTensor, mpoTensor, lBlock, ...
-                                    ROW_SIZE, COL_SIZE, HILBY, OP_COL);
+                                    ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL);
     elseif strcmpi(direction, 'R');
             rBlock = right{site};
             updateBlock = GrowRight(siteTensor, mpoTensor, rBlock, ...
