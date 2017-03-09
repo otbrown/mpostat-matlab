@@ -10,264 +10,6 @@
 #include "mex.h"
 #include "matrix.h"
 #include <stdlib.h>
-#include <complex.h>
-
-typedef struct array_Z3D
-{
-  mwSize dims[3];
-  complex double *arr;
-} az3_t;
-
-typedef struct array_Z4D
-{
-  mwSize dims[4];
-  complex double *arr;
-} az4_t;
-
-typedef struct array_Z6D
-{
-  mwSize dims[6];
-  complex double *arr;
-} az6_t;
-
-az3_t *init_Z3arr(const mwSize dims[3])
-{
-  const mwSize NUMEL = dims[0] * dims[1] * dims[2];
-  az3_t *A = mxMalloc(sizeof(az3_t));
-  mwIndex dim;
-
-  for(dim = 0; dim < 3; ++dim) {
-    (*A).dims[dim] = dims[dim];
-  }
-
-  (*A).arr = mxMalloc(sizeof(complex double) * NUMEL);
-
-  return A;
-}
-
-az4_t *init_Z4arr(const mwSize dims[4])
-{
-  const mwSize NUMEL = dims[0] * dims[1] * dims[2] * dims[3];
-  az4_t *A = mxMalloc(sizeof(az4_t));
-  mwIndex dim;
-
-  for(dim = 0; dim < 4; ++dim) {
-    (*A).dims[dim] = dims[dim];
-  }
-
-  (*A).arr = mxMalloc(sizeof(complex double) * NUMEL);
-
-  return A;
-}
-
-az6_t *init_Z6arr(const mwSize dims[6])
-{
-  const mwSize NUMEL = dims[0] * dims[1] * dims[2]
-                        * dims[3] * dims[4] * dims[5];
-  az6_t *A = mxMalloc(sizeof(az6_t));
-  mwIndex dim;
-
-  for(dim = 0; dim < 6; ++dim) {
-    (*A).dims[dim] = dims[dim];
-  }
-
-  (*A).arr = mxMalloc(sizeof(complex double) * NUMEL);
-
-  return A;
-}
-
-void free_Z3arr(az3_t *X)
-{
-  mxFree((*X).arr);
-  mxFree(X);
-
-  return;
-}
-
-void free_Z4arr(az4_t *X)
-{
-  mxFree((*X).arr);
-  mxFree(X);
-
-  return;
-}
-
-void free_Z6arr(az6_t *X)
-{
-  mxFree((*X).arr);
-  mxFree(X);
-
-  return;
-}
-
-az3_t *MxToZ3Array(const mxArray *M)
-{
-  const mwSize *MXDIMS = mxGetDimensions(M);
-  const mwSize NDIMS = mxGetNumberOfDimensions(M);
-  const bool isComplex = mxIsComplex(M);
-  double *MXDATAr, *MXDATAi;
-  az3_t *A;
-  mwIndex lindex, dim;
-  mwSize dims[3];
-
-  if(isComplex) {
-    MXDATAr = mxGetPr(M);
-    MXDATAi = mxGetPi(M);
-  } else {
-    MXDATAr = mxGetPr(M);
-  }
-
-  /* pad any missing dimensions with 1 */
-  if(NDIMS < 3) {
-    for(dim = 0; dim < NDIMS; ++dim) {
-      dims[dim] = MXDIMS[dim];
-    }
-    for(dim = NDIMS; dim < 3; ++dim) {
-      dims[dim] = 1;
-    }
-  }
-  else {
-    for(dim = 0; dim < 3; ++dim) {
-      dims[dim] = MXDIMS[dim];
-    }
-  }
-  const mwSize NUMEL = dims[0] * dims[1] * dims[2];
-
-  /* initialise return struct */
-  A = init_Z3arr(dims);
-
-  /* fill from mxArray, converting to complex double */
-  if(isComplex) {
-    for(lindex = 0; lindex < NUMEL; ++lindex) {
-      (*A).arr[lindex] = (complex double) MXDATAr[lindex] + I * MXDATAi[lindex];
-    }
-  } else {
-    for(lindex = 0; lindex < NUMEL; ++lindex) {
-      (*A).arr[lindex] = (complex double) MXDATAr[lindex] + I * 0.0;
-    }
-  }
-
-  return A;
-}
-
-az4_t *MxToZ4Array(const mxArray *M)
-{
-  const mwSize *MXDIMS = mxGetDimensions(M);
-  const mwSize NDIMS = mxGetNumberOfDimensions(M);
-  const bool isComplex = mxIsComplex(M);
-  double *MXDATAr, *MXDATAi;
-  az4_t *A;
-  mwIndex lindex, dim;
-  mwSize dims[4];
-
-  if(isComplex) {
-    MXDATAr = mxGetPr(M);
-    MXDATAi = mxGetPi(M);
-  } else {
-    MXDATAr = mxGetPr(M);
-  }
-
-  /* pad any missing dimensions with 1 */
-  if(NDIMS < 4) {
-    for(dim = 0; dim < NDIMS; ++dim) {
-      dims[dim] = MXDIMS[dim];
-    }
-    for(dim = NDIMS; dim < 4; ++dim) {
-      dims[dim] = 1;
-    }
-  } else {
-    for(dim = 0; dim < 4; ++dim) {
-      dims[dim] = MXDIMS[dim];
-    }
-  }
-  const mwSize NUMEL = dims[0] * dims[1] * dims[2] * dims[3];
-
-  /* initialise return struct */
-  A = init_Z4arr(dims);
-  /* fill from mxArray, converting to complex double */
-  if(isComplex) {
-    for(lindex = 0; lindex < NUMEL; ++lindex) {
-      (*A).arr[lindex] = (complex double) MXDATAr[lindex] + I * MXDATAi[lindex];
-    }
-  } else {
-    for(lindex = 0; lindex < NUMEL; ++lindex) {
-      (*A).arr[lindex] = (complex double) MXDATAr[lindex] + I * 0.0;
-    }
-  }
-
-  return A;
-}
-
-az6_t *MxToZ6Array(const mxArray *M)
-{
-  const mwSize *MXDIMS = mxGetDimensions(M);
-  const mwSize NDIMS = mxGetNumberOfDimensions(M);
-  const bool isComplex = mxIsComplex(M);
-  double *MXDATAr, *MXDATAi;
-  az6_t *A;
-  mwIndex lindex, dim;
-  mwSize dims[6];
-
-  if(isComplex) {
-    MXDATAr = mxGetPr(M);
-    MXDATAi = mxGetPi(M);
-  } else {
-    MXDATAr = mxGetPr(M);
-  }
-
-  /* pad any missing dimensions with 1 */
-  if(NDIMS < 6) {
-    for(dim = 0; dim < NDIMS; ++dim) {
-      dims[dim] = MXDIMS[dim];
-    }
-    for(dim = NDIMS; dim < 6; ++dim) {
-      dims[dim] = 1;
-    }
-  } else {
-    for(dim = 0; dim < 6; ++dim) {
-      dims[dim] = MXDIMS[dim];
-    }
-  }
-  const mwSize NUMEL = dims[0] * dims[1] * dims[2]
-                        * dims[3] * dims[4] * dims[5];
-
-  /* initialise return struct */
-  A = init_Z6arr(dims);
-
-  /* fill from mxArray, converting to complex double */
-  if(isComplex) {
-    for(lindex = 0; lindex < NUMEL; ++lindex) {
-      (*A).arr[lindex] = (complex double) MXDATAr[lindex] + I * MXDATAi[lindex];
-    }
-  } else {
-    for(lindex = 0; lindex < NUMEL; ++lindex) {
-      (*A).arr[lindex] = (complex double) MXDATAr[lindex] + I * 0.0;
-    }
-  }
-
-  return A;
-}
-
-mxArray *Z3ArrayToMx(az3_t *A)
-{
-  mxArray *M = mxCreateUninitNumericArray(3, (*A).dims, mxDOUBLE_CLASS,
-                                          mxCOMPLEX);
-  const mwSize NUMEL = (*A).dims[0] * (*A).dims[1] * (*A).dims[2];
-  mwIndex lindex;
-
-  double *mxVecR = mxMalloc(sizeof(double) * NUMEL);
-  double *mxVecI = mxMalloc(sizeof(double) * NUMEL);
-
-  for(lindex = 0; lindex < NUMEL; ++lindex) {
-    mxVecR[lindex] = creal((*A).arr[lindex]);
-    mxVecI[lindex] = cimag((*A).arr[lindex]);
-  }
-
-  mxSetPr(M, mxVecR);
-  mxSetPi(M, mxVecI);
-
-  return M;
-}
 
 mwIndex a3dex(const mwIndex dim0, const mwIndex dim1, const mwIndex dim2,
               const mwSize dims[3])
@@ -298,100 +40,551 @@ mwIndex a6dex(const mwIndex dim0, const mwIndex dim1, const mwIndex dim2,
   return lindex;
 }
 
-az3_t *GrowLeft(az4_t *siteTensor, az6_t *mpo, az3_t *leftBlock,
-                const mwSize ROW_SIZE, const mwSize COL_SIZE,
-                const mwSize HILBY, const mwSize OP_ROW, const mwSize OP_COL)
+double zmultr(const double Ar, const double Ai, const double Br, const double Bi)
 {
-  mwIndex row, col, conjRow, conjCol, bra, ket;
-  mwIndex conjBra, conjKet, opRow, opCol;
-  mwIndex sitedex, conjdex, mpodex, leftdex, updex;
-  mwSize numel, updims[3];
-  complex double FA, WFA, AWFA;
-  az3_t *updateBlock;
+  double Zr = (Ar * Br) - (Ai * Bi);
 
-  /* create conjugate site tensor */
-  az4_t *conjTensor = init_Z4arr((*siteTensor).dims);
-  numel = (*siteTensor).dims[0] * (*siteTensor).dims[1]
-          * (*siteTensor).dims[2] * (*siteTensor).dims[3];
-  for(conjdex = 0; conjdex < numel; ++conjdex) {
-    (*conjTensor).arr[conjdex] = conj((*siteTensor).arr[conjdex]);
-  }
+  return Zr;
+}
 
-  /* allocate return */
-  updims[0] = COL_SIZE;
-  updims[1] = OP_COL;
-  updims[2] = COL_SIZE;
-  updateBlock = init_Z3arr(updims);
+double zmulti(const double Ar, const double Ai, const double Br, const double Bi)
+{
+  double Zi = (Ar * Bi) + (Ai * Br);
+
+  return Zi;
+}
+
+mxArray * GrowLeft_RRR(const double* siteReal, const double* mpoReal, const double* leftReal, const mwSize ROW_SIZE, const mwSize COL_SIZE, const mwSize HILBY, const mwSize OP_ROW, const mwSize OP_COL, const mwSize* siteDims, const mwSize* mpoDims, const mwSize* lBlockDims)
+{
+  mwIndex row, col, conjRow, conjCol, bra, ket, conjBra, conjKet, opRow, opCol;
+  mwIndex updex, sitedex, conjdex, mpodex, leftdex;
+  mwSize updims[3] = {COL_SIZE, OP_COL, COL_SIZE};
+  mxArray *updateBlock = mxCreateUninitNumericArray(3, updims, mxDOUBLE_CLASS, mxREAL);
+  const mwSize NUMEL = COL_SIZE * OP_COL * COL_SIZE;
+  double FAr, WFAr, AWFAr;
+  double *updReal = mxMalloc(sizeof(double) * NUMEL);
 
   /* loop the loop! */
   updex = 0;
   for(col = 0; col < COL_SIZE; ++col) {
     for(opCol = 0; opCol < OP_COL; ++opCol) {
       for(conjRow = 0; conjRow < COL_SIZE; ++conjRow) {
-        AWFA = 0.0 + I * 0.0;
+        AWFAr = 0.0;
         for(conjCol = 0; conjCol < ROW_SIZE; ++conjCol) {
           for(conjBra = 0; conjBra < HILBY; ++conjBra) {
             for(conjKet = 0; conjKet < HILBY; ++conjKet) {
-              conjdex = a4dex(conjCol, conjRow, conjBra, conjKet, (*conjTensor).dims);
-
-              WFA = 0.0 + I * 0.0;
+              conjdex = a4dex(conjCol, conjRow, conjBra, conjKet, siteDims);
+              WFAr = 0.0;
               for(bra = 0; bra < HILBY; ++bra) {
                 for(ket = 0; ket < HILBY; ++ket) {
                   for(opRow = 0; opRow < OP_ROW; ++opRow) {
-                    mpodex = a6dex(conjBra, conjKet, bra, ket, opRow, opCol, (*mpo).dims);
-
-                    FA = 0.0 + I * 0.0;
+                    mpodex = a6dex(conjBra, conjKet, bra, ket, opRow, opCol, mpoDims);
+                    FAr = 0.0;
                     for(row = 0; row < ROW_SIZE; ++row) {
-                      leftdex = a3dex(conjCol, opRow, row, (*leftBlock).dims);
-                      sitedex = a4dex(row, col, bra, ket, (*siteTensor).dims);
-
-                      FA += (*leftBlock).arr[leftdex] * (*siteTensor).arr[sitedex];
+                      leftdex = a3dex(conjCol, opRow, row, lBlockDims);
+                      sitedex = a4dex(row, col, bra, ket, siteDims);
+                      FAr += leftReal[leftdex] * siteReal[sitedex];
                     }
-                    WFA += (*mpo).arr[mpodex] * FA;
+                    WFAr += mpoReal[mpodex] * FAr;
                   }
                 }
               }
-              AWFA += (*conjTensor).arr[conjdex] * WFA;
+              AWFAr += siteReal[conjdex] * WFAr;
             }
           }
         }
-        (*updateBlock).arr[updex] = AWFA;
+        updReal[updex] = AWFAr;
         ++updex;
       }
     }
   }
 
-  free_Z4arr(conjTensor);
+  mxSetPr(updateBlock, updReal);
+
+  return updateBlock;
+}
+
+mxArray *GrowLeft_RRZ(const double* siteReal, const double* mpoReal, const double* leftReal, const double* leftImag, const mwSize ROW_SIZE, const mwSize COL_SIZE, const mwSize HILBY, const mwSize OP_ROW, const mwSize OP_COL, const mwSize* siteDims, const mwSize* mpoDims, const mwSize* lBlockDims)
+{
+  mwIndex row, col, conjRow, conjCol, bra, ket, conjBra, conjKet, opRow, opCol;
+  mwIndex updex, sitedex, conjdex, mpodex, leftdex;
+  mwSize updims[3] = {COL_SIZE, OP_COL, COL_SIZE};
+  mxArray *updateBlock = mxCreateUninitNumericArray(3, updims, mxDOUBLE_CLASS, mxCOMPLEX);
+  const mwSize NUMEL = COL_SIZE * OP_COL * COL_SIZE;
+  double FAr, FAi, WFAr, WFAi, AWFAr, AWFAi;
+  double *updReal = mxMalloc(sizeof(double) * NUMEL);
+  double *updImag = mxMalloc(sizeof(double) * NUMEL);
+
+  /* loop the loop! */
+  updex = 0;
+  for(col = 0; col < COL_SIZE; ++col) {
+    for(opCol = 0; opCol < OP_COL; ++opCol) {
+      for(conjRow = 0; conjRow < COL_SIZE; ++conjRow) {
+        AWFAr = 0.0;
+        AWFAi = 0.0;
+        for(conjCol = 0; conjCol < ROW_SIZE; ++conjCol) {
+          for(conjBra = 0; conjBra < HILBY; ++conjBra) {
+            for(conjKet = 0; conjKet < HILBY; ++conjKet) {
+              conjdex = a4dex(conjCol, conjRow, conjBra, conjKet, siteDims);
+              WFAr = 0.0;
+              WFAi = 0.0;
+              for(bra = 0; bra < HILBY; ++bra) {
+                for(ket = 0; ket < HILBY; ++ket) {
+                  for(opRow = 0; opRow < OP_ROW; ++opRow) {
+                    mpodex = a6dex(conjBra, conjKet, bra, ket, opRow, opCol, mpoDims);
+                    FAr = 0.0;
+                    FAi = 0.0;
+                    for(row = 0; row < ROW_SIZE; ++row) {
+                      leftdex = a3dex(conjCol, opRow, row, lBlockDims);
+                      sitedex = a4dex(row, col, bra, ket, siteDims);
+                      FAr += leftReal[leftdex] * siteReal[sitedex];
+                      FAi += leftImag[leftdex] * siteReal[sitedex];
+                    }
+                    WFAr += mpoReal[mpodex] * FAr;
+                    WFAi += mpoReal[mpodex] * FAi;
+                  }
+                }
+              }
+              AWFAr += siteReal[conjdex] * WFAr;
+              AWFAi += siteReal[conjdex] * WFAi;
+            }
+          }
+        }
+        updReal[updex] = AWFAr;
+        updImag[updex] = AWFAi;
+        ++updex;
+      }
+    }
+  }
+
+  mxSetPr(updateBlock, updReal);
+  mxSetPi(updateBlock, updImag);
+
+  return updateBlock;
+}
+
+mxArray *GrowLeft_RZR(const double* siteReal, const double* mpoReal, const double* mpoImag, const double* leftReal, const mwSize ROW_SIZE, const mwSize COL_SIZE, const mwSize HILBY, const mwSize OP_ROW, const mwSize OP_COL, const mwSize* siteDims, const mwSize* mpoDims, const mwSize* lBlockDims)
+{
+  mwIndex row, col, conjRow, conjCol, bra, ket, conjBra, conjKet, opRow, opCol;
+  mwIndex updex, sitedex, conjdex, mpodex, leftdex;
+  mwSize updims[3] = {COL_SIZE, OP_COL, COL_SIZE};
+  mxArray *updateBlock = mxCreateUninitNumericArray(3, updims, mxDOUBLE_CLASS, mxCOMPLEX);
+  const mwSize NUMEL = COL_SIZE * OP_COL * COL_SIZE;
+  double FAr, WFAr, WFAi, AWFAr, AWFAi;
+  double *updReal = mxMalloc(sizeof(double) * NUMEL);
+  double *updImag = mxMalloc(sizeof(double) * NUMEL);
+
+  /* loop the loop! */
+  updex = 0;
+  for(col = 0; col < COL_SIZE; ++col) {
+    for(opCol = 0; opCol < OP_COL; ++opCol) {
+      for(conjRow = 0; conjRow < COL_SIZE; ++conjRow) {
+        AWFAr = 0.0;
+        AWFAi = 0.0;
+        for(conjCol = 0; conjCol < ROW_SIZE; ++conjCol) {
+          for(conjBra = 0; conjBra < HILBY; ++conjBra) {
+            for(conjKet = 0; conjKet < HILBY; ++conjKet) {
+              conjdex = a4dex(conjCol, conjRow, conjBra, conjKet, siteDims);
+              WFAr = 0.0;
+              WFAi = 0.0;
+              for(bra = 0; bra < HILBY; ++bra) {
+                for(ket = 0; ket < HILBY; ++ket) {
+                  for(opRow = 0; opRow < OP_ROW; ++opRow) {
+                    mpodex = a6dex(conjBra, conjKet, bra, ket, opRow, opCol, mpoDims);
+                    FAr = 0.0;
+                    for(row = 0; row < ROW_SIZE; ++row) {
+                      leftdex = a3dex(conjCol, opRow, row, lBlockDims);
+                      sitedex = a4dex(row, col, bra, ket, siteDims);
+                      FAr += leftReal[leftdex] * siteReal[sitedex];
+                    }
+                    WFAr += mpoReal[mpodex] * FAr;
+                    WFAi += mpoImag[mpodex] * FAr;
+                  }
+                }
+              }
+              AWFAr += siteReal[conjdex] * WFAr;
+              AWFAi += siteReal[conjdex] * WFAi;
+            }
+          }
+        }
+        updReal[updex] = AWFAr;
+        updImag[updex] = AWFAi;
+        ++updex;
+      }
+    }
+  }
+
+  mxSetPr(updateBlock, updReal);
+  mxSetPi(updateBlock, updImag);
+
+  return updateBlock;
+}
+
+mxArray *GrowLeft_RZZ(const double* siteReal, const double* mpoReal, const double* mpoImag, const double* leftReal, const double* leftImag, const mwSize ROW_SIZE, const mwSize COL_SIZE, const mwSize HILBY, const mwSize OP_ROW, const mwSize OP_COL, const mwSize* siteDims, const mwSize* mpoDims, const mwSize* lBlockDims)
+{
+  mwIndex row, col, conjRow, conjCol, bra, ket, conjBra, conjKet, opRow, opCol;
+  mwIndex updex, sitedex, conjdex, mpodex, leftdex;
+  mwSize updims[3] = {COL_SIZE, OP_COL, COL_SIZE};
+  mxArray *updateBlock = mxCreateUninitNumericArray(3, updims, mxDOUBLE_CLASS, mxCOMPLEX);
+  const mwSize NUMEL = COL_SIZE * OP_COL * COL_SIZE;
+  double FAr, FAi, WFAr, WFAi, AWFAr, AWFAi;
+  double *updReal = mxMalloc(sizeof(double) * NUMEL);
+  double *updImag = mxMalloc(sizeof(double) * NUMEL);
+
+  /* loop the loop! */
+  updex = 0;
+  for(col = 0; col < COL_SIZE; ++col) {
+    for(opCol = 0; opCol < OP_COL; ++opCol) {
+      for(conjRow = 0; conjRow < COL_SIZE; ++conjRow) {
+        AWFAr = 0.0;
+        AWFAi = 0.0;
+        for(conjCol = 0; conjCol < ROW_SIZE; ++conjCol) {
+          for(conjBra = 0; conjBra < HILBY; ++conjBra) {
+            for(conjKet = 0; conjKet < HILBY; ++conjKet) {
+              conjdex = a4dex(conjCol, conjRow, conjBra, conjKet, siteDims);
+              WFAr = 0.0;
+              WFAi = 0.0;
+              for(bra = 0; bra < HILBY; ++bra) {
+                for(ket = 0; ket < HILBY; ++ket) {
+                  for(opRow = 0; opRow < OP_ROW; ++opRow) {
+                    mpodex = a6dex(conjBra, conjKet, bra, ket, opRow, opCol, mpoDims);
+                    FAr = 0.0;
+                    FAi = 0.0;
+                    for(row = 0; row < ROW_SIZE; ++row) {
+                      leftdex = a3dex(conjCol, opRow, row, lBlockDims);
+                      sitedex = a4dex(row, col, bra, ket, siteDims);
+                      FAr += leftReal[leftdex] * siteReal[sitedex];
+                      FAi += leftImag[leftdex] * siteReal[sitedex];
+                    }
+                    WFAr += zmultr(mpoReal[mpodex], mpoImag[mpodex], FAr, FAi);
+                    WFAi += zmulti(mpoReal[mpodex], mpoImag[mpodex], FAr, FAi);
+                  }
+                }
+              }
+              AWFAr += siteReal[conjdex] * WFAr;
+              AWFAi += siteReal[conjdex] * WFAi;
+            }
+          }
+        }
+        updReal[updex] = AWFAr;
+        updImag[updex] = AWFAi;
+        ++updex;
+      }
+    }
+  }
+
+  mxSetPr(updateBlock, updReal);
+  mxSetPi(updateBlock, updImag);
+
+  return updateBlock;
+}
+
+mxArray *GrowLeft_ZRR(const double* siteReal, const double* siteImag, const double* mpoReal, const double* leftReal, const mwSize ROW_SIZE, const mwSize COL_SIZE, const mwSize HILBY, const mwSize OP_ROW, const mwSize OP_COL, const mwSize* siteDims, const mwSize* mpoDims, const mwSize* lBlockDims)
+{
+  mwIndex row, col, conjRow, conjCol, bra, ket, conjBra, conjKet, opRow, opCol;
+  mwIndex updex, sitedex, conjdex, mpodex, leftdex;
+  mwSize updims[3] = {COL_SIZE, OP_COL, COL_SIZE};
+  mxArray *updateBlock = mxCreateUninitNumericArray(3, updims, mxDOUBLE_CLASS, mxCOMPLEX);
+  const mwSize NUMEL = COL_SIZE * OP_COL * COL_SIZE;
+  double FAr, FAi, WFAr, WFAi, AWFAr, AWFAi;
+  double *updReal = mxMalloc(sizeof(double) * NUMEL);
+  double *updImag = mxMalloc(sizeof(double) * NUMEL);
+
+  /* loop the loop! */
+  updex = 0;
+  for(col = 0; col < COL_SIZE; ++col) {
+    for(opCol = 0; opCol < OP_COL; ++opCol) {
+      for(conjRow = 0; conjRow < COL_SIZE; ++conjRow) {
+        AWFAr = 0.0;
+        AWFAi = 0.0;
+        for(conjCol = 0; conjCol < ROW_SIZE; ++conjCol) {
+          for(conjBra = 0; conjBra < HILBY; ++conjBra) {
+            for(conjKet = 0; conjKet < HILBY; ++conjKet) {
+              conjdex = a4dex(conjCol, conjRow, conjBra, conjKet, siteDims);
+              WFAr = 0.0;
+              WFAi = 0.0;
+              for(bra = 0; bra < HILBY; ++bra) {
+                for(ket = 0; ket < HILBY; ++ket) {
+                  for(opRow = 0; opRow < OP_ROW; ++opRow) {
+                    mpodex = a6dex(conjBra, conjKet, bra, ket, opRow, opCol, mpoDims);
+                    FAr = 0.0;
+                    FAi = 0.0;
+                    for(row = 0; row < ROW_SIZE; ++row) {
+                      leftdex = a3dex(conjCol, opRow, row, lBlockDims);
+                      sitedex = a4dex(row, col, bra, ket, siteDims);
+                      FAr += leftReal[leftdex] * siteReal[sitedex];
+                      FAi += leftReal[leftdex] * siteImag[sitedex];
+                    }
+                    WFAr += mpoReal[mpodex] * FAr;
+                    WFAi += mpoReal[mpodex] * FAi;
+                  }
+                }
+              }
+              AWFAr += zmultr(siteReal[conjdex], -siteImag[conjdex], WFAr, WFAi);
+              AWFAi += zmulti(siteReal[conjdex], -siteImag[conjdex], WFAr, WFAi);
+            }
+          }
+        }
+        updReal[updex] = AWFAr;
+        updImag[updex] = AWFAi;
+        ++updex;
+      }
+    }
+  }
+
+  mxSetPr(updateBlock, updReal);
+  mxSetPi(updateBlock, updImag);
+
+  return updateBlock;
+}
+
+mxArray *GrowLeft_ZRZ(const double* siteReal, const double* siteImag, const double* mpoReal, const double* leftReal, const double* leftImag, const mwSize ROW_SIZE, const mwSize COL_SIZE, const mwSize HILBY, const mwSize OP_ROW, const mwSize OP_COL, const mwSize* siteDims, const mwSize* mpoDims, const mwSize* lBlockDims)
+{
+  mwIndex row, col, conjRow, conjCol, bra, ket, conjBra, conjKet, opRow, opCol;
+  mwIndex updex, sitedex, conjdex, mpodex, leftdex;
+  mwSize updims[3] = {COL_SIZE, OP_COL, COL_SIZE};
+  mxArray *updateBlock = mxCreateUninitNumericArray(3, updims, mxDOUBLE_CLASS, mxCOMPLEX);
+  const mwSize NUMEL = COL_SIZE * OP_COL * COL_SIZE;
+  double FAr, FAi, WFAr, WFAi, AWFAr, AWFAi;
+  double *updReal = mxMalloc(sizeof(double) * NUMEL);
+  double *updImag = mxMalloc(sizeof(double) * NUMEL);
+
+  /* loop the loop! */
+  updex = 0;
+  for(col = 0; col < COL_SIZE; ++col) {
+    for(opCol = 0; opCol < OP_COL; ++opCol) {
+      for(conjRow = 0; conjRow < COL_SIZE; ++conjRow) {
+        AWFAr = 0.0;
+        AWFAi = 0.0;
+        for(conjCol = 0; conjCol < ROW_SIZE; ++conjCol) {
+          for(conjBra = 0; conjBra < HILBY; ++conjBra) {
+            for(conjKet = 0; conjKet < HILBY; ++conjKet) {
+              conjdex = a4dex(conjCol, conjRow, conjBra, conjKet, siteDims);
+              WFAr = 0.0;
+              WFAi = 0.0;
+              for(bra = 0; bra < HILBY; ++bra) {
+                for(ket = 0; ket < HILBY; ++ket) {
+                  for(opRow = 0; opRow < OP_ROW; ++opRow) {
+                    mpodex = a6dex(conjBra, conjKet, bra, ket, opRow, opCol, mpoDims);
+                    FAr = 0.0;
+                    FAi = 0.0;
+                    for(row = 0; row < ROW_SIZE; ++row) {
+                      leftdex = a3dex(conjCol, opRow, row, lBlockDims);
+                      sitedex = a4dex(row, col, bra, ket, siteDims);
+                      FAr += zmultr(leftReal[leftdex], leftImag[leftdex], siteReal[sitedex], siteImag[sitedex]);
+                      FAi += zmulti(leftReal[leftdex], leftImag[leftdex], siteReal[sitedex], siteImag[sitedex]);
+                    }
+                    WFAr += mpoReal[mpodex] * FAr;
+                    WFAi += mpoReal[mpodex] * FAi;
+                  }
+                }
+              }
+              AWFAr += zmultr(siteReal[conjdex], -siteImag[conjdex], WFAr, WFAi);
+              AWFAi += zmulti(siteReal[conjdex], -siteImag[conjdex], WFAr, WFAi);
+            }
+          }
+        }
+        updReal[updex] = AWFAr;
+        updImag[updex] = AWFAi;
+        ++updex;
+      }
+    }
+  }
+
+  mxSetPr(updateBlock, updReal);
+  mxSetPi(updateBlock, updImag);
+
+  return updateBlock;
+}
+
+mxArray *GrowLeft_ZZR(const double* siteReal, const double* siteImag, const double* mpoReal, const double* mpoImag, const double* leftReal, const mwSize ROW_SIZE, const mwSize COL_SIZE, const mwSize HILBY, const mwSize OP_ROW, const mwSize OP_COL, const mwSize* siteDims, const mwSize* mpoDims, const mwSize* lBlockDims)
+{
+  mwIndex row, col, conjRow, conjCol, bra, ket, conjBra, conjKet, opRow, opCol;
+  mwIndex updex, sitedex, conjdex, mpodex, leftdex;
+  mwSize updims[3] = {COL_SIZE, OP_COL, COL_SIZE};
+  mxArray *updateBlock = mxCreateUninitNumericArray(3, updims, mxDOUBLE_CLASS, mxCOMPLEX);
+  const mwSize NUMEL = COL_SIZE * OP_COL * COL_SIZE;
+  double FAr, FAi, WFAr, WFAi, AWFAr, AWFAi;
+  double *updReal = mxMalloc(sizeof(double) * NUMEL);
+  double *updImag = mxMalloc(sizeof(double) * NUMEL);
+
+  /* loop the loop! */
+  updex = 0;
+  for(col = 0; col < COL_SIZE; ++col) {
+    for(opCol = 0; opCol < OP_COL; ++opCol) {
+      for(conjRow = 0; conjRow < COL_SIZE; ++conjRow) {
+        AWFAr = 0.0;
+        AWFAi = 0.0;
+        for(conjCol = 0; conjCol < ROW_SIZE; ++conjCol) {
+          for(conjBra = 0; conjBra < HILBY; ++conjBra) {
+            for(conjKet = 0; conjKet < HILBY; ++conjKet) {
+              conjdex = a4dex(conjCol, conjRow, conjBra, conjKet, siteDims);
+              WFAr = 0.0;
+              WFAi = 0.0;
+              for(bra = 0; bra < HILBY; ++bra) {
+                for(ket = 0; ket < HILBY; ++ket) {
+                  for(opRow = 0; opRow < OP_ROW; ++opRow) {
+                    mpodex = a6dex(conjBra, conjKet, bra, ket, opRow, opCol, mpoDims);
+                    FAr = 0.0;
+                    FAi = 0.0;
+                    for(row = 0; row < ROW_SIZE; ++row) {
+                      leftdex = a3dex(conjCol, opRow, row, lBlockDims);
+                      sitedex = a4dex(row, col, bra, ket, siteDims);
+                      FAr += leftReal[leftdex] * siteReal[sitedex];
+                      FAi += leftReal[leftdex] * siteImag[sitedex];
+                    }
+                    WFAr += zmultr(mpoReal[mpodex], mpoImag[mpodex], FAr, FAi);
+                    WFAi += zmulti(mpoReal[mpodex], mpoImag[mpodex], FAr, FAi);
+                  }
+                }
+              }
+              AWFAr += zmultr(siteReal[conjdex], -siteImag[conjdex], WFAr, WFAi);
+              AWFAi += zmulti(siteReal[conjdex], -siteImag[conjdex], WFAr, WFAi);
+            }
+          }
+        }
+        updReal[updex] = AWFAr;
+        updImag[updex] = AWFAi;
+        ++updex;
+      }
+    }
+  }
+
+  mxSetPr(updateBlock, updReal);
+  mxSetPi(updateBlock, updImag);
+
+  return updateBlock;
+}
+
+mxArray *GrowLeft_ZZZ(const double* siteReal, const double* siteImag, const double* mpoReal, const double* mpoImag, const double* leftReal, const double* leftImag, const mwSize ROW_SIZE, const mwSize COL_SIZE, const mwSize HILBY, const mwSize OP_ROW, const mwSize OP_COL, const mwSize* siteDims, const mwSize* mpoDims, const mwSize* lBlockDims)
+{
+  mwIndex row, col, conjRow, conjCol, bra, ket, conjBra, conjKet, opRow, opCol;
+  mwIndex updex, sitedex, conjdex, mpodex, leftdex;
+  mwSize updims[3] = {COL_SIZE, OP_COL, COL_SIZE};
+  mxArray *updateBlock = mxCreateUninitNumericArray(3, updims, mxDOUBLE_CLASS, mxCOMPLEX);
+  const mwSize NUMEL = COL_SIZE * OP_COL * COL_SIZE;
+  double FAr, FAi, WFAr, WFAi, AWFAr, AWFAi;
+  double *updReal = mxMalloc(sizeof(double) * NUMEL);
+  double *updImag = mxMalloc(sizeof(double) * NUMEL);
+
+  /* loop the loop! */
+  updex = 0;
+  for(col = 0; col < COL_SIZE; ++col) {
+    for(opCol = 0; opCol < OP_COL; ++opCol) {
+      for(conjRow = 0; conjRow < COL_SIZE; ++conjRow) {
+        AWFAr = 0.0;
+        AWFAi = 0.0;
+        for(conjCol = 0; conjCol < ROW_SIZE; ++conjCol) {
+          for(conjBra = 0; conjBra < HILBY; ++conjBra) {
+            for(conjKet = 0; conjKet < HILBY; ++conjKet) {
+              conjdex = a4dex(conjCol, conjRow, conjBra, conjKet, siteDims);
+              WFAr = 0.0;
+              WFAi = 0.0;
+              for(bra = 0; bra < HILBY; ++bra) {
+                for(ket = 0; ket < HILBY; ++ket) {
+                  for(opRow = 0; opRow < OP_ROW; ++opRow) {
+                    mpodex = a6dex(conjBra, conjKet, bra, ket, opRow, opCol, mpoDims);
+                    FAr = 0.0;
+                    FAi = 0.0;
+                    for(row = 0; row < ROW_SIZE; ++row) {
+                      leftdex = a3dex(conjCol, opRow, row, lBlockDims);
+                      sitedex = a4dex(row, col, bra, ket, siteDims);
+                      FAr += zmultr(leftReal[leftdex], leftImag[leftdex], siteReal[sitedex], siteImag[sitedex]);
+                      FAi += zmulti(leftReal[leftdex], leftImag[leftdex], siteReal[sitedex], siteImag[sitedex]);
+                    }
+                    WFAr += zmultr(mpoReal[mpodex], mpoImag[mpodex], FAr, FAi);
+                    WFAi += zmulti(mpoReal[mpodex], mpoImag[mpodex], FAr, FAi);
+                  }
+                }
+              }
+              AWFAr += zmultr(siteReal[conjdex], -siteImag[conjdex], WFAr, WFAi);
+              AWFAi += zmulti(siteReal[conjdex], -siteImag[conjdex], WFAr, WFAi);
+            }
+          }
+        }
+        updReal[updex] = AWFAr;
+        updImag[updex] = AWFAi;
+        ++updex;
+      }
+    }
+  }
+
+  mxSetPr(updateBlock, updReal);
+  mxSetPi(updateBlock, updImag);
 
   return updateBlock;
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  az3_t *updateBlock;
-  az4_t *siteTensor;
-  az6_t *mpo;
-  az3_t *leftBlock;
+  const mxArray *siteTensor = prhs[0];
+  const mxArray *mpo = prhs[1];
+  const mxArray *leftBlock = prhs[2];
+  const mwSize ROW_SIZE = (mwSize) mxGetScalar(prhs[3]);
+  const mwSize COL_SIZE = (mwSize) mxGetScalar(prhs[4]);
+  const mwSize HILBY = (mwSize) mxGetScalar(prhs[5]);
+  const mwSize OP_ROW = (mwSize) mxGetScalar(prhs[6]);
+  const mwSize OP_COL = (mwSize) mxGetScalar(prhs[7]);
+  double *siteReal, *siteImag, *mpoReal, *mpoImag, *leftReal, *leftImag;
+  mwSize numel;
 
-  siteTensor = MxToZ4Array(prhs[0]);
-  mpo = MxToZ6Array(prhs[1]);
-  leftBlock = MxToZ3Array(prhs[2]);
+  const mwSize siteDims[4] = {ROW_SIZE, COL_SIZE, HILBY, HILBY};
+  const mwSize mpoDims[6] = {HILBY, HILBY, HILBY, HILBY, OP_ROW, OP_COL};
+  const mwSize leftDims[3] = {ROW_SIZE, OP_ROW, ROW_SIZE};
 
-  const mwSize ROW_SIZE = (*siteTensor).dims[0];
-  const mwSize COL_SIZE = (*siteTensor).dims[1];
-  const mwSize HILBY = (*siteTensor).dims[2];
-  const mwSize OP_ROW = (*mpo).dims[4];
-  const mwSize OP_COL = (*mpo).dims[5];
+  const bool siteCOMPLEX = mxIsComplex(siteTensor);
+  const bool mpoCOMPLEX = mxIsComplex(mpo);
+  const bool leftCOMPLEX = mxIsComplex(leftBlock);
 
-  updateBlock = GrowLeft(siteTensor, mpo, leftBlock, ROW_SIZE, COL_SIZE,
-                          HILBY, OP_ROW, OP_COL);
+  /* gather real arrays */
+  siteReal = mxGetPr(siteTensor);
+  mpoReal = mxGetPr(mpo);
+  leftReal = mxGetPr(leftBlock);
 
-  plhs[0] = Z3ArrayToMx(updateBlock);
+  /* gather complex arrays, or create temporary zero arrays.. */
+  if(siteCOMPLEX) {
+    siteImag = mxGetPi(siteTensor);
+  }
 
-  free_Z3arr(updateBlock);
-  free_Z4arr(siteTensor);
-  free_Z6arr(mpo);
-  free_Z3arr(leftBlock);
+  if(mpoCOMPLEX) {
+    mpoImag = mxGetPi(mpo);
+  }
+
+  if(leftCOMPLEX) {
+    leftImag = mxGetPi(leftBlock);
+  }
+
+  /* run GrowLeft! */
+  if(siteCOMPLEX) {
+    if(leftCOMPLEX) {
+      if(mpoCOMPLEX) {
+        plhs[0] = GrowLeft_ZZZ(siteReal, siteImag, mpoReal, mpoImag, leftReal, leftImag, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL, siteDims, mpoDims, leftDims);
+      } else {
+        plhs[0] = GrowLeft_ZRZ(siteReal, siteImag, mpoReal, leftReal, leftImag, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL, siteDims, mpoDims, leftDims);
+      }
+    } else {
+      if(mpoCOMPLEX) {
+        plhs[0] = GrowLeft_ZZR(siteReal, siteImag, mpoReal, mpoImag, leftReal, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL, siteDims, mpoDims, leftDims);
+      } else {
+        plhs[0] = GrowLeft_ZRR(siteReal, siteImag, mpoReal, leftReal, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL, siteDims, mpoDims, leftDims);
+      }
+    }
+  }
+  else {
+    if(leftCOMPLEX) {
+      if(mpoCOMPLEX) {
+        plhs[0] = GrowLeft_RZZ(siteReal, mpoReal, mpoImag, leftReal, leftImag, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL, siteDims, mpoDims, leftDims);
+      } else {
+        plhs[0] = GrowLeft_RRZ(siteReal, mpoReal, leftReal, leftImag, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL, siteDims, mpoDims, leftDims);
+      }
+    } else {
+      if(mpoCOMPLEX) {
+        plhs[0] = GrowLeft_RZR(siteReal, mpoReal, mpoImag, leftReal, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL, siteDims, mpoDims, leftDims);
+      } else {
+        plhs[0] = GrowLeft_RRR(siteReal, mpoReal, leftReal, ROW_SIZE, COL_SIZE, HILBY, OP_ROW, OP_COL, siteDims, mpoDims, leftDims);
+      }
+    }
+  }
 
   return;
 }
