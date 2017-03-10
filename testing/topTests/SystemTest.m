@@ -67,6 +67,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 mpo{site} = lmpo;
             end
 
+            if strcmpi(tc.variant, 'hermitian')
+                mpo = MPOHermProd(mpo);
+            end
+
             % solve using Stationary
             [dmpoStat, eigTrack] = Stationary(tc.dmpoInit, mpo, ...
                                               tc.THRESHOLD, tc.variant);
@@ -176,6 +180,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             mpo{tc.LENGTH} = lmpo(:, :, :, :, :, 1);
             for site = 2 : 1 : (tc.LENGTH - 1)
                 mpo{site} = lmpo;
+            end
+
+            if strcmpi(tc.variant, 'hermitian')
+                mpo = MPOHermProd(mpo);
             end
 
             % solve using Stationary
@@ -288,6 +296,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             mpo{tc.LENGTH} = lmpo(:, :, :, :, :, 1);
             for site = 2 : 1 : (tc.LENGTH - 1)
                 mpo{site} = lmpo;
+            end
+
+            if strcmpi(tc.variant, 'hermitian')
+                mpo = MPOHermProd(mpo);
             end
 
             % solve using Stationary

@@ -10,6 +10,11 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
     end
 
     methods (Test)
+        function testThrowBadHermiticity(tc)
+            tc.fatalAssertError(@()EigenSolver(tc.effL, true), ...
+            'EigenSolver:badHermiticity');
+        end
+
         function testHermitian(tc)
             HERMITIAN = true;
             H = ctranspose(tc.effL) * tc.effL;

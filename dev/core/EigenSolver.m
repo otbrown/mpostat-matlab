@@ -28,6 +28,11 @@ function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, varargin)
         % clean effL as primme has no tolerance for non-hermitian input
         epsilon = full(max(max(abs(effL - ctranspose(effL)))));
         fprintf('Hermiticity error: %g\n', epsilon);
+        if epsilon > 1E-9
+            ME = MException('EigenSolver:badHermiticity', ['The error',...
+            'in L'' - L was large. Supplied MPO may not be Hermitian.']);
+            throw(ME);
+        end
         effL = (effL + ctranspose(effL))/2;
 
         opts = struct('eps', 1E-14);

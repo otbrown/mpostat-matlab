@@ -19,32 +19,21 @@
 %               operator form
 % THRESHOLD:    double, how close must L*rho be to zero for the
 %               calculation to be deemed successful
-% variant:      string, OPTIONAL, may specify whether to solve the
-%               non-Hermitian Liovillian, or the Hermitian product L^(T*)L
-%               -- 'hermitian' and 'direct' are the two accepted values --
-%               default value is 'direct'
+% variant:      string, specify whether to solve the non-Hermitian
+%               Liovillian, or the Hermitian product L^(T*)L --
+%               'hermitian' and 'direct' are the two accepted values
 
-function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
-    % check for optional arguments
-    switch nargin
-        case 3
-            HERMITIAN = false;
-        case 4
-            if strcmpi(varargin{1}, 'hermitian')
-                HERMITIAN = true;
-            elseif strcmpi(varargin{1}, 'direct')
-                HERMITIAN = false;
-            else
-                ME = MException('Stationary:badHERMITIAN', ['The last ',...
-                'argument was invalid: %s. Type help Stationary.'], ...
-                varargin{1});
-                throw(ME);
-            end
-        otherwise
-            ME = MException('Stationary:badArguments', ['Stationary ', ...
-            'accepts 3 or 4 arguments, but %g were supplied. Type ', ...
-            'help Stationary.'], nargin);
-            throw(ME);
+function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
+
+    if strcmpi(variant, 'hermitian')
+        HERMITIAN = true;
+    elseif strcmpi(variant, 'direct')
+        HERMITIAN = false;
+    else
+        ME = MException('Stationary:badHERMITIAN', ['The last ',...
+        'argument was invalid: %s. Type help Stationary.'], ...
+        variant);
+        throw(ME);
     end
 
     % gather up physical system parameters
@@ -57,11 +46,6 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, varargin)
     % set internal calculation parameters
     RUNMAX = 50*LENGTH;
     CONVERGENCE_THRESHOLD = THRESHOLD / (2 * LENGTH);
-
-    if HERMITIAN
-        % make mpo hermitian
-        mpo = MPOHermProd(mpo);
-    end
 
     % print some info about the calculation
     fprintf('Variational Stationary State Search\n');

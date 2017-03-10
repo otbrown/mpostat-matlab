@@ -56,12 +56,13 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             for site = 2 : 1 : (tc.LENGTH - 1)
                 tc.mpo{site} = lmpo;
             end
+            mpoH = MPOHermProd(tc.mpo);
 
             % solve using Stationary
             [tc.dmpoStat, tc.eigTrack] = Stationary(tc.dmpoInit, ...
                                          tc.mpo, tc.THRESHOLD, 'direct');
             [tc.dmpoStatH, tc.eigTrackH] = Stationary(tc.dmpoInit,  ...
-                                           tc.mpo, tc.THRESHOLD, ...
+                                           mpoH, tc.THRESHOLD, ...
                                            'hermitian');
         end
     end
@@ -81,11 +82,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                                     'Stationary:badHERMITIAN');
         end
 
-        function testThrowBadArguments(tc)
-            HERMITIAN = 'hermitian';
+        function testThrowBadHermiticity(tc)
             tc.fatalAssertError(@()Stationary(tc.dmpoInit, tc.mpo, ...
-                                    tc.THRESHOLD, HERMITIAN, 1), ...
-                                    'Stationary:badArguments');
+                                    tc.THRESHOLD, 'hermitian'), ...
+                                    'EigenSolver:badHermiticity');
         end
 
         function testShape(tc)
