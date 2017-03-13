@@ -41,7 +41,7 @@ function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, THRESHOLD, varargi
         [eigVector, eigValue] = primme_eigs(effL, 1, 'SM', opts);
         fprintf('\n');
     else
-        if nargin > 2
+        if nargin > 3
             opts.v0 = varargin{1};
         end
 
