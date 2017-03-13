@@ -6,8 +6,8 @@
 % Oliver Thomson Brown
 % 2016-10-03
 %
-% [ eigVector, eigValue ] = EigenSolver(effL, HERMITIAN)
-% [ eigVector, eigValue ] = EigenSolver(effL, HERMITIAN, initVec)
+% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, THRESHOLD)
+% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, THRESHOLD, initVec)
 %
 % RETURN
 % eigVector:    (complex) double, the desired eigenvector of the effective %                Liouvillian
@@ -23,12 +23,12 @@
 %               eigenvector -- only used in the non-hermitian case PRIMME's
 %               Matlab interface does not currently support this
 
-function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, varargin)
+function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, THRESHOLD, varargin)
     if HERMITIAN
         % clean effL as primme has no tolerance for non-hermitian input
         epsilon = full(max(max(abs(effL - ctranspose(effL)))));
         fprintf('Hermiticity error: %g\n', epsilon);
-        if epsilon > 1E-9
+        if epsilon > (THRESHOLD / 2);
             ME = MException('EigenSolver:badHermiticity', ['The error',...
             'in L'' - L was large. Supplied MPO may not be Hermitian.']);
             throw(ME);
