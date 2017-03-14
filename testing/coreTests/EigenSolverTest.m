@@ -15,10 +15,20 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             'EigenSolver:badHermiticity');
         end
 
+        function testThrowBadHermiticityThreshold(tc)
+            tc.fatalAssertError(@()EigenSolver(tc.effL, true,  ...
+            rand(3, 1)), 'EigenSolver:badHermiticityThreshold');
+        end
+
+        function testThrowBadInitVec(tc)
+            tc.fatalAssertError(@()EigenSolver(tc.effL, false, 1), ...
+            'EigenSolver:badInitVec');
+        end
+
         function testHermitian(tc)
             HERMITIAN = true;
             H = ctranspose(tc.effL) * tc.effL;
-            [vec, val] = EigenSolver(H, HERMITIAN, 1E-9);
+            [vec, val] = EigenSolver(H, HERMITIAN);
 
             actualVal = 0;
             actualVec = [ 0.302322027807821 + 0.345148819050045i;
@@ -32,7 +42,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
         function testNonHermitian(tc)
             HERMITIAN = false;
-            [vec, val] = EigenSolver(tc.effL, HERMITIAN, 1E-9);
+            [vec, val] = EigenSolver(tc.effL, HERMITIAN);
 
             actualVal = 1.920620363439616 + 0.618180731783746i;
             actualVec = [0.909915536697958;
