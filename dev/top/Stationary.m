@@ -59,7 +59,9 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
         fprintf('\tEffective Liouvillian: Hermitian Product\n\n');
         HERMITICITY_THRESHOLD = Inf;
         for site = 1 : 1 : LENGTH
-            tmpMin = abs(min(min(min(min(min(min(mpo{site})))))));
+            siteMPO = abs(mpo{site});
+            siteMPO = siteMPO(siteMPO > 0);
+            tmpMin = min(min(min(min(min(min(siteMPO))))));
             HERMITICITY_THRESHOLD = min(HERMITICITY_THRESHOLD, tmpMin);
         end
         HERMITICITY_THRESHOLD = HERMITICITY_THRESHOLD / 10;
