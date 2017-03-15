@@ -99,17 +99,20 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
         for sitedex = 1 : 1 : (LENGTH - 1)
             site = route(sitedex);
 
+            fprintf('|%g| ', site);
+
             [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
             effL = EffL(site, dmpoStat, mpo, left, right);
 
+            % we can supply an initial guess to EigenSolver, so we use
+            % the current site tensor, to aid convergence
+            siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
+            siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
+
             if HERMITIAN
-                [update, eig] = EigenSolver(effL, HERMITIAN, ...
+                [update, eig] = EigenSolver(effL, HERMITIAN, siteVec, ...
                                             HERMITICITY_THRESHOLD);
             else
-                % we can supply an initial guess to eigs, so we use the
-                % current site tensor, to aid convergence
-                siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
-                siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
                 try
                     [update, eig] = EigenSolver(effL, HERMITIAN, siteVec);
                 catch ME
@@ -170,6 +173,8 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
             eigTrack(1 : (end - 1)) = eigTrack(2 : end);
             updCount = updCount + 1;
         end
+
+        fprintf('\n');
 
         if finished
             fprintf(['Finished at %s.\n', ...
