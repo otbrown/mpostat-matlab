@@ -31,30 +31,19 @@
 %                           non-hermitian case PRIMME's Matlab interface
 %                           does not currently support this
 
-function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, varargin)
-    narginchk(2, 3);
+function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, initVec, varargin)
+    narginchk(3, 4);
 
     if HERMITIAN
         % solve hermitian product of L
-        if nargin == 3
+        if nargin == 4
             % if HERMITICITY_THRESHOLD is supplied check difference
             % between L and L'
-            if numel(varargin{1}) == 1
-                % here we check it's a number not a vector
-                epsilon = full(max(max(abs(effL - ctranspose(effL)))));
-                fprintf('Hermiticity error: %g\n', epsilon);
-
-                if epsilon > varargin{1}
-                    ME = MException('EigenSolver:badHermiticity',  ...
-                    ['The error in L'' - L was large. Supplied MPO', ...
-                     ' may not be Hermitian.']);
-                    throw(ME);
-                end
-            else
-                ME = MException('EigenSolver:badHermiticityThreshold', ...
-                ['The supplied Hermiticity Threshold appears to be a', ...
-                 ' vector. Was it intended as an initVec? Type ''help', ...
-                 ' EigenSolver'' for an explanation of input arguments.']);
+            epsilon = full(max(max(abs(effL - ctranspose(effL)))));
+            if epsilon > varargin{1}
+                ME = MException('EigenSolver:badHermiticity',  ...
+                ['The error in L'' - L was large. Supplied MPO', ...
+                 ' may not be Hermitian.']);
                 throw(ME);
             end
         end
@@ -62,29 +51,12 @@ function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, varargin)
         % clean effL as primme has no tolerance for non-hermitian input
         effL = (effL + ctranspose(effL))/2;
 
-        opts = struct('eps', 1E-14);
+        opts = struct('eps', 1E-14, 'v0', {initVec});
 
-        fprintf('\n');
         [eigVector, eigValue] = primme_eigs(effL, 1, 'SM', opts);
-        fprintf('\n');
     else
         % solve L directly
-        opts = struct('maxit', 500);
-
-        if nargin == 3
-            % and here we check it's a vector not a number
-            if numel(varargin{1}) > 1
-                opts.v0 = varargin{1};
-            else
-                ME = MException('EigenSolver:badInitVec', ...
-                ['The supplied initVec appears to be a scalar. Was', ...
-                 ' it intended to be a Hermiticity threshold? Type', ...
-                 ' ''help EigenSolver'' for an explanation of input', ...
-                 ' arguments.']);
-                throw(ME);
-            end
-        end
-
+        opts = struct('maxit', 500, 'v0', initVec);
         [eigVector, eigValue] = eigs(effL, 1, 'lr', opts);
     end
 end
