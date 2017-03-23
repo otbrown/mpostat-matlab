@@ -11,8 +11,18 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
     methods (Test)
         function testThrowBadHermiticity(tc)
-            tc.fatalAssertError(@()EigenSolver(tc.effL, true), ...
+            tc.fatalAssertError(@()EigenSolver(tc.effL, true, 1E-9), ...
             'EigenSolver:badHermiticity');
+        end
+
+        function testThrowBadHermiticityThreshold(tc)
+            tc.fatalAssertError(@()EigenSolver(tc.effL, true,  ...
+            rand(3, 1)), 'EigenSolver:badHermiticityThreshold');
+        end
+
+        function testThrowBadInitVec(tc)
+            tc.fatalAssertError(@()EigenSolver(tc.effL, false, 1), ...
+            'EigenSolver:badInitVec');
         end
 
         function testHermitian(tc)

@@ -57,6 +57,14 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
             'Liouvillian size: %g\n'], THRESHOLD, MAX_DIM, MAX_LDIM);
     if HERMITIAN
         fprintf('\tEffective Liouvillian: Hermitian Product\n\n');
+        HERMITICITY_THRESHOLD = Inf;
+        for site = 1 : 1 : LENGTH
+            siteMPO = abs(mpo{site});
+            siteMPO = siteMPO(siteMPO > 0);
+            tmpMin = min(min(min(min(min(min(siteMPO))))));
+            HERMITICITY_THRESHOLD = min(HERMITICITY_THRESHOLD, tmpMin);
+        end
+        HERMITICITY_THRESHOLD = HERMITICITY_THRESHOLD / 10;
     else
         fprintf('\tEffective Liouvillian: Non-Hermitian\n\n');
         ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
@@ -95,7 +103,8 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
             effL = EffL(site, dmpoStat, mpo, left, right);
 
             if HERMITIAN
-                [update, eig] = EigenSolver(effL, HERMITIAN);
+                [update, eig] = EigenSolver(effL, HERMITIAN, ...
+                                            HERMITICITY_THRESHOLD);
             else
                 % we can supply an initial guess to eigs, so we use the
                 % current site tensor, to aid convergence
