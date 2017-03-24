@@ -29,14 +29,12 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
         case 'hermitian'
             HERMITIAN = true;
             PRIMME = false;
-            ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
         case 'primme'
             HERMITIAN = true;
             PRIMME = true;
         case 'direct'
             HERMITIAN = false;
             PRIMME = false;
-            ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
         otherwise
             ME = MException('Stationary:badHERMITIAN', ['The last ',...
             'argument was invalid: %s. Type help Stationary.'], ...
@@ -54,6 +52,8 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
     % set internal calculation parameters
     RUNMAX = 50*LENGTH;
     CONVERGENCE_THRESHOLD = THRESHOLD / (2 * LENGTH);
+    ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
+    eigExact_msgID = 'MATLAB:eigs:AminusBSingular';
 
     % print some info about the calculation
     fprintf('Variational Stationary State Search\n');
@@ -151,6 +151,12 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
                                  'variant.\n']);
                         throw(ME);
                     end
+                elseif strcmp(ME.identifier, eigExact_msgID)
+                    % basically matlab has complained that it's already
+                    % found the eigenvalue, we'll choose to believe it
+                    % and set eig to 1 on the basis that this update will
+                    % be ignored -- the calculation will converge quickly
+                    eig = 1;
                 else
                     throw(ME);
                 end
