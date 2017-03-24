@@ -40,22 +40,13 @@ function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, PRIMME, initVec, v
         if nargin == 5
             % if HERMITICITY_THRESHOLD is supplied check difference
             % between L and L'
-            if numel(varargin{1}) == 1
-                % here we check it's a number not a vector
-                epsilon = full(max(max(abs(effL - ctranspose(effL)))));
-                fprintf('Hermiticity error: %g\n', epsilon);
+            epsilon = full(max(max(abs(effL - ctranspose(effL)))));
+            fprintf('Hermiticity error: %g\n', epsilon);
 
-                if epsilon > varargin{1}
-                    ME = MException('EigenSolver:badHermiticity',  ...
-                    ['The error in L'' - L was large. Supplied MPO', ...
-                     ' may not be Hermitian.']);
-                    throw(ME);
-                end
-            else
-                ME = MException('EigenSolver:badHermiticityThreshold', ...
-                ['The supplied Hermiticity Threshold appears to be a', ...
-                 ' vector. Was it intended as an initVec? Type ''help', ...
-                 ' EigenSolver'' for an explanation of input arguments.']);
+            if epsilon > varargin{1}
+                ME = MException('EigenSolver:badHermiticity',  ...
+                ['The error in L'' - L was large. Supplied MPO', ...
+                 ' may not be Hermitian.']);
                 throw(ME);
             end
         end
@@ -64,10 +55,11 @@ function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, PRIMME, initVec, v
         effL = (effL + ctranspose(effL))/2;
 
         if PRIMME
-            opts = struct('eps', 1E-14);
+            opts = struct('eps', 1E-14, 'numTargetShifts', {1}, ...
+                    'targetShifts', {0}, 'initialevecs', {initVec});
 
             fprintf('\n');
-            [eigVector, eigValue] = primme_eigs(effL, 1, 'SM', opts);
+            [eigVector, eigValue] = primme_eigs(effL, 1, 'CT', opts);
             fprintf('\n');
         else
             opts = struct('maxit', 500, 'v0', initVec);
