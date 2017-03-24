@@ -11,8 +11,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         sampleSz = 200;
         dmpoStat;
         dmpoStatH;
+        dmpoStatP;
         eigTrack;
         eigTrackH;
+        eigTrackP;
         HILBY = 3;
         LENGTH = 5;
         COMPRESS = 27;
@@ -62,8 +64,11 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             [tc.dmpoStat, tc.eigTrack] = Stationary(tc.dmpoInit, ...
                                          tc.mpo, tc.THRESHOLD, 'direct');
             [tc.dmpoStatH, tc.eigTrackH] = Stationary(tc.dmpoInit,  ...
-                                           mpoH, tc.THRESHOLD, ...
-                                           'hermitian');
+                                            mpoH, tc.THRESHOLD, ...
+                                            'hermitian');
+            [tc.dmpoStatP, tc.eigTrackP] = Stationary(tc.dmpoInit,  ...
+                                            mpoH, tc.THRESHOLD, ...
+                                            'primme');
         end
     end
 
@@ -71,8 +76,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testClass(tc)
             tc.fatalAssertClass(tc.dmpoStat, 'cell');
             tc.fatalAssertClass(tc.dmpoStatH, 'cell');
+            tc.fatalAssertClass(tc.dmpoStatP, 'cell');
             tc.fatalAssertClass(tc.eigTrack, 'double');
             tc.fatalAssertClass(tc.eigTrackH, 'double');
+            tc.fatalAssertClass(tc.eigTrackP, 'double');
         end
 
         function testThrowBadHERMITIAN(tc)
@@ -91,20 +98,25 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testShape(tc)
             tc.fatalAssertSize(tc.dmpoStat, [tc.LENGTH, 1]);
             tc.fatalAssertSize(tc.dmpoStatH, [tc.LENGTH, 1]);
+            tc.fatalAssertSize(tc.dmpoStatP, [tc.LENGTH, 1]);
             tc.fatalAssertSize(tc.eigTrack, [2*(tc.LENGTH-1), 1]);
             tc.fatalAssertSize(tc.eigTrackH, [2*(tc.LENGTH-1), 1]);
+            tc.fatalAssertSize(tc.eigTrackP, [2*(tc.LENGTH-1), 1]);
         end
 
         function testTrace(tc)
             tr = DMPOTrace(tc.dmpoStat);
             trH = DMPOTrace(tc.dmpoStatH);
+            trP = DMPOTrace(tc.dmpoStatP);
             tc.assertLessThan((tr-1), tc.absTol);
             tc.assertLessThan((trH-1), tc.absTol);
+            tc.assertLessThan((trP-1), tc.absTol);
         end
 
         function testEigZero(tc)
             tc.assertLessThan(abs(tc.eigTrack(end)), tc.THRESHOLD);
             tc.assertLessThan(abs(tc.eigTrackH(end)), tc.THRESHOLD);
+            tc.assertLessThan(abs(tc.eigTrackP(end)), tc.THRESHOLD);
         end
 
         function testZZZ(tc)
@@ -117,8 +129,12 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             zzzH = tc.dmpoStatH{1}(:, :, 1, 1) ...
                     * tc.dmpoStatH{2}(:, :, 1, 1) ...
                     * tc.dmpoStatH{3}(:, :, 1, 1);
+            zzzP = tc.dmpoStatP{1}(:, :, 1, 1) ...
+                    * tc.dmpoStatP{2}(:, :, 1, 1) ...
+                    * tc.dmpoStatP{3}(:, :, 1, 1);
             tc.assertLessThan((zzz - 1), tc.absTol);
             tc.assertLessThan((zzzH - 1), tc.absTol);
+            tc.assertLessThan((zzzP - 1), tc.absTol);
         end
 
         function testZeroes(tc)
@@ -135,14 +151,17 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
                 coefft = 1;
                 coefftH = 1;
+                coefftP = 1;
                 for site = 1 : 1 : tc.LENGTH
                     bra = braBits(site) + 1;
                     ket = braBits(site) + 1;
                     coefft = coefft * tc.dmpoStat{site}(:, :, bra, ket);
                     coefftH = coefftH * tc.dmpoStatH{site}(:, :, bra, ket);
+                    coefftP = coefftP * tc.dmpoStatH{site}(:, :, bra, ket);
                 end
                 tc.assertLessThan(coefft, tc.absTol);
                 tc.assertLessThan(coefftH, tc.absTol);
+                tc.assertLessThan(coefftP, tc.absTol);
             end
         end
     end
