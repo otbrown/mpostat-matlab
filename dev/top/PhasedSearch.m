@@ -52,7 +52,7 @@ function [dmpoStat, phaseTrack] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRE
                                                 threshold, VARIANT);
             phaseEig = abs(eigTrack(end));
         catch ME
-            if strcmpi(ME.identifier, ARPACK_msgID);
+            if strcmpi(ME.identifier, ARPACK_msgID)
                 % DO NOTHING
             else
                 throw(ME);
