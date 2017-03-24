@@ -41,7 +41,6 @@ function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, PRIMME, initVec, v
             % if HERMITICITY_THRESHOLD is supplied check difference
             % between L and L'
             epsilon = full(max(max(abs(effL - ctranspose(effL)))));
-            fprintf('Hermiticity error: %g\n', epsilon);
 
             if epsilon > varargin{1}
                 ME = MException('EigenSolver:badHermiticity',  ...
