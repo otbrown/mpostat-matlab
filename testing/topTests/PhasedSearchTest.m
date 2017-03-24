@@ -13,8 +13,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         sampleSz = 200;
         dmpoStat;
         dmpoStatH;
+        dmpoStatP;
         phaseTrack;
         phaseTrackH;
+        phaseTrackP;
         HILBY = 3;
         LENGTH = 5;
         MAX_COMPRESS = 27;
@@ -66,6 +68,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                                             tc.LENGTH, mpoH, ...
                                             tc.ULTIMATE_THRESHOLD, ...
                                             tc.MAX_COMPRESS, 'hermitian');
+            [tc.dmpoStatP, tc.phaseTrackP] = PhasedSearch(tc.HILBY, ...
+                                            tc.LENGTH, mpoH, ...
+                                            tc.ULTIMATE_THRESHOLD, ...
+                                            tc.MAX_COMPRESS, 'primme');
         end
     end
 
@@ -80,26 +86,33 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function testClass(tc)
             tc.fatalAssertClass(tc.dmpoStat, 'cell');
             tc.fatalAssertClass(tc.dmpoStatH, 'cell');
+            tc.fatalAssertClass(tc.dmpoStatP, 'cell');
             tc.fatalAssertClass(tc.phaseTrack, 'double');
             tc.fatalAssertClass(tc.phaseTrackH, 'double');
+            tc.fatalAssertClass(tc.phaseTrackP, 'double');
         end
 
         function testShape(tc)
             tc.fatalAssertSize(tc.dmpoStat, [tc.LENGTH, 1]);
             tc.fatalAssertSize(tc.dmpoStatH, [tc.LENGTH, 1]);
+            tc.fatalAssertSize(tc.dmpoStatP, [tc.LENGTH, 1]);
         end
 
         function testTrace(tc)
             tr = DMPOTrace(tc.dmpoStat);
             trH = DMPOTrace(tc.dmpoStatH);
+            trP = DMPOTrace(tc.dmpoStatP);
             tc.assertLessThan(abs(tr-1), tc.absTol);
             tc.assertLessThan(abs(trH-1), tc.absTol);
+            tc.assertLessThan(abs(trP-1), tc.absTol);
         end
 
         function testEigZero(tc)
             tc.assertLessThan(abs(tc.phaseTrack(end)), ...
                                 tc.ULTIMATE_THRESHOLD);
             tc.assertLessThan(abs(tc.phaseTrackH(end)), ...
+                                tc.ULTIMATE_THRESHOLD);
+            tc.assertLessThan(abs(tc.phaseTrackP(end)), ...
                                 tc.ULTIMATE_THRESHOLD);
         end
 
@@ -113,8 +126,12 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             zzzH = tc.dmpoStatH{1}(:, :, 1, 1) ...
                     * tc.dmpoStatH{2}(:, :, 1, 1) ...
                     * tc.dmpoStatH{3}(:, :, 1, 1);
+            zzzP = tc.dmpoStatP{1}(:, :, 1, 1) ...
+                    * tc.dmpoStatP{2}(:, :, 1, 1) ...
+                    * tc.dmpoStatP{3}(:, :, 1, 1);
             tc.assertLessThan((zzz - 1), tc.absTol);
             tc.assertLessThan((zzzH - 1), tc.absTol);
+            tc.assertLessThan((zzzP - 1), tc.absTol);
         end
 
         function testZeroes(tc)
@@ -131,14 +148,17 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
                 coefft = 1;
                 coefftH = 1;
+                coefftP = 1;
                 for site = 1 : 1 : tc.LENGTH
                     bra = braBits(site) + 1;
                     ket = braBits(site) + 1;
                     coefft = coefft * tc.dmpoStat{site}(:, :, bra, ket);
                     coefftH = coefftH * tc.dmpoStatH{site}(:, :, bra, ket);
+                    coefftP = coefftP * tc.dmpoStatP{site}(:, :, bra, ket);
                 end
                 tc.assertLessThan(coefft, tc.absTol);
                 tc.assertLessThan(coefftH, tc.absTol);
+                tc.assertLessThan(coefftP, tc.absTol);
             end
         end
     end

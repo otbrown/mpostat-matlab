@@ -18,14 +18,14 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
     end
 
     properties (ClassSetupParameter)
-        testVariant = {'direct', 'hermitian'};
+        testVariant = {'direct', 'hermitian', 'primme'};
     end
 
     methods (TestClassSetup)
         function ClassSetup(tc, testVariant)
             tc.variant = testVariant;
 
-            if strcmpi(tc.variant, 'hermitian')
+            if strcmpi(tc.variant, 'primme')
                 tc.absTol = 2E-11;
             else
                 tc.absTol = 1E-14;
@@ -67,7 +67,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 mpo{site} = lmpo;
             end
 
-            if strcmpi(tc.variant, 'hermitian')
+            if strcmpi(tc.variant, 'hermitian') || strcmpi(tc.variant, 'primme')
                 mpo = MPOHermProd(mpo);
             end
 
@@ -182,7 +182,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 mpo{site} = lmpo;
             end
 
-            if strcmpi(tc.variant, 'hermitian')
+            if strcmpi(tc.variant, 'hermitian') || strcmpi(tc.variant, 'primme')
                 mpo = MPOHermProd(mpo);
             end
 
@@ -298,7 +298,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 mpo{site} = lmpo;
             end
 
-            if strcmpi(tc.variant, 'hermitian')
+            if strcmpi(tc.variant, 'hermitian') || strcmpi(tc.variant, 'primme')
                 mpo = MPOHermProd(mpo);
             end
 
