@@ -108,6 +108,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
     updCount = 0;
     route = 1 : 1 : LENGTH;
     direction = 'L';
+    siteEigs = Inf(LENGTH, 1);
 
     while ~convFlag && updCount < RUNMAX
         fprintf('Sweep %g:\n', sweepCount);
@@ -116,17 +117,16 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
 
             fprintf('|%g| ', site);
 
-            [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-            effL = EffL(site, dmpoStat, mpo, left, right);
+            if siteEigs(site) > THRESHOLD
 
-            % the current site tensor will be used as an initial guess for
-            % the eigenvector
-            siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
-            siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
+                [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
+                effL = EffL(site, dmpoStat, mpo, left, right);
 
-            siteUnconverged = any(abs(effL * siteVec) > THRESHOLD);
+                % the current site tensor will be used as an initial guess for
+                % the eigenvector
+                siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
+                siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
 
-            if siteUnconverged || updCount < length(eigTrack)
                 try
                     [update, eig] = EigenSolver(effL, HERMITIAN, PRIMME, ...
                                             siteVec, HERMITICITY_THRESHOLD);
@@ -165,15 +165,14 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
 
                     end
                 end
-            else
-                eig = Inf;
-            end
 
-            if ~(abs(eig) > abs(eigTrack(end)))
-                eigTrack(end) = eig;
-                update = reshape(update, ...
-                                    [COL_SIZE, ROW_SIZE, HILBY, HILBY]);
-                dmpoStat{site} = permute(update, [2, 1, 3, 4]);
+                if ~(abs(eig) > abs(eigTrack(end)))
+                    eigTrack(end) = eig;
+                    siteEigs(site) = abs(eig);
+                    update = reshape(update, ...
+                                        [COL_SIZE, ROW_SIZE, HILBY, HILBY]);
+                    dmpoStat{site} = permute(update, [2, 1, 3, 4]);
+                end
             end
 
             % canonicalise & include new site in block tensor
