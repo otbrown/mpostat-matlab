@@ -53,7 +53,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
     RUNMAX = 50*LENGTH;
     CONVERGENCE_THRESHOLD = THRESHOLD / (2 * LENGTH);
     ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
-    eigExact_msgID = 'MATLAB:eigs:AminusBSingular';
+    eigExact_msgID = 'MATLAB:eigs:SingularA';
 
     % print some info about the calculation
     fprintf('Variational Stationary State Search\n');
@@ -66,12 +66,10 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
     if HERMITIAN
         fprintf('\tEffective Liouvillian: Hermitian Product\n\n');
         if ~PRIMME
-            warning('off', 'MATLAB:nearlySingularMatrix');
-            warning('off', 'MATLAB:eigs:SigmaNearExactEig');
+            warning('off', 'MATLAB:eigs:IllConditionedA');
             fprintf(['Please note that the following warnings have ' ...
                      'been switched off:\n\t' ...
-                     'MATLAB:nearlySingularMatrix\n\t' ...
-                     'MATLAB:eigs:SigmaNearExactEig\n\n']);
+                     'MATLAB:eigs:IllConditionedA\n\n']);
         end
         HERMITICITY_THRESHOLD = Inf;
         for site = 1 : 1 : LENGTH
