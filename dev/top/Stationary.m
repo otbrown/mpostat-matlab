@@ -128,7 +128,14 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
                 [update, eig] = EigenSolver(effL, HERMITIAN, PRIMME, ...
                                         siteVec, HERMITICITY_THRESHOLD);
             catch ME
-                if strcmp(ME.identifier, ARPACK_msgID)
+                if strcmp(ME.identifier, eigExact_msgID)
+                    % basically matlab has complained that it's already
+                    % found the eigenvalue, we'll choose to believe it
+                    % and set eig to 1 on the basis that this update will
+                    % be ignored -- the calculation will converge quickly
+                    eig = Inf;
+
+                elseif strcmp(ME.identifier, ARPACK_msgID)
                     if HERMITIAN
                         fprintf(['Unfortunately, the calculation has ' ...
                                  'failed while trying to find ' ...
@@ -149,14 +156,10 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
                                  'variant.\n']);
                         throw(ME);
                     end
-                elseif strcmp(ME.identifier, eigExact_msgID)
-                    % basically matlab has complained that it's already
-                    % found the eigenvalue, we'll choose to believe it
-                    % and set eig to 1 on the basis that this update will
-                    % be ignored -- the calculation will converge quickly
-                    eig = 1;
+
                 else
                     throw(ME);
+
                 end
             end
 
