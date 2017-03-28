@@ -38,9 +38,13 @@ function [effectiveLiouv] = EffLSparse(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SI
     siteMPO = permute(siteMPO, [5, 6, 1, 2, 3, 4]);
     rBlock = permute(rBlock, [2, 3, 1]);
 
-    lRow = 1;
-    lCol = 1;
-    lVal = 0;
+    numNZ = ceil(0.6 * ROW_SIZE * COL_SIZE * HILBY^4);
+    growNZ = ceil(0.1 * ROW_SIZE * COL_SIZE * HILBY^4);
+    lRow = ones(numNZ, 1);
+    lCol = ones(numNZ, 1);
+    lVal = zeros(numNZ, 1);
+    ldex = 0;
+
     for conjKet = 1 : 1 : HILBY
         for conjBra = 1 : 1 : HILBY
             for ket = 1 : 1 : HILBY
@@ -58,21 +62,30 @@ function [effectiveLiouv] = EffLSparse(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SI
                                 COL_SIZE + (conjBra - 1) * ROW_SIZE * ...
                                 COL_SIZE + (conjCol - 1) * COL_SIZE + ...
                                 (conjRow - 1);
+
                                 % put together a 2d slice
                                 chunk = lBlock(:, :, conjCol) ...
                                         * mpoSlice * rBlock(:, :, conjRow);
-
-                                % make sure the zeros are zero
-                                chunk(abs(chunk) < eps) = 0;
                                 chunk = reshape(transpose(chunk), ...
                                                 [1, ROW_SIZE*COL_SIZE]);
 
                                 [cRow, cCol, cVal] = find(chunk);
                                 cRow = cRow + chunkRow;
                                 cCol = cCol + chunkCol;
-                                lRow = [lRow, cRow];
-                                lCol = [lCol, cCol];
-                                lVal = [lVal, cVal];
+
+                                chunkSize = length(cVal);
+                                if (ldex + chunkSize) > numNZ
+                                    lRow = [lRow; ones(growNZ, 1)];
+                                    lCol = [lCol; ones(growNZ, 1)];
+                                    lVal = [lVal; zeros(growNZ, 1)];
+                                    numNZ = numNZ + growNZ;
+                                end
+
+                                lRow(ldex + 1 : ldex + chunkSize) = cRow;
+                                lCol(ldex + 1 : ldex + chunkSize) = cCol;
+                                lVal(ldex + 1 : ldex + chunkSize) = cVal;
+
+                                ldex = ldex + chunkSize;
                             end
                         end
                     end
