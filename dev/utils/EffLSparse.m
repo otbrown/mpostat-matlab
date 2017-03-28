@@ -38,8 +38,8 @@ function [effectiveLiouv] = EffLSparse(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SI
     siteMPO = permute(siteMPO, [5, 6, 1, 2, 3, 4]);
     rBlock = permute(rBlock, [2, 3, 1]);
 
-    numNZ = ceil(0.6 * ROW_SIZE * COL_SIZE * HILBY^4);
-    growNZ = ceil(0.1 * ROW_SIZE * COL_SIZE * HILBY^4);
+    numNZ = ceil(0.1 * LDIM^2);
+    growNZ = ceil(0.05 * LDIM^2);
     lRow = ones(numNZ, 1);
     lCol = ones(numNZ, 1);
     lVal = zeros(numNZ, 1);
@@ -69,6 +69,7 @@ function [effectiveLiouv] = EffLSparse(lBlock, siteMPO, rBlock, ROW_SIZE, COL_SI
                                 chunk = reshape(transpose(chunk), ...
                                                 [1, ROW_SIZE*COL_SIZE]);
 
+                                chunk(abs(chunk) < eps) = 0;
                                 [cRow, cCol, cVal] = find(chunk);
                                 cRow = cRow + chunkRow;
                                 cCol = cCol + chunkCol;
