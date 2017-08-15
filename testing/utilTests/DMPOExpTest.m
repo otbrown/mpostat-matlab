@@ -25,7 +25,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
             tc.STATE = tc.HILBY^tc.LENGTH - 1;
-            tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = ZDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             tc.prodDMPO = ProdDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS, tc.STATE);
             tc.idOp = repmat(eye(tc.HILBY), [1, 1, tc.LENGTH]);
         end

@@ -23,7 +23,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function MethodSetup(tc, testHILBY, testSystemSz)
             tc.HILBY = testHILBY;
             tc.systemSz = testSystemSz;
-            tc.dmpo = DMPO(testHILBY, testSystemSz, 0);
+            tc.dmpo = ZDMPO(testHILBY, testSystemSz, 0);
             tc.conjDMPO = DMPOConj(tc.dmpo);
         end
     end

@@ -18,10 +18,10 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
     methods (TestMethodSetup)
         function MethodSetup(tc)
-            tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = ZDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             tc.sumDMPO = DMPOSum(tc.dmpo, tc.dmpo);
-            tc.badHilbyDMPO = DMPO(tc.HILBY - 1, tc.LENGTH, tc.COMPRESS);
-            tc.badLengthDMPO = DMPO(tc.HILBY, tc.LENGTH - 1, tc.COMPRESS);
+            tc.badHilbyDMPO = ZDMPO(tc.HILBY - 1, tc.LENGTH, tc.COMPRESS);
+            tc.badLengthDMPO = ZDMPO(tc.HILBY, tc.LENGTH - 1, tc.COMPRESS);
         end
     end
 

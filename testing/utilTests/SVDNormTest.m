@@ -15,7 +15,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
     methods (TestMethodSetup)
         function MethodSetup(tc)
-            tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = ZDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             tc.svdDMPO = SVDNorm(tc.dmpo);
         end
     end
