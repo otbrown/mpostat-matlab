@@ -16,7 +16,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
     methods (TestMethodSetup)
         function MethodSetup(tc)
             TARGET = ceil(tc.LENGTH / 2);
-            dmpo = MixDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            dmpo = DDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             impo = cell(tc.LENGTH, 1);
             for site = 1 : 1 : tc.LENGTH
                 impo{site} = reshape(eye(tc.HILBY^2), ...

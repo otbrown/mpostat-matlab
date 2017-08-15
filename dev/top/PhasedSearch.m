@@ -38,7 +38,7 @@ function [dmpoStat, phaseTrack] = PhasedSearch(HILBY, LENGTH, mpo, ULTIMATE_THRE
     eigTrack = NaN;
     ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
 
-    dmpoStat = MixDMPO(HILBY, LENGTH, compress);
+    dmpoStat = DDMPO(HILBY, LENGTH, compress);
 
     while phaseEig > ULTIMATE_THRESHOLD
         fprintf('PHASE %g:\n[ THRESHOLD: %g, COMPRESS: %g]\n', ...

@@ -1,4 +1,4 @@
-% DMPOReseizeTest.m
+% DMPOResizeTest.m
 % Oliver Thomson Brown
 % 2016-11-17
 
@@ -18,8 +18,8 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
 
     methods (TestClassSetup)
         function ClassSetup(tc)
-            tc.xdmpo = MixDMPO(tc.HILBY, tc.LENGTH, 0);
-            tc.cdmpo = MixDMPO(tc.HILBY, tc.LENGTH, tc.OLD_COMPRESS);
+            tc.xdmpo = DDMPO(tc.HILBY, tc.LENGTH, 0);
+            tc.cdmpo = DDMPO(tc.HILBY, tc.LENGTH, tc.OLD_COMPRESS);
             tc.ENLARGE = tc.OLD_COMPRESS + 20;
             tc.elDMPO = DMPOResize(tc.cdmpo, tc.ENLARGE);
             tc.compDMPO = DMPOResize(tc.xdmpo, tc.OLD_COMPRESS);
