@@ -6,9 +6,9 @@
 % Oliver Thomson Brown
 % 2016-10-03
 %
-% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN = true,
+% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, PRIMME, initVec)
+% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, PRIMME, initVec,
 %                                       HERMITICITY_THRESHOLD)
-% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN = false, initVec)
 %
 % RETURN
 % eigVector:    (complex) double, the desired eigenvector of the effective
