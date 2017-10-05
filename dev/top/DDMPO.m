@@ -1,12 +1,11 @@
-% MixDMPO.m
-% (Mix)ed (D)ensity (M)atrix (P)roduct (O)perator
+% DDMPO.m
 % forms a matrix product density operator with every tensor as a
 % single element identity (a one in the top left), which is then
-% trace-normed represents an even mix of every possible state
+% trace-normed
 % Oliver Thomson Brown
 % 2016-03-14
 %
-% [ dmpo ] = MixDMPO(HILBY, LENGTH, COMPRESS)
+% [ dmpo ] = DDMPO(HILBY, LENGTH, COMPRESS)
 %
 % RETURN
 % dmpo      : cell, a density matrix product operator
@@ -16,12 +15,12 @@
 % LENGTH	: integer, the number of sites in the system
 % COMPRESS	: integer, the maximum virtual dimension of any given tensor
 
-function [dmpo] = MixDMPO(HILBY, LENGTH, COMPRESS)
+function [dmpo] = DDMPO(HILBY, LENGTH, COMPRESS)
     % COMPRESS == 0 means no compression
     if COMPRESS == 0
         COMPRESS = Inf;
     elseif COMPRESS < HILBY^2
-		msgID = 'MixDMPO:BadCOMPRESS';
+		msgID = 'DDMPO:BadCOMPRESS';
 		msg = sprintf(['Minimum matrix dimension is %d. Supplied ', ...
                         'COMPRESS value was %d.'], HILBY^2, COMPRESS);
 		badCOMPRESSException = MException(msgID, msg);

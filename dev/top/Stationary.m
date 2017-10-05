@@ -3,7 +3,6 @@
 % Oliver Thomson Brown
 % 2016-05-06
 %
-% [ dmpoStat, eigTrack ] = Stationary(dmpoInit, mpo, THRESHOLD)
 % [ dmpoStat, eigTrack ] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
 %
 % RETURN

@@ -1,8 +1,8 @@
-% MixDMPOTest.m
+% DDMPOTest.m
 % Oliver Thomson Brown
 % 2016-03-14
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) MixDMPOTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) DDMPOTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-15;
@@ -22,7 +22,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function MethodSetup(tc, testHILBY, testLENGTH)
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
-            tc.dmpo = MixDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = DDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
         end
     end
 
@@ -35,7 +35,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             % have to anonymise function to ensure that error is caught
             % by fatal assert
             BAD_COMPRESS = tc.HILBY^2 - 1;
-            tc.fatalAssertError(@()MixDMPO(tc.HILBY, tc.LENGTH, BAD_COMPRESS), 'MixDMPO:BadCOMPRESS');
+            tc.fatalAssertError(@()DDMPO(tc.HILBY, tc.LENGTH, BAD_COMPRESS), 'DDMPO:BadCOMPRESS');
         end
 
         function testSystemSize(tc)

@@ -1,8 +1,8 @@
-% DMPOTest.m
+% ZDMPOTest.m
 % Oliver Thomson Brown
 % 2016-03-10
 
-classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) DMPOTest < matlab.unittest.TestCase
+classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 'IncludingSubfolders', true)}) ZDMPOTest < matlab.unittest.TestCase
 
     properties
         absTol = 1E-14;
@@ -21,7 +21,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function MethodSetup(tc, testHILBY, testLENGTH)
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
-            tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = ZDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
         end
     end
 
@@ -34,7 +34,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             % have to anonymise function to ensure that error is caught
             % by fatal assert
             BAD_COMPRESS = tc.HILBY^2 - 1;
-            tc.fatalAssertError(@()DMPO(tc.HILBY, tc.LENGTH, BAD_COMPRESS), 'DMPO:BadCOMPRESS');
+            tc.fatalAssertError(@()ZDMPO(tc.HILBY, tc.LENGTH, BAD_COMPRESS), 'ZDMPO:BadCOMPRESS');
         end
 
         function testSystemSize(tc)

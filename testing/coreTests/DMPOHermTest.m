@@ -25,7 +25,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
             % build a DMPO
-            tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = ZDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             % (hopefully) make it Hermitian
             tc.hDMPO = DMPOHerm(tc.dmpo);
         end

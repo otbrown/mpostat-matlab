@@ -26,7 +26,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             tc.LENGTH = testLENGTH;
             tc.COMPRESS = testCOMPRESS;
             tc.NEW_COMPRESS = testCOMPRESS + 10;
-            tc.dmpo = MixDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = DDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             tc.bdmpo = DMPOEnlarge(tc.dmpo, tc.NEW_COMPRESS, ...
                                     tc.HILBY, tc.LENGTH);
         end

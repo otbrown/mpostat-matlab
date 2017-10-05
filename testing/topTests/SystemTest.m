@@ -31,7 +31,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 tc.absTol = 1E-14;
             end
 
-            tc.dmpoInit = MixDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpoInit = DDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
         end
     end
 

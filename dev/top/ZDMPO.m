@@ -1,26 +1,26 @@
-% DMPO.m
+% ZDMPO.m
 % function which generates an arbitrary complex valued density matrix
 % product operator, which is trace-normed
 % Oliver Thomson Brown
 % 2016-02-05
 %
-% [ dmpo ] = DMPO(HILBY, LENGTH, COMPRESS)
+% [ dmpo ] = ZDMPO(HILBY, LENGTH, COMPRESS)
 %
 % RETURN
-% dmpo:	cell, an arbitrary density matrix product operator
+% dmpo:	cell, an arbitrary complex density matrix product operator
 %
 % INPUT
 % HILBY:	integer, size of the local state space
 % LENGTH:	integer, the number of sites in the system
 % COMPRESS:	integer, the maximum virtual dimension of any given tensor
 
-function [dmpo] = DMPO(HILBY, LENGTH, COMPRESS)
+function [dmpo] = ZDMPO(HILBY, LENGTH, COMPRESS)
 
 	% COMPRESS == 0 means no compression
 	if COMPRESS == 0
 		COMPRESS = Inf;
 	elseif COMPRESS < HILBY^2
-		msgID = 'DMPO:BadCOMPRESS';
+		msgID = 'ZDMPO:BadCOMPRESS';
 		msg = sprintf(['Minimum matrix dimension is %d. Supplied ', ...
 						'COMPRESS value was %d.'], HILBY^2, COMPRESS);
 		badCOMPRESSException = MException(msgID, msg);
