@@ -24,7 +24,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
             % form a DMPO
-            tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = ZDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             % mess it up
             tc.dmpo = DMPOScalarDiv(tc.dmpo, 0.1);
             % trace norm it

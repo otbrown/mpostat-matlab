@@ -3,7 +3,6 @@
 % Oliver Thomson Brown
 % 2016-05-06
 %
-% [ dmpoStat, eigTrack ] = Stationary(dmpoInit, mpo, THRESHOLD)
 % [ dmpoStat, eigTrack ] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
 %
 % RETURN
@@ -20,20 +19,26 @@
 % THRESHOLD:    double, how close must L*rho be to zero for the
 %               calculation to be deemed successful
 % variant:      string, specify whether to solve the non-Hermitian
-%               Liovillian, or the Hermitian product L^(T*)L --
-%               'hermitian' and 'direct' are the two accepted values
+%               Liouvillian, or the Hermitian product L^(T*)L --
+%               'hermitian', 'primme', and 'direct' are the accepted values
 
 function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
 
-    if strcmpi(variant, 'hermitian')
-        HERMITIAN = true;
-    elseif strcmpi(variant, 'direct')
-        HERMITIAN = false;
-    else
-        ME = MException('Stationary:badHERMITIAN', ['The last ',...
-        'argument was invalid: %s. Type help Stationary.'], ...
-        variant);
-        throw(ME);
+    switch lower(variant)
+        case 'hermitian'
+            HERMITIAN = true;
+            PRIMME = false;
+        case 'primme'
+            HERMITIAN = true;
+            PRIMME = true;
+        case 'direct'
+            HERMITIAN = false;
+            PRIMME = false;
+        otherwise
+            ME = MException('Stationary:badHERMITIAN', ['The last ',...
+            'argument was invalid: %s. Type help Stationary.'], ...
+            variant);
+            throw(ME);
     end
 
     % gather up physical system parameters
@@ -46,6 +51,8 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
     % set internal calculation parameters
     RUNMAX = 50*LENGTH;
     CONVERGENCE_THRESHOLD = THRESHOLD / (2 * LENGTH);
+    ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
+    eigExact_msgID = 'MATLAB:eigs:SingularA';
 
     % print some info about the calculation
     fprintf('Variational Stationary State Search\n');
@@ -57,6 +64,12 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
             'Liouvillian size: %g\n'], THRESHOLD, MAX_DIM, MAX_LDIM);
     if HERMITIAN
         fprintf('\tEffective Liouvillian: Hermitian Product\n\n');
+        if ~PRIMME
+            warning('off', 'MATLAB:eigs:IllConditionedA');
+            fprintf(['Please note that the following warnings have ' ...
+                     'been switched off:\n\t' ...
+                     'MATLAB:eigs:IllConditionedA\n\n']);
+        end
         HERMITICITY_THRESHOLD = Inf;
         for site = 1 : 1 : LENGTH
             siteMPO = abs(mpo{site});
@@ -67,7 +80,7 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
         HERMITICITY_THRESHOLD = HERMITICITY_THRESHOLD / 10;
     else
         fprintf('\tEffective Liouvillian: Non-Hermitian\n\n');
-        ARPACK_msgID = 'MATLAB:eigs:ARPACKroutineErrorMinus14';
+        HERMITICITY_THRESHOLD = 0;
     end
 
     % allocate return variables
@@ -90,53 +103,80 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
     % initialise flags and counters
     convFlag = false;
     finished = false;
-    sweepCount = 0;
+    sweepCount = 1;
     updCount = 0;
     route = 1 : 1 : LENGTH;
     direction = 'L';
+    siteEigs = Inf(LENGTH, 1);
 
     while ~convFlag && updCount < RUNMAX
+        fprintf('Sweep %g:\n', sweepCount);
         for sitedex = 1 : 1 : (LENGTH - 1)
             site = route(sitedex);
 
             fprintf('|%g| ', site);
 
-            [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
-            effL = EffL(site, dmpoStat, mpo, left, right);
+            % check site's current eigenvalue, if it is already below
+            % THRESHOLD, don't even form effL
+            if siteEigs(site) > THRESHOLD
 
-            % we can supply an initial guess to EigenSolver, so we use
-            % the current site tensor, to aid convergence
-            siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
-            siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
+                [ROW_SIZE, COL_SIZE, ~, ~] = size(dmpoStat{site});
+                effL = EffL(site, dmpoStat, mpo, left, right);
 
-            if HERMITIAN
-                [update, eig] = EigenSolver(effL, HERMITIAN, siteVec, ...
-                                            HERMITICITY_THRESHOLD);
-            else
+                % the current site tensor will be used as an initial guess
+                % for the eigenvector
+                siteVec = permute(dmpoStat{site}, [2, 1, 3, 4]);
+                siteVec = reshape(siteVec, [ROW_SIZE*COL_SIZE*HILBY^2, 1]);
+
                 try
-                    [update, eig] = EigenSolver(effL, HERMITIAN, siteVec);
+                    [update, eig] = EigenSolver(effL, HERMITIAN, ...
+                                                PRIMME, siteVec, ...
+                                                HERMITICITY_THRESHOLD);
                 catch ME
-                    if strcmp(ME.identifier, ARPACK_msgID)
-                        fname = sprintf('mpostat%uX%u_failed.mat', ...
-                                        LENGTH, HILBY);
-                        save(fname);
-                        fprintf(['Unfortunately, the calculation has ' ...
-                                'failed while trying to find  ' ...
-                                'eigenvalues.\nPartial result saved in %s\nConsider using larger matrix ' ...
-                                'dimensions or the Hermitian ' ...
-                                'variant.\n'], fname);
-                        throw(ME);
+                    if strcmp(ME.identifier, eigExact_msgID)
+                        % basically matlab has complained that it's already
+                        % found the eigenvalue, we'll choose to believe it
+                        % and set eig to 1 on the basis that this update
+                        % will be ignored -- the calculation will converge
+                        % quickly
+                        eig = Inf;
+
+                    elseif strcmp(ME.identifier, ARPACK_msgID)
+                        if HERMITIAN
+                            fprintf(['Unfortunately, the calculation ', ...
+                                     'has failed while trying to ', ...
+                                     'find eigenvalues. Will try ', ...
+                                     'again using the Primme ', ...
+                                     'eigensolver.\n']);
+                            [update, eig] = EigenSolver(effL, ...
+                                                    HERMITIAN, true, ...
+                                                    HERMITICITY_THRESHOLD);
+                        else
+                            fname = sprintf('mpostat_%gx%g_fail.mat', ...
+                                            LENGTH, HILBY);
+                            save(fname);
+                            fprintf(['Unfortunately, the calculation ', ...
+                                     'has failed while trying to find ',...
+                                     'eigenvalues. Partial results ', ...
+                                     'saved in %s.\nConsider using ', ...
+                                     'larger matrix dimensions, or ', ...
+                                     'the hermitian variant.\n']);
+                            throw(ME);
+                        end
+
                     else
                         throw(ME);
+
                     end
                 end
-            end
 
-            if ~(abs(eig) > abs(eigTrack(end)))
-                eigTrack(end) = eig;
-                update = reshape(update, ...
+                if ~(abs(eig) > abs(eigTrack(end)))
+                    eigTrack(end) = eig;
+                    siteEigs(site) = abs(eig);
+                    update = reshape(update, ...
                                     [COL_SIZE, ROW_SIZE, HILBY, HILBY]);
-                dmpoStat{site} = permute(update, [2, 1, 3, 4]);
+                    dmpoStat{site} = permute(update, [2, 1, 3, 4]);
+                end
             end
 
             % canonicalise & include new site in block tensor
@@ -183,9 +223,9 @@ function [dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant)
                     convergence);
         else
             % add to sweepCount and report on progress
+            fprintf('[ Eigenvalue: %g, Convergence: %g ]\n\n', ...
+                    eigTrack(end), convergence);
             sweepCount = sweepCount + 1;
-            fprintf('Sweep %g:\n[ Eigenvalue: %g, Convergence: %g ]\n', ...
-                    sweepCount, eigTrack(end), convergence);
         end
 
         % flip it and reverse it

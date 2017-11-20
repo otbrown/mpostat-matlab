@@ -6,9 +6,9 @@
 % Oliver Thomson Brown
 % 2016-10-03
 %
-% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN = true,
+% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, PRIMME, initVec)
+% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, PRIMME, initVec,
 %                                       HERMITICITY_THRESHOLD)
-% [eigVector, eigValue] = EigenSolver(effL, HERMITIAN = false, initVec)
 %
 % RETURN
 % eigVector:    (complex) double, the desired eigenvector of the effective
@@ -18,28 +18,30 @@
 % INPUT
 % effL:                     (complex) double, effective Liouvillian for
 %                           some site in the system
-% HERMITIAN:                bool, true if effL is hermitian, in which case
-%                           PRIMME will be used instead of eigs, as ARPACK
-%                           struggles with smallest magnitude eigenvalues
+% HERMITIAN:                bool, true if effL is hermitian
+% PRIMME:                   bool, true if PRIMME eigensolver should be used
+%                           instead of eigs, which can struggle with
+%                           finding the smallest magnitude eigenvalue
+% initVec:                  (complex) double, initial guess for the
+%                           eigenvector -- only used with eigs PRIMME's
+%                           Matlab interface does not currently support
+%                           this
 % HERMITICITY_THRESHOLD:    (complex) double, OPTIONAL, should ONLY be
 %                           supplied if HERMITIAN = true, threshold at
 %                           which function will reject mpo as probably not
 %                           actually Hermitian -- in Stationary this is
 %                           set at 0.1 * the smallest value in the mpo
-% initVec:                  (complex) double, OPTIONAL, initial guess for
-%                           the eigenvector -- only used in the
-%                           non-hermitian case PRIMME's Matlab interface
-%                           does not currently support this
 
-function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, initVec, varargin)
-    narginchk(3, 4);
+function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, PRIMME, initVec, varargin)
+    narginchk(4, 5);
 
     if HERMITIAN
         % solve hermitian product of L
-        if nargin == 4
+        if nargin == 5
             % if HERMITICITY_THRESHOLD is supplied check difference
             % between L and L'
             epsilon = full(max(max(abs(effL - ctranspose(effL)))));
+
             if epsilon > varargin{1}
                 ME = MException('EigenSolver:badHermiticity',  ...
                 ['The error in L'' - L was large. Supplied MPO', ...
@@ -51,12 +53,22 @@ function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, initVec, varargin)
         % clean effL as primme has no tolerance for non-hermitian input
         effL = (effL + ctranspose(effL))/2;
 
-        opts = struct('eps', 1E-14, 'v0', {initVec});
+        if PRIMME
+            opts = struct('eps', 1E-14, 'numTargetShifts', {1}, ...
+                    'targetShifts', {0}, 'initialevecs', {initVec});
 
-        [eigVector, eigValue] = primme_eigs(effL, 1, 'SM', opts);
+            fprintf('\n');
+            [eigVector, eigValue] = primme_eigs(effL, 1, 'CT', opts);
+            fprintf('\n');
+        else
+            opts = struct('maxit', 500, 'v0', initVec);
+
+            [eigVector, eigValue] = eigs(effL, 1, 'sm', opts);
+        end
     else
         % solve L directly
         opts = struct('maxit', 500, 'v0', initVec);
+
         [eigVector, eigValue] = eigs(effL, 1, 'lr', opts);
     end
 end

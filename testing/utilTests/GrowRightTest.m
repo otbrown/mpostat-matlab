@@ -27,7 +27,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function MethodSetup(tc, testHILBY, testLENGTH)
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
-            tc.dmpo = MixDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = DDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             tc.dmpo = Can(tc.dmpo, [tc.LENGTH : -1 : 2], 'R');
             tc.rhoVec = ones(tc.HILBY^(2*tc.LENGTH), 1) / (tc.HILBY^tc.LENGTH);
             tc.iRight = cell(tc.LENGTH, 1);

@@ -23,7 +23,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
         function MethodSetup(tc, testHILBY, testLENGTH)
             tc.HILBY = testHILBY;
             tc.LENGTH = testLENGTH;
-            tc.dmpo = DMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
+            tc.dmpo = ZDMPO(tc.HILBY, tc.LENGTH, tc.COMPRESS);
             tc.canDMPO = tc.dmpo;
             for site = tc.LENGTH : -1 : 2
                 siteTensor = tc.canDMPO{site};

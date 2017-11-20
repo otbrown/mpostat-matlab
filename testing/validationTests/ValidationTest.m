@@ -19,7 +19,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
     end
 
     properties (ClassSetupParameter)
-        testVariant = {'direct', 'hermitian'};
+        testVariant = {'direct', 'hermitian', 'primme'};
     end
 
     methods (TestClassSetup)
@@ -42,7 +42,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             fname = 'data/FourSiteExact.mat';
 
             % inputs
-            dmpoInit = MixDMPO(HILBY, LENGTH, tc.COMPRESS);
+            dmpoInit = DDMPO(HILBY, LENGTH, tc.COMPRESS);
 
             % local operators
             I = eye(HILBY);
@@ -101,7 +101,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 mpo{site} = lmpo;
             end
 
-            if strcmpi(tc.variant, 'hermitian')
+            if strcmpi(tc.variant, 'hermitian') || strcmpi(tc.variant, 'primme')
                 mpo = MPOHermProd(mpo);
             end
 
@@ -180,7 +180,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
             fname = 'data/MFS15_FiveSite.mat';
 
             % inputs
-            dmpoInit = MixDMPO(HILBY, LENGTH, tc.COMPRESS);
+            dmpoInit = DDMPO(HILBY, LENGTH, tc.COMPRESS);
 
             % local operators
             I = eye(HILBY);
@@ -230,7 +230,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 mpo{site} = lmpo;
             end
 
-            if strcmpi(tc.variant, 'hermitian')
+            if strcmpi(tc.variant, 'hermitian') || strcmpi(tc.variant, 'primme')
                 mpo = MPOHermProd(mpo);
             end
 
@@ -336,7 +336,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 mpo{site} = lmpo;
             end
 
-            if strcmpi(tc.variant, 'hermitian')
+            if strcmpi(tc.variant, 'hermitian') || strcmpi(tc.variant, 'primme')
                 mpo = MPOHermProd(mpo);
             end
 
@@ -462,7 +462,7 @@ classdef (SharedTestFixtures={matlab.unittest.fixtures.PathFixture('../../dev', 
                 mpo{site} = lmpo;
             end
 
-            if strcmpi(tc.variant, 'hermitian')
+            if strcmpi(tc.variant, 'hermitian') || strcmpi(tc.variant, 'primme')
                 mpo = MPOHermProd(mpo);
             end
 

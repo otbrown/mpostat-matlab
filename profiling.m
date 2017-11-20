@@ -16,22 +16,20 @@ if ~exist(resultDir, 'dir')
 end
 
 % set up system to be solved
-HILBY = 3;
-LENGTH = 4;
-COMPRESS = 75;
-THRESHOLD = 1E-5;
-variant = 'direct';
+COMPRESS = 81;
+THRESHOLD = 1E-7;
+variant = 'hermitian';
 
 dateStamp = datestr(datetime('now'), 30);
 savePath = sprintf('%s/%s_%sPROFILE.mat', resultDir, dateStamp, variant);
 
-dmpoInit = MixDMPO(HILBY, LENGTH, COMPRESS);
-
-% build Liouvillian mpo
-% parameters
+% system parameters
+HILBY = 3;
+LENGTH = 4;
+hop = 0.5;
+las02Intensity = 8;
 detuning01 = 0;
 detuning02 = 0;
-hop = 0.5;
 diss21 = 1;
 diss10 = 0.1;
 
@@ -46,7 +44,9 @@ a21 = [0, 0, 0; 0, 0, sqrt(2); 0, 0, 0];
 
 % mpo building blocks
 ident = kron(I, I);
-Hloc = [0, 0, 0; 0, detuning01, 0; 0, 0, detuning02];
+Hloc = [0, 0, conj(las02Intensity) / sqrt(2); ...
+        0, detuning01, 0; ...
+        las02Intensity / sqrt(2), 0, detuning02];
 dissipator = 0.5 * diss10 * (kron(2 * conj(a10), a10) ...
              - kron(I, ctranspose(a10) * a10) ...
              - kron(transpose(a10) * conj(a10), I)) ...
@@ -90,20 +90,16 @@ for site = 2 : 1 : (LENGTH - 1)
     mpo{site} = lmpo;
 end
 
+if strcmpi(variant, 'hermitian') || strcmpi(variant, 'primme')
+    mpo = MPOHermProd(mpo);
+end
+
 profile on;
 
 % solve using Stationary
-[dmpoStat, eigTrack] = Stationary(dmpoInit, mpo, THRESHOLD, variant);
+[dmpoStat, eigTrack] = PhasedSearch(HILBY, LENGTH, mpo, ...
+                                    THRESHOLD, COMPRESS, variant);
 
 profinfo = profile('info');
-
-% a couple of basic checks that the solution is correct
-% this system should end up in the all zero state, so we'll check trace and
-% the first element of the density matrix
-tr = DMPOTrace(dmpoStat);
-rho0 = 1;
-for site = 1 : 1 : LENGTH
-    rho0 = rho0 * dmpoStat{site}(:, :, 1, 1);
-end
 
 save(savePath);
