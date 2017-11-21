@@ -54,12 +54,9 @@ function [eigVector, eigValue] = EigenSolver(effL, HERMITIAN, PRIMME, initVec, v
         effL = (effL + ctranspose(effL))/2;
 
         if PRIMME
-            opts = struct('eps', 1E-14, 'numTargetShifts', {1}, ...
-                    'targetShifts', {0}, 'initialevecs', {initVec});
+            opts = struct('tol', 1E-14, 'targetShifts', 0, 'v0', initVec);
 
-            fprintf('\n');
-            [eigVector, eigValue] = primme_eigs(effL, 1, 'CT', opts);
-            fprintf('\n');
+            [eigVector, eigValue] = primme_eigs(effL, 1, 'CGT', opts);
         else
             opts = struct('maxit', 500, 'v0', initVec);
 
